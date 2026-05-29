@@ -389,67 +389,67 @@ const Header = () => {
         <div className="flex items-center gap-1.5 md:gap-3.5 overflow-x-auto scrollbar-none pb-0.5 pt-0.5 flex-1">
           
           {/* Hamburger All departments */}
-          <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-sm border border-transparent hover:border-white/30 cursor-pointer shrink-0 transition-all duration-150">
+          <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-sm cursor-pointer shrink-0 hover:bg-white/5 transition-all duration-150">
             <Menu className="h-4.5 w-4.5" />
             <span>All</span>
           </div>
 
           <span 
             onClick={() => navigate('/?tab=deals')} 
-            className={`px-2 py-1.5 rounded-sm border transition-all duration-150 cursor-pointer shrink-0 ${
+            className={`px-2 py-1.5 rounded-sm transition-all duration-150 cursor-pointer shrink-0 ${
               isDealsActive 
-                ? "border-white/60 text-[#febd69] bg-white/5" 
-                : "border-transparent text-white hover:border-white/30"
+                ? "text-[#febd69] bg-white/10" 
+                : "text-white hover:text-[#febd69] hover:bg-white/5"
             }`}
           >
             Today's Deals
           </span>
           <span 
             onClick={() => navigate('/labour')} 
-            className={`px-2 py-1.5 rounded-sm border flex items-center gap-1 transition-all duration-150 cursor-pointer shrink-0 ${
+            className={`px-2 py-1.5 rounded-sm flex items-center gap-1 transition-all duration-150 cursor-pointer shrink-0 ${
               isLabourActive 
-                ? "border-white/60 text-[#febd69] bg-white/5" 
-                : "border-transparent text-[#febd69] hover:text-white hover:border-white/30"
+                ? "text-[#febd69] bg-white/10" 
+                : "text-[#febd69] hover:text-white hover:bg-white/5"
             }`}
           >
             <HardHat className="h-3.5 w-3.5" /> Labour Services
           </span>
           <span 
             onClick={() => navigate('/wholesale')} 
-            className={`px-2 py-1.5 rounded-sm border transition-all duration-150 cursor-pointer shrink-0 ${
+            className={`px-2 py-1.5 rounded-sm transition-all duration-150 cursor-pointer shrink-0 ${
               isWholesaleActive 
-                ? "border-white/60 text-[#febd69] bg-white/5" 
-                : "border-transparent text-white hover:border-white/30"
+                ? "text-[#febd69] bg-white/10" 
+                : "text-white hover:text-[#febd69] hover:bg-white/5"
             }`}
           >
             Wholesale Store
           </span>
           <span 
             onClick={() => navigate('/?tab=bestsellers')} 
-            className={`px-2 py-1.5 rounded-sm border transition-all duration-150 cursor-pointer shrink-0 ${
+            className={`px-2 py-1.5 rounded-sm transition-all duration-150 cursor-pointer shrink-0 ${
               isBestSellersActive 
-                ? "border-white/60 text-[#febd69] bg-white/5" 
-                : "border-transparent text-white hover:border-white/30"
+                ? "text-[#febd69] bg-white/10" 
+                : "text-white hover:text-[#febd69] hover:bg-white/5"
             }`}
           >
             Best Sellers
           </span>
           <span 
             onClick={() => navigate('/?tab=newreleases')} 
-            className={`px-2 py-1.5 rounded-sm border transition-all duration-150 cursor-pointer shrink-0 ${
+            className={`px-2 py-1.5 rounded-sm transition-all duration-150 cursor-pointer shrink-0 ${
               isNewReleasesActive 
-                ? "border-white/60 text-[#febd69] bg-white/5" 
-                : "border-transparent text-white hover:border-white/30"
+                ? "text-[#febd69] bg-white/10" 
+                : "text-white hover:text-[#febd69] hover:bg-white/5"
             }`}
           >
             New Releases
           </span>
           <span 
             onClick={() => navigate('/?tab=customerservice')} 
-            className={`px-2 py-1.5 rounded-sm border transition-all duration-150 cursor-pointer shrink-0 ${
+            className={`px-2 py-1.5 rounded-sm transition-all duration-150 cursor-pointer shrink-0 ${
               isCustomerServiceActive 
-                ? "border-white/60 text-[#febd69] bg-white/5" 
-                : "border-transparent text-white hover:border-white/30"
+                ? "text-[#febd69] bg-white/10" 
+                : "text-white hover:text-[#febd69] hover:bg-white/5"
             }`}
           >
             Customer Service
