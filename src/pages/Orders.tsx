@@ -177,11 +177,11 @@ const Orders = () => {
                     <div key={item.id} className="flex items-center gap-4">
                       <div className="w-16 h-16 bg-muted rounded-lg flex items-center justify-center overflow-hidden">
                         <img
-                          src={item.item.images[0] || '/placeholder.svg'}
+                          src={item.item.images[0] || 'https://images.unsplash.com/photo-1608613304899-ea8098577e38?auto=format&fit=crop&w=400&q=80'}
                           alt={item.item.title}
                           className="w-full h-full object-cover"
                           onError={(e) => {
-                            e.currentTarget.src = '/placeholder.svg'
+                            e.currentTarget.src = 'https://images.unsplash.com/photo-1608613304899-ea8098577e38?auto=format&fit=crop&w=400&q=80'
                           }}
                         />
                       </div>

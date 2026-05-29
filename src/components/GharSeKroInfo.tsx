@@ -36,10 +36,10 @@ export const GharSeKroInfo = () => {
               
               <div className="space-y-3">
                 <h3 className="text-3xl font-extrabold text-red-950 leading-tight">
-                  India's Construction Sector Is Broken
+                  India's Hardware & Building Supply Sector Is Broken
                 </h3>
                 <p className="text-red-800/80 text-base font-medium">
-                  Over <span className="font-bold text-red-900">₹12 lakh crore</span> invested annually — yet the market remains deeply fragmented and inefficient.
+                  Over <span className="font-bold text-red-900">₹12 lakh crore</span> spent annually on hardware and materials — yet procurement remains deeply fragmented.
                 </p>
               </div>
 
@@ -49,28 +49,28 @@ export const GharSeKroInfo = () => {
                     <span className="w-1.5 h-1.5 bg-red-600 rounded-full" />
                     No Price Transparency
                   </h4>
-                  <p className="text-sm text-red-800/70">Rates vary wildly between vendors with no benchmarking.</p>
+                  <p className="text-sm text-red-800/70">Tool, sanitary, and structural rates vary wildly between local vendors with no benchmarking.</p>
                 </div>
                 <div className="space-y-2">
                   <h4 className="font-bold text-red-950 flex items-center gap-2">
                     <span className="w-1.5 h-1.5 bg-red-600 rounded-full" />
-                    Unreliable Delivery
+                    Unreliable Logistics
                   </h4>
-                  <p className="text-sm text-red-800/70">Delayed materials stall projects and inflate overall construction costs.</p>
+                  <p className="text-sm text-red-800/70">Delayed fittings, fasteners, or cement bags stall sites and inflate construction budgets.</p>
                 </div>
                 <div className="space-y-2">
                   <h4 className="font-bold text-red-950 flex items-center gap-2">
                     <span className="w-1.5 h-1.5 bg-red-600 rounded-full" />
-                    Zero Vendor Trust
+                    Zero Quality Trust
                   </h4>
-                  <p className="text-sm text-red-800/70">No verification, background checks, or accountability in the supply chain.</p>
+                  <p className="text-sm text-red-800/70">No standard quality checks or background accountability for wholesale hardware materials.</p>
                 </div>
                 <div className="space-y-2">
                   <h4 className="font-bold text-red-950 flex items-center gap-2">
                     <span className="w-1.5 h-1.5 bg-red-600 rounded-full" />
-                    Fully Unorganised
+                    Fully Offline Stores
                   </h4>
-                  <p className="text-sm text-red-800/70">90% of suppliers operate entirely offline with no digital records or tracking.</p>
+                  <p className="text-sm text-red-800/70">90% of local hardware stores operate entirely offline with no digital stock status or itemized tracking.</p>
                 </div>
               </div>
             </div>
@@ -88,10 +88,10 @@ export const GharSeKroInfo = () => {
               
               <div className="space-y-3">
                 <h3 className="text-3xl font-extrabold leading-tight">
-                  One Platform. Everything You Need to Build.
+                  One Unified Store. All Your Hardware & Material Needs.
                 </h3>
                 <p className="text-amber-100 text-base font-medium">
-                  Ghar Se Karo is a <span className="font-bold text-white">full-stack construction marketplace</span> — connecting buyers with verified vendors, skilled labour, and reliable logistics in a single seamless experience.
+                  Ghar Se Karo is a <span className="font-bold text-white">full-stack hardware & tool e-commerce marketplace</span> — connecting buyers directly with verified manufacturers, suppliers, and fast logistics.
                 </p>
               </div>
 
@@ -101,8 +101,8 @@ export const GharSeKroInfo = () => {
                     <ShieldCheck className="w-5 h-5 text-white" />
                   </div>
                   <div>
-                    <h4 className="font-bold text-white">Verified Vendors</h4>
-                    <p className="text-xs text-amber-100/90 mt-0.5">Every supplier is thoroughly vetted for quality, authenticity, and reliability.</p>
+                    <h4 className="font-bold text-white">Verified Local Dealers</h4>
+                    <p className="text-xs text-amber-100/90 mt-0.5">Every vendor is vetted for brand-authentic tools, accessories, and certified building materials.</p>
                   </div>
                 </div>
 
@@ -111,8 +111,8 @@ export const GharSeKroInfo = () => {
                     <DollarSign className="w-5 h-5 text-white" />
                   </div>
                   <div>
-                    <h4 className="font-bold text-white">Transparent Pricing</h4>
-                    <p className="text-xs text-amber-100/90 mt-0.5">Get real-time rates directly from wholesalers and local vendors with zero hidden charges.</p>
+                    <h4 className="font-bold text-white">Transparent Wholesale Pricing</h4>
+                    <p className="text-xs text-amber-100/90 mt-0.5">Get volume-based direct wholesale and retail pricing with automated quote calculations.</p>
                   </div>
                 </div>
 
@@ -121,8 +121,8 @@ export const GharSeKroInfo = () => {
                     <Truck className="w-5 h-5 text-white" />
                   </div>
                   <div>
-                    <h4 className="font-bold text-white">End-to-End Delivery</h4>
-                    <p className="text-xs text-amber-100/90 mt-0.5">Tracked, safe, and lightning-fast logistics layer sending materials directly from warehouse to site.</p>
+                    <h4 className="font-bold text-white">Instant Site Delivery</h4>
+                    <p className="text-xs text-amber-100/90 mt-0.5">Tracked on-time transport layers delivering tools and heavy cargo straight to your project site.</p>
                   </div>
                 </div>
               </div>
@@ -138,10 +138,10 @@ export const GharSeKroInfo = () => {
               Our Services
             </Badge>
             <h2 className="text-3xl md:text-4xl font-extrabold text-slate-800">
-              Everything Under One Roof
+              All Premium Hardware & Construction Supplies Under One Roof
             </h2>
             <p className="text-slate-500 text-base">
-              Say goodbye to juggling multiple suppliers. Ghar Se Karo integrates everything you need to execute your construction projects.
+              Say goodbye to juggling multiple hardware stores. Ghar Se Karo integrates premium tools, fittings, fasteners, materials, and skilled masons.
             </p>
           </div>
 
@@ -153,14 +153,14 @@ export const GharSeKroInfo = () => {
                   <Truck className="w-7 h-7" />
                 </div>
                 <div className="space-y-2">
-                  <h3 className="text-xl font-bold text-slate-800">Construction Materials</h3>
+                  <h3 className="text-xl font-bold text-slate-800">Hardware & Materials</h3>
                   <p className="text-sm text-slate-500 leading-relaxed">
-                    Cement, steel, sand, bricks, pipes, and tools — sourced from premium verified suppliers at competitive wholesale and retail rates.
+                    Hand tools, power tools, bathroom fittings, fasteners, electricals, cement, and piping — sourced directly from top hardware manufacturers at competitive wholesale and retail rates.
                   </p>
                 </div>
               </div>
               <div className="pt-6 border-t border-slate-100 mt-6 flex items-center justify-between text-xs text-slate-400">
-                <span>Cement, Bricks, Steel & Tools</span>
+                <span>Tools, Fixtures, Fittings & Materials</span>
                 <span className="font-semibold text-amber-600">Available</span>
               </div>
             </div>
@@ -279,10 +279,10 @@ export const GharSeKroInfo = () => {
               Why Ghar Se Karo Wins
             </Badge>
             <h2 className="text-3xl font-extrabold text-slate-800 leading-tight">
-              Leading the Construction Revolution
+              Leading the Hardware & Supplies Revolution
             </h2>
             <p className="text-slate-500 text-sm">
-              We match local sourcing networks with modern tech integration to bring transparency, efficiency, and scale to building projects.
+              We match local hardware manufacturing networks with modern e-commerce technology to bring transparency and efficiency to contractors, builders, and homeowners.
             </p>
           </div>
 

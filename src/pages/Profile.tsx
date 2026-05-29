@@ -341,7 +341,7 @@ const Profile = () => {
                 <Button
                   variant="outline"
                   onClick={handleLogout}
-                  className="border-white/20 text-white hover:bg-white/10 hover:text-white font-bold bg-transparent gap-2 py-5 px-6 rounded-xl"
+                  className="!border-white/20 !text-white hover:!bg-white/10 hover:!text-white font-bold !bg-transparent gap-2 py-5 px-6 rounded-xl"
                 >
                   <LogOut className="w-4 h-4" />
                   Logout

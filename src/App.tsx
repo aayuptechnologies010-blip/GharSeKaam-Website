@@ -14,6 +14,8 @@ import ProductDetail from "./pages/ProductDetail";
 import NotFound from "./pages/NotFound";
 import Labour from "./pages/Labour";
 import Profile from "./pages/Profile";
+import Search from "./pages/Search";
+import CheckoutSuccess from "./pages/CheckoutSuccess";
 import ScrollToTop from "@/components/ScrollToTop";
 import BackToTopButton from "@/components/BackToTopButton";
 
@@ -34,6 +36,8 @@ const App = () => (
             <Route path="/wholesale" element={<Wholesale />} />
             <Route path="/category/:categoryName" element={<Category />} />
             <Route path="/product/:id" element={<ProductDetail />} />
+            <Route path="/search" element={<Search />} />
+            <Route path="/checkout-success" element={<CheckoutSuccess />} />
             <Route path="/cart" element={<Cart />} />
             <Route path="/orders" element={<Orders />} />
             <Route path="/labour" element={<Labour />} />

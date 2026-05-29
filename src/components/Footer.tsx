@@ -1,6 +1,5 @@
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Separator } from "@/components/ui/separator"
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
 import { 
   Facebook, 
   Twitter, 
@@ -9,170 +8,136 @@ import {
   Mail, 
   Phone, 
   MapPin,
-  Truck,
-  Shield,
-  Clock,
-  CreditCard
-} from "lucide-react"
-import logo from '../../public/logo.png';
+  Globe,
+  DollarSign
+} from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const Footer = () => {
+  const navigate = useNavigate();
+
+  const handleScrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
+  };
+
   return (
-    <footer className="bg-muted/30 border-t">
-      {/* Features Section */}
-      <div className="bg-gradient-card border-b">
-        <div className="container mx-auto px-4 py-8">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-primary rounded-lg">
-                <Truck className="h-5 w-5 text-primary-foreground" />
-              </div>
-              <div>
-                <div className="font-semibold">Fast Delivery</div>
-                <div className="text-sm text-muted-foreground">Same day delivery available</div>
-              </div>
-            </div>
-            
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-success rounded-lg">
-                <Shield className="h-5 w-5 text-success-foreground" />
-              </div>
-              <div>
-                <div className="font-semibold">Quality Assured</div>
-                <div className="text-sm text-muted-foreground">100% authentic products</div>
-              </div>
-            </div>
-            
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-secondary rounded-lg">
-                <Clock className="h-5 w-5 text-secondary-foreground" />
-              </div>
-              <div>
-                <div className="font-semibold">24/7 Support</div>
-                <div className="text-sm text-muted-foreground">Always here to help</div>
-              </div>
-            </div>
-            
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-warning rounded-lg">
-                <CreditCard className="h-5 w-5 text-warning-foreground" />
-              </div>
-              <div>
-                <div className="font-semibold">Secure Payment</div>
-                <div className="text-sm text-muted-foreground">Multiple payment options</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Main Footer */}
-      <div className="container mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          {/* Company Info */}
-          <div className="space-y-4">
-            <div className="flex items-center gap-3">
-                <img src={logo} alt="GharSeKro logo" className="w-16 h-16 object-contain" />
-                <div>
-                  <h3
-                    className="text-2xl font-bold bg-clip-text text-transparent"
-                    style={{ backgroundImage: 'linear-gradient(90deg, #f59e0b, #d97706)' }}
-                  >
-                    GharSeKro
-                  </h3>
-                  <span className="text-sm text-muted-foreground">Do it from home.</span>
-                </div>
-              </div>
-            <p className="text-sm text-muted-foreground">
-              Your trusted partner for all construction supply needs. 
-              From hardware to heavy machinery, we've got you covered.
-            </p>
-            <div className="flex space-x-3">
-              <Button size="icon" variant="ghost">
-                <Facebook className="h-4 w-4" />
-              </Button>
-              <Button size="icon" variant="ghost">
-                <Twitter className="h-4 w-4" />
-              </Button>
-              <Button size="icon" variant="ghost">
-                <Instagram className="h-4 w-4" />
-              </Button>
-              <Button size="icon" variant="ghost">
-                <Linkedin className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-
-          {/* Quick Links */}
-          <div className="space-y-4">
-            <h4 className="font-semibold">Quick Links</h4>
-            <ul className="space-y-2 text-sm">
-              <li><a href="#" className="text-muted-foreground hover:text-primary transition-colors">About Us</a></li>
-              <li><a href="#" className="text-muted-foreground hover:text-primary transition-colors">Wholesale Program</a></li>
-              <li><a href="#" className="text-muted-foreground hover:text-primary transition-colors">Become a Supplier</a></li>
-              <li><a href="/labour" className="text-muted-foreground hover:text-primary transition-colors">Worker Hiring</a></li>
-              <li><a href="#" className="text-muted-foreground hover:text-primary transition-colors">Track Order</a></li>
-            </ul>
-          </div>
-
-          {/* Categories */}
-          <div className="space-y-4">
-            <h4 className="font-semibold">Categories</h4>
-            <ul className="space-y-2 text-sm">
-              <li><a href="#" className="text-muted-foreground hover:text-primary transition-colors">Hardware & Tools</a></li>
-              <li><a href="#" className="text-muted-foreground hover:text-primary transition-colors">Plumbing Supplies</a></li>
-              <li><a href="#" className="text-muted-foreground hover:text-primary transition-colors">Electrical Materials</a></li>
-              <li><a href="#" className="text-muted-foreground hover:text-primary transition-colors">Building Materials</a></li>
-              <li><a href="#" className="text-muted-foreground hover:text-primary transition-colors">Safety Equipment</a></li>
-            </ul>
-          </div>
-
-          {/* Contact & Newsletter */}
-          <div className="space-y-4">
-            <h4 className="font-semibold">Stay Connected</h4>
-            <div className="space-y-3">
-              <div className="flex items-center gap-2 text-sm">
-                <Phone className="h-4 w-4 text-primary" />
-                <span>+91 8957035082</span>
-              </div>
-              <div className="flex items-center gap-2 text-sm">
-                <Mail className="h-4 w-4 text-primary" />
-                <span>amanwork0099@gmail.com</span>
-              </div>
-              <div className="flex items-center gap-2 text-sm">
-                <MapPin className="h-4 w-4 text-primary" />
-                <span>Gorakhpur, Uttar Pradesh</span>
-              </div>
-            </div>
-            
-            <div className="space-y-2">
-              <h5 className="text-sm font-medium">Newsletter</h5>
-              <div className="flex gap-2">
-                <Input placeholder="Enter email" className="text-sm" />
-                <Button size="sm">Subscribe</Button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <Separator />
+    <footer className="w-full flex flex-col mt-auto select-none">
       
-      {/* Bottom Footer */}
-      <div className="container mx-auto px-4 py-4">
-        <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-muted-foreground">
-          <div>
-            © 2024 GharSeKro Connect. All rights reserved.
+      {/* 1. Back to Top Bar (Amazon style #37475a) */}
+      <button 
+        onClick={handleScrollToTop}
+        className="w-full bg-[#37475a] hover:bg-[#485769] py-3.5 text-center text-xs font-black text-white cursor-pointer select-none transition-colors border-none outline-none"
+      >
+        Back to top
+      </button>
+
+      {/* 2. Main Columns Directory Belt (Amazon style #232f3e) */}
+      <div className="bg-[#232f3e] text-slate-100 border-b border-slate-700/60">
+        <div className="container mx-auto px-6 py-12 grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12 max-w-5xl text-left">
+          
+          {/* Column 1: Get to Know Us */}
+          <div className="space-y-3.5">
+            <h4 className="text-sm font-black text-white uppercase tracking-wider">Get to Know Us</h4>
+            <ul className="space-y-2 text-xs font-bold text-slate-300">
+              <li><a href="#" className="hover:underline transition-all">About GharSeKro</a></li>
+              <li><span onClick={() => navigate('/wholesale')} className="hover:underline cursor-pointer transition-all">Wholesale Program</span></li>
+              <li><span onClick={() => navigate('/labour')} className="hover:underline cursor-pointer transition-all">Worker Portal</span></li>
+              <li><a href="#" className="hover:underline transition-all">Careers</a></li>
+              <li><a href="#" className="hover:underline transition-all">Press Releases</a></li>
+            </ul>
           </div>
-          <div className="flex gap-6">
-            <a href="#" className="hover:text-primary transition-colors">Privacy Policy</a>
-            <a href="#" className="hover:text-primary transition-colors">Terms of Service</a>
-            <a href="#" className="hover:text-primary transition-colors">Return Policy</a>
+
+          {/* Column 2: Connect with Us */}
+          <div className="space-y-3.5">
+            <h4 className="text-sm font-black text-white uppercase tracking-wider">Connect with Us</h4>
+            <ul className="space-y-2 text-xs font-bold text-slate-300">
+              <li className="flex items-center gap-2">
+                <Facebook className="h-3.5 w-3.5 text-slate-400" />
+                <a href="#" className="hover:underline">Facebook</a>
+              </li>
+              <li className="flex items-center gap-2">
+                <Twitter className="h-3.5 w-3.5 text-slate-400" />
+                <a href="#" className="hover:underline">Twitter</a>
+              </li>
+              <li className="flex items-center gap-2">
+                <Instagram className="h-3.5 w-3.5 text-slate-400" />
+                <a href="#" className="hover:underline">Instagram</a>
+              </li>
+              <li className="flex items-center gap-2">
+                <Linkedin className="h-3.5 w-3.5 text-slate-400" />
+                <a href="#" className="hover:underline">LinkedIn</a>
+              </li>
+            </ul>
           </div>
+
+          {/* Column 3: Make Money with Us */}
+          <div className="space-y-3.5">
+            <h4 className="text-sm font-black text-white uppercase tracking-wider">Make Money with Us</h4>
+            <ul className="space-y-2 text-xs font-bold text-slate-300">
+              <li><a href="#" className="hover:underline transition-all flex items-center gap-1"><DollarSign className="h-3.5 w-3.5 text-[#febd69]" /> Sell on GharSeKro</a></li>
+              <li><a href="#" className="hover:underline transition-all">Become a Vendor</a></li>
+              <li><a href="#" className="hover:underline transition-all">Advertise Products</a></li>
+              <li><a href="#" className="hover:underline transition-all">Fulfilment by GSK</a></li>
+              <li><a href="#" className="hover:underline transition-all"> GSK Merchant Hub</a></li>
+            </ul>
+          </div>
+
+          {/* Column 4: Let Us Help You */}
+          <div className="space-y-3.5">
+            <h4 className="text-sm font-black text-white uppercase tracking-wider">Let Us Help You</h4>
+            <ul className="space-y-2 text-xs font-bold text-slate-300">
+              <li><span onClick={() => navigate('/profile')} className="hover:underline cursor-pointer transition-all">Your GSK Account</span></li>
+              <li><span onClick={() => navigate('/orders')} className="hover:underline cursor-pointer transition-all">Returns & Orders</span></li>
+              <li><a href="#" className="hover:underline transition-all">GST Input Assistance</a></li>
+              <li><a href="#" className="hover:underline transition-all"> GSK Help Center</a></li>
+              <li><a href="#" className="hover:underline transition-all">Shipping & Rates</a></li>
+            </ul>
+          </div>
+
+        </div>
+
+        {/* Global Settings row inside Medium Navy bar */}
+        <div className="border-t border-slate-700/50 py-7 flex flex-wrap gap-5 justify-center items-center">
+          <div className="flex items-center leading-none text-white p-1">
+            <span className="text-lg font-black tracking-tight">GharSeKro</span>
+            <span className="text-xs font-black text-[#febd69] ml-0.5">.in</span>
+          </div>
+          <div className="flex gap-3 text-xs font-bold text-slate-300">
+            <div className="flex items-center gap-1.5 border border-slate-600 rounded px-2.5 py-1 hover:border-slate-400 cursor-pointer">
+              <Globe className="h-3.5 w-3.5 text-slate-400" />
+              <span>English</span>
+            </div>
+            <div className="flex items-center gap-1.5 border border-slate-600 rounded px-2.5 py-1 hover:border-slate-400 cursor-pointer">
+              <span className="text-xs">🇮🇳</span>
+              <span>India</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 3. Bottom Legal strip (Amazon style #131921) */}
+      <div className="bg-[#131921] py-8 text-slate-400 text-xs font-bold">
+        <div className="container mx-auto px-4 max-w-4xl text-center space-y-4">
+          
+          {/* Sub-Footer fine links */}
+          <div className="flex flex-wrap gap-x-6 gap-y-2 justify-center text-[10.5px]">
+            <a href="#" className="hover:underline">Conditions of Use & Sale</a>
+            <a href="#" className="hover:underline">Privacy Notice</a>
+            <a href="#" className="hover:underline">Interest-Based Ads</a>
+            <span>© 2024-{new Date().getFullYear()}, GharSeKro Connect, Inc. or its affiliates</span>
+          </div>
+
+          <p className="text-[10px] text-slate-500 font-semibold leading-relaxed max-w-2xl mx-auto">
+            GharSeKro.in is India's leading fully integrated e-commerce and logistics marketplace for heavy structural materials, modular power tools, premium paints, and certified job-site labor.
+          </p>
+
         </div>
       </div>
     </footer>
-  )
-}
+  );
+};
 
-export default Footer
+export default Footer;

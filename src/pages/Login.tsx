@@ -3,26 +3,14 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
-import { url } from "@/constant.js";
 import logo from '../../public/logo.png';
-import AddressModal from "@/components/AddressModal";
 import { Globe } from "lucide-react";
 
 const Login = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
-  const [showAddressModal, setShowAddressModal] = useState(false);
-  const [language, setLanguage] = useState('hi'); // Default to Hindi
-
-  // Store Google auth details temporarily
-  const [googleAuthData, setGoogleAuthData] = useState<{
-    token: string;
-    name?: string;
-    email?: string;
-    profile?: string;
-    type?: string;
-  } | null>(null);
+  const [language, setLanguage] = useState('hi');
 
   // Load language preference from localStorage
   useEffect(() => {
@@ -71,67 +59,25 @@ const Login = () => {
 
   const currentLang = t[language];
 
-  // Handle Google OAuth token in URL
+  // Demo login - no backend needed
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const token = params.get('token');
-    const name = params.get('name');
-    const email = params.get('email');
-    const profile = params.get('profile');
+    // Check if already logged in
+    const token = localStorage.getItem('authToken');
+    if (token) navigate('/');
+  }, [navigate]);
 
-    const type = params.get('type');
-    const isExistingUser = params.get('success');
-
-    if (token) {
-      if (isExistingUser === 'yes') {
-        // Existing user - store data and redirect to home
-        localStorage.setItem('authToken', token);
-        if (name) localStorage.setItem('userName', name);
-        if (email) localStorage.setItem('userEmail', email);
-        if (profile) localStorage.setItem('userProfile', profile);
-        if (type) localStorage.setItem('userType', type);
-
-        // Dispatch custom event to update Header state immediately
-        window.dispatchEvent(new Event('auth-change'));
-
-        toast({
-          title: currentLang.loginSuccess,
-          description: `${currentLang.welcomeBack}${name ? `, ${name}` : ''}!`,
-        });
-        navigate('/');
-      } else {
-        // New user - store Google auth data immediately and show address modal
-        localStorage.setItem('authToken', token);
-        if (name) localStorage.setItem('userName', name);
-        if (email) localStorage.setItem('userEmail', email);
-        if (profile) localStorage.setItem('userProfile', profile);
-        if (type) localStorage.setItem('userType', type);
-
-        // Dispatch custom event to update Header state immediately
-        window.dispatchEvent(new Event('auth-change'));
-
-        setGoogleAuthData({
-          token,
-          name: name || undefined,
-          email: email || undefined,
-          profile: profile || undefined,
-          type: type || undefined
-        });
-        setShowAddressModal(true);
-        toast({
-          title: currentLang.googleAuthSuccess,
-          description: currentLang.completeRegistration,
-        });
-      }
-
-      // Clear URL params without refreshing
-      window.history.replaceState({}, '', window.location.pathname);
-    }
-  }, [navigate, toast, currentLang]);
-
-  const handleAddressModalClose = () => {
-    setShowAddressModal(false);
-    setGoogleAuthData(null);
+  const handleDemoLogin = () => {
+    setIsLoading(true);
+    setTimeout(() => {
+      localStorage.setItem('authToken', 'demo-token-gharsekro');
+      localStorage.setItem('userName', 'Rahul Sharma');
+      localStorage.setItem('userEmail', 'rahul@gharsekro.com');
+      localStorage.setItem('userType', 'RETAILER');
+      window.dispatchEvent(new Event('auth-change'));
+      toast({ title: currentLang.loginSuccess, description: `${currentLang.welcomeBack}, Rahul Sharma!` });
+      navigate('/');
+      setIsLoading(false);
+    }, 800);
   };
 
   return (
@@ -173,9 +119,7 @@ const Login = () => {
           <div className="flex flex-col items-center">
             <Button
               className={`w-full flex items-center justify-center gap-3 bg-white border-2 border-gray-300 shadow-lg hover:shadow-xl hover:bg-gray-50 text-gray-800 font-bold py-6 text-lg rounded-2xl transition-all duration-200 ${language === 'hi' ? 'font-sans' : ''}`}
-              onClick={() => {
-                window.location.href = `${url}/user/auth/google/`;
-              }}
+              onClick={handleDemoLogin}
               disabled={isLoading}
             >
               <svg className="w-6 h-6" viewBox="0 0 48 48">
@@ -213,14 +157,6 @@ const Login = () => {
         <div className="h-2 bg-gradient-to-r from-orange-500 via-white to-green-500"></div>
       </Card>
 
-      {/* Address Modal for new users */}
-      {googleAuthData && (
-        <AddressModal
-          isOpen={showAddressModal}
-          onClose={handleAddressModalClose}
-          googleAuthData={googleAuthData}
-        />
-      )}
     </div>
   );
 };
