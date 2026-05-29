@@ -70,6 +70,10 @@ const Footer = () => {
                 <Linkedin className="h-3.5 w-3.5 text-slate-400" />
                 <a href="#" className="hover:underline">LinkedIn</a>
               </li>
+              <li className="flex items-center gap-2 border-t border-slate-700/50 pt-2 mt-2">
+                <Mail className="h-3.5 w-3.5 text-[#febd69]" />
+                <a href="mailto:amanwork0099@gmail.com" className="hover:underline text-slate-200">amanwork0099@gmail.com</a>
+              </li>
             </ul>
           </div>
 
