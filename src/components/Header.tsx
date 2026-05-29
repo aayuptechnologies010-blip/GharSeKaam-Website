@@ -163,22 +163,16 @@ const Header = () => {
       {/* 1. Main Nav Belt (Upper Row - Deep Navy #131921) */}
       <div className="bg-[#131921] h-14 md:h-16 flex items-center px-4 gap-3 md:gap-5 justify-between">
         
-        {/* Brand Logo - Signature Amazon Smile Vector style */}
+        {/* Brand Logo - New Premium Image Logo */}
         <div 
           onClick={() => navigate('/')}
-          className="flex items-center p-1.5 rounded-sm border border-transparent hover:border-white/20 cursor-pointer transition-all duration-150 shrink-0"
+          className="flex items-center p-1 bg-white rounded-lg border border-transparent hover:border-amber-400/30 cursor-pointer transition-all duration-150 shrink-0 shadow-sm"
         >
-          <div className="flex flex-col items-start leading-none pt-0.5">
-            <div className="flex items-baseline text-white">
-              <span className="text-xl md:text-2xl font-black tracking-tight">GharSeKro</span>
-              <span className="text-xs font-black text-[#febd69] ml-0.5">.in</span>
-            </div>
-            {/* Signature Smiling Gold/Orange Arrow Vector curve */}
-            <svg className="w-24 md:w-28 h-2 text-[#febd69] -mt-0.5" viewBox="0 0 100 15" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M6 3C26 12 56 12 94 3" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
-              <path d="M89 3C91 5 93 8 96 10C94 10 90 10 87 10" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </div>
+          <img 
+            src="/logo.png" 
+            alt="GharSeKro Logo" 
+            className="h-9 md:h-11 w-auto object-contain rounded-md"
+          />
         </div>
 
         {/* Location Selector - Standard Stacked Layout */}
