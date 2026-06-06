@@ -31,6 +31,9 @@ const ProductGrid = ({ category, wholesale = false }: ProductGridProps) => {
   const isLoggedIn = !!localStorage.getItem('authToken')
   const viewingWholesale = wholesale || isWholesaler
 
+  // Wholesale price show karo agar: wholesale page ho, ya userType WHOLESALER ho, ya GST verified ho
+  const hasWholesaleAccess = wholesale || isWholesaler || !!sessionStorage.getItem('wholesaleGST')
+
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -59,7 +62,13 @@ const ProductGrid = ({ category, wholesale = false }: ProductGridProps) => {
         product.category.title &&
         product.category.title.toLowerCase().replace(/\s+/g, '-') === category.toLowerCase()
       )
-    : products
+    : viewingWholesale
+      ? products.filter(product =>
+          product.category &&
+          product.category.title &&
+          product.category.title.toLowerCase() === 'plumbing'
+        )
+      : products
 
   const filteredProducts = filteredByCategory.filter((product) => {
     if (!product.availability) return true
@@ -71,13 +80,13 @@ const ProductGrid = ({ category, wholesale = false }: ProductGridProps) => {
   const getProductPrice = (product: ApiProduct) => {
     const variant = selectedVariants[product.id]
     
-    // If variant is selected, use variant price
     if (variant) {
       return variant.price
     }
 
-    // Otherwise use base price
-    if (isLoggedIn && isWholesaler && product.wholesaleprice) {
+    // Wholesale price: agar GST verified ho ya WHOLESALER ho AND category is Plumbing
+    const isPlumbingCategory = product.category?.title?.toLowerCase() === 'plumbing'
+    if (hasWholesaleAccess && isPlumbingCategory && product.wholesaleprice) {
       return parseFloat(product.wholesaleprice)
     }
     return parseFloat(product.retailprice || '0')
@@ -236,9 +245,7 @@ const ProductGrid = ({ category, wholesale = false }: ProductGridProps) => {
         <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {filteredProducts.map((product) => {
             const price = getProductPrice(product)
-            const isWholesaleProduct = isLoggedIn && isWholesaler && product.wholesaleprice
-            
-            // Calculate a dummy brand name if not present
+            const isWholesaleProduct = hasWholesaleAccess && product.wholesaleprice
             const brandName = product.title.split(' ')[0].toUpperCase()
             
             // Calculate dummy ratings
@@ -332,17 +339,27 @@ const ProductGrid = ({ category, wholesale = false }: ProductGridProps) => {
                         <span className="font-black text-lg text-slate-900">
                           ₹{price.toLocaleString()}
                         </span>
-                        <span className="text-xs text-slate-400 line-through">
-                          ₹{Math.round(price * 1.3).toLocaleString()}
+                        {isWholesaleProduct && product.retailprice && (
+                          <span className="text-xs text-slate-400 line-through">
+                            ₹{parseFloat(product.retailprice).toLocaleString()}
+                          </span>
+                        )}
+                        {!isWholesaleProduct && (
+                          <span className="text-xs text-slate-400 line-through">
+                            ₹{Math.round(price * 1.3).toLocaleString()}
+                          </span>
+                        )}
+                        <span className="text-xs font-black text-green-600">
+                          {isWholesaleProduct && product.retailprice
+                            ? `${Math.round((1 - parseFloat(product.wholesaleprice!) / parseFloat(product.retailprice)) * 100)}% OFF`
+                            : '23% OFF'}
                         </span>
-                        <span className="text-xs font-black text-green-600">23% OFF</span>
                       </div>
                       
-                      {/* GST and Wholesaler Specific Info */}
                       {isWholesaleProduct ? (
                         <div className="flex items-center gap-1 text-[9px] text-blue-600 font-extrabold uppercase">
                           <Tag className="h-3 w-3" />
-                          <span>Includes 18% GST Benefit</span>
+                          <span>Wholesale Price · 18% GST Benefit</span>
                         </div>
                       ) : (
                         <span className="text-[9px] text-slate-400 font-bold block uppercase">Inclusive of all taxes</span>
@@ -439,7 +456,7 @@ const ProductGrid = ({ category, wholesale = false }: ProductGridProps) => {
         <div className="grid grid-cols-2 gap-[1px] bg-slate-200">
           {filteredProducts.map((product) => {
             const price = getProductPrice(product)
-            const isWholesaleProduct = isLoggedIn && isWholesaler && product.wholesaleprice
+            const isWholesaleProduct = hasWholesaleAccess && product.wholesaleprice
             
             const brandName = product.title.split(' ')[0].toUpperCase()
             const ratingScore = 4.0 + (product.title.length % 11) / 10

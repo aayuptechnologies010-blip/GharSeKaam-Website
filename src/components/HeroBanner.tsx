@@ -13,7 +13,7 @@ const DEFAULT_SLIDES = [
     highlight: "Direct From Brand Plants",
     description: "India's first fully integrated hardware e-store. Get high-strength steel rebars, premium aggregate cements, modular wires, and designer faucets delivered directly to your job site.",
     image: "https://images.unsplash.com/photo-1541888946425-d81bb19240f5?q=80&w=800&auto=format&fit=crop",
-    ctaText: "Shop Bulk Rates",
+    ctaText: "Shop on Wholesale",
     ctaLink: "/wholesale",
     bgGradient: "from-slate-950 via-slate-900 to-amber-950/80",
   },
@@ -138,14 +138,6 @@ const HeroBanner = () => {
                 >
                   {currentSlide.ctaText}
                   <ArrowRight className="h-4 w-4 group-hover:translate-x-1.5 transition-transform text-slate-950" />
-                </Button>
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="!bg-transparent border-white/20 hover:border-amber-500/50 hover:!bg-amber-500/5 !text-white font-extrabold px-8 py-6 rounded-xl transition-all"
-                  onClick={() => navigate("/")}
-                >
-                  Browse Retail Shop
                 </Button>
               </div>
 

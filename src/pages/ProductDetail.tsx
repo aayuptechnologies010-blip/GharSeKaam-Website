@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
 import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import { useCartContext } from '@/context/CartContext'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
@@ -473,8 +474,9 @@ const ProductDetail = () => {
       }
     }
     
-    // Show wholesale price if wholesaler is logged in
-    if (isLoggedIn && isWholesaler && product.wholesaleprice) {
+    // Show wholesale price if wholesaler is logged in AND category is Plumbing
+    const isPlumbingCategory = product.category?.title?.toLowerCase() === 'plumbing'
+    if (isLoggedIn && isWholesaler && isPlumbingCategory && product.wholesaleprice) {
       return parseFloat(product.wholesaleprice)
     }
     // Otherwise show retail price

@@ -8,6 +8,7 @@ import { useEffect, useState, useRef } from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import DrawerCart from "./DrawerCart";
+import DrawerAll from "./DrawerAll";
 
 const POPULAR_SUGGESTIONS = [
   { text: "Ultratech Cement 50kg", category: "Cement & Sand" },
@@ -61,6 +62,7 @@ const Header = () => {
   const [searchFocused, setSearchFocused] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("All Departments");
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [isAllMenuOpen, setIsAllMenuOpen] = useState(false);
   
   // Pincode Location States
   const [pincode, setPincode] = useState(() => localStorage.getItem('userPincode') || '400001');
@@ -160,19 +162,29 @@ const Header = () => {
   return (
     <header className="w-full flex flex-col z-50 sticky top-0 shadow-lg select-none">
       
+      {/* Top Banner Highlight Strip */}
+      <div className="bg-gradient-to-r from-amber-500 via-amber-600 to-amber-700 text-slate-950 text-[9px] md:text-xs font-black py-1.5 px-4 text-center tracking-wider uppercase flex items-center justify-center gap-1.5 shadow-inner">
+        <Sparkles className="h-3.5 w-3.5 fill-slate-950 text-slate-950 animate-pulse" />
+        <span>Powered by Aman Traders – Your Premium Partner for Wholesale & Retail Site Supplies</span>
+      </div>
+
       {/* 1. Main Nav Belt (Upper Row - Deep Navy #131921) */}
       <div className="bg-[#131921] h-14 md:h-16 flex items-center px-4 gap-3 md:gap-5 justify-between">
         
         {/* Brand Logo - New Premium Image Logo */}
         <div 
           onClick={() => navigate('/')}
-          className="flex items-center p-1 bg-white rounded-lg border border-transparent hover:border-amber-400/30 cursor-pointer transition-all duration-150 shrink-0 shadow-sm"
+          className="flex items-center gap-2 p-1 bg-white rounded-lg border border-transparent hover:border-amber-400/30 cursor-pointer transition-all duration-150 shrink-0 shadow-sm"
         >
           <img 
             src="/logo.png" 
             alt="GharSeKro Logo" 
             className="h-9 md:h-11 w-auto object-contain rounded-md"
           />
+          <div className="hidden lg:flex flex-col text-slate-800 pr-1 select-none leading-none">
+            <span className="text-[9px] font-bold text-amber-600 uppercase tracking-wider">Sponsored by</span>
+            <span className="text-[11px] font-extrabold text-slate-900 tracking-tight">Aman Traders</span>
+          </div>
         </div>
 
         {/* Location Selector - Standard Stacked Layout */}
@@ -383,7 +395,10 @@ const Header = () => {
         <div className="flex items-center gap-1.5 md:gap-3.5 overflow-x-auto scrollbar-none pb-0.5 pt-0.5 flex-1">
           
           {/* Hamburger All departments */}
-          <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-sm cursor-pointer shrink-0 hover:bg-white/5 transition-all duration-150">
+          <div 
+            onClick={() => setIsAllMenuOpen(true)}
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-sm cursor-pointer shrink-0 hover:bg-white/5 transition-all duration-150"
+          >
             <Menu className="h-4.5 w-4.5" />
             <span>All</span>
           </div>
@@ -407,6 +422,16 @@ const Header = () => {
             }`}
           >
             <HardHat className="h-3.5 w-3.5" /> Labour Services
+          </span>
+          <span 
+            onClick={() => navigate('/services')} 
+            className={`px-2 py-1.5 rounded-sm flex items-center gap-1 transition-all duration-150 cursor-pointer shrink-0 ${
+              location.pathname === '/services'
+                ? "text-[#febd69] bg-white/10" 
+                : "text-white hover:text-[#febd69] hover:bg-white/5"
+            }`}
+          >
+            <Sparkles className="h-3.5 w-3.5 text-amber-400" /> Site Services
           </span>
           <span 
             onClick={() => navigate('/wholesale')} 
@@ -513,6 +538,9 @@ const Header = () => {
 
       {/* Drawer Cart slide-over */}
       <DrawerCart isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
+
+      {/* Drawer All slide-over left-sided menu */}
+      <DrawerAll isOpen={isAllMenuOpen} onClose={() => setIsAllMenuOpen(false)} />
     </header>
   );
 };

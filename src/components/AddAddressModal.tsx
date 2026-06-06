@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -31,6 +31,21 @@ const AddAddressModal = ({ isOpen, onClose, onAddressAdded }: AddAddressModalPro
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
+  useEffect(() => {
+    if (isOpen) {
+      setFormData({
+        city: 'Gorakhpur',
+        pincode: '',
+        flatnumber: 0,
+        state: 'Uttar Pradesh',
+        phone: ''
+      })
+      setLatitude(null)
+      setLongitude(null)
+      setError('')
+    }
+  }, [isOpen])
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
@@ -43,13 +58,17 @@ const AddAddressModal = ({ isOpen, onClose, onAddressAdded }: AddAddressModalPro
     }
 
     try {
-      const result = await addAddress(formData)
+      const result = await addAddress({
+        ...formData,
+        latitude,
+        longitude
+      })
       if (result.success) {
         setFormData({
-          city: '',
+          city: 'Gorakhpur',
           pincode: '',
           flatnumber: 0,
-          state: '',
+          state: 'Uttar Pradesh',
           phone: ''
         })
         onAddressAdded()

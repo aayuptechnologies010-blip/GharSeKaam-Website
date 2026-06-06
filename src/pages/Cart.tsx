@@ -176,6 +176,16 @@ const Cart = () => {
           <div className="flex-1 h-0.5 bg-slate-200 mx-4"></div>
           <div 
             onClick={() => {
+              const authToken = localStorage.getItem('authToken')
+              if (!authToken) {
+                toast({
+                  title: "Login Required",
+                  description: "Please login to proceed to checkout",
+                  variant: "destructive"
+                })
+                navigate('/login')
+                return
+              }
               if (checkoutStep === "delivery" || checkoutStep === "cart") {
                 setCheckoutStep("delivery");
               }
@@ -290,7 +300,19 @@ const Cart = () => {
                 <div className="flex justify-end pt-4">
                   <Button 
                     size="lg"
-                    onClick={() => setCheckoutStep("delivery")}
+                    onClick={() => {
+                      const authToken = localStorage.getItem('authToken')
+                      if (!authToken) {
+                        toast({
+                          title: "Login Required",
+                          description: "Please login to proceed to delivery details",
+                          variant: "destructive"
+                        })
+                        navigate('/login')
+                        return
+                      }
+                      setCheckoutStep("delivery")
+                    }}
                     className="bg-amber-500 hover:bg-amber-600 text-slate-950 font-black rounded-xl px-8 shadow-md"
                   >
                     Proceed to Delivery address

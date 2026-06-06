@@ -1,162 +1,532 @@
 import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
-import logo from '../../public/logo.png';
-import { Globe } from "lucide-react";
+import { Globe, ArrowRight } from "lucide-react";
+import AddressModal from "@/components/AddressModal";
+import { sendOtp, verifyOtp } from "@/lib/api";
 
 const Login = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
-  const [language, setLanguage] = useState('hi');
+  const [language, setLanguage] = useState("hi");
+
+  // Authentication mode: "signin" | "create"
+  const [authMode, setAuthMode] = useState<"signin" | "create">("signin");
+  // Verification step: "input" | "verify"
+  const [step, setStep] = useState<"input" | "verify">("input");
+
+  // Form fields
+  const [name, setName] = useState("");
+  const [emailOrPhone, setEmailOrPhone] = useState("");
+  const [otp, setOtp] = useState("");
+
+  // OTP State
+  const [sentOtp, setSentOtp] = useState<string | null>(null);
+  const [timer, setTimer] = useState(0);
+  const [needHelpOpen, setNeedHelpOpen] = useState(false);
+
+  // Address Modal Registration States
+  const [showAddressModal, setShowAddressModal] = useState(false);
+  const [registrationData, setRegistrationData] = useState<{
+    token: string;
+    name?: string;
+    email?: string;
+    profile?: string;
+  } | null>(null);
+
+  // Countdown timer for resending OTP
+  useEffect(() => {
+    let interval: any;
+    if (timer > 0) {
+      interval = setInterval(() => {
+        setTimer((t) => t - 1);
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [timer]);
 
   // Load language preference from localStorage
   useEffect(() => {
-    const savedLang = localStorage.getItem('appLanguage');
+    const savedLang = localStorage.getItem("appLanguage");
     if (savedLang) {
       setLanguage(savedLang);
     } else {
-      // Auto-select Hindi by default
-      localStorage.setItem('appLanguage', 'hi');
+      localStorage.setItem("appLanguage", "hi");
     }
   }, []);
 
   const toggleLanguage = () => {
-    const newLang = language === 'hi' ? 'en' : 'hi';
+    const newLang = language === "hi" ? "en" : "hi";
     setLanguage(newLang);
-    localStorage.setItem('appLanguage', newLang);
+    localStorage.setItem("appLanguage", newLang);
   };
 
   // Translations
   const t = {
     hi: {
       appName: "घर से करो",
-      tagline: "जुड़ें",
-      signInTitle: "अपने खाते में प्रवेश करें",
-      or: "या",
-      continueWithGoogle: "Google से जारी रखें",
+      signInTitle: "लॉग इन करें",
+      createAccountTitle: "खाता बनाएं",
+      nameLabel: "आपका नाम",
+      namePlaceholder: "पहला और आखिरी नाम",
+      emailOrPhoneLabel: "ईमेल या मोबाइल फ़ोन नंबर",
+      emailOrPhonePlaceholder: "",
+      continueButton: "आगे बढ़ें",
+      signInButton: "लॉग इन करें",
+      verifyOtpTitle: "सत्यापन आवश्यक",
+      enterOtpLabel: "ओटीपी दर्ज करें",
+      otpPlaceholder: "6-अंकीय ओटीपी",
+      verifyOtpButton: "सत्यापन कोड की पुष्टि करें",
+      sending: "ओटीपी भेज रहे हैं...",
+      verifying: "सत्यापित कर रहे हैं...",
+      resendOtp: "ओटीपी पुनः भेजें",
+      resendIn: "पुनः भेजें {timer}s में",
+      changeInput: "बदलें",
       backToHome: "होम पर वापस जाएं",
+      needHelp: "क्या आपको सहायता चाहिए?",
+      forgotPasswordHelp: "अपना पासवर्ड भूल गए?",
+      otherSigninIssues: "लॉग इन से जुड़ी अन्य समस्याएं",
+      conditionsOfUse: "आगे बढ़ने पर, आप घर से करो की उपयोग की शर्तें और गोपनीयता सूचना से सहमत होते हैं।",
+      conditionsLink: "उपयोग की शर्तें",
+      privacyLink: "गोपनीयता सूचना",
+      newToApp: "घर से करो पर नए हैं?",
+      createAccountButtonText: "अपना घर से करो खाता बनाएं",
+      alreadyHaveAccount: "पहले से ही एक खाता है?",
       loginSuccess: "लॉगिन सफल",
       welcomeBack: "वापसी पर स्वागत है",
-      googleAuthSuccess: "Google प्रमाणीकरण सफल",
-      completeRegistration: "कृपया पता विवरण के साथ अपना पंजीकरण पूरा करें।"
+      detailsRequired: "विवरण आवश्यक",
+      completeRegistration: "कृपया अपना पंजीकरण पूरा करने के लिए पता विवरण प्रदान करें।"
     },
     en: {
       appName: "GharSeKro",
-      tagline: "Connect",
-      signInTitle: "Sign in to your account",
-      or: "or",
-      continueWithGoogle: "Continue with Google",
+      signInTitle: "Sign in",
+      createAccountTitle: "Create account",
+      nameLabel: "Your name",
+      namePlaceholder: "First and last name",
+      emailOrPhoneLabel: "Email or mobile phone number",
+      emailOrPhonePlaceholder: "",
+      continueButton: "Continue",
+      signInButton: "Sign in",
+      verifyOtpTitle: "Verification required",
+      enterOtpLabel: "Enter OTP",
+      otpPlaceholder: "6-digit OTP",
+      verifyOtpButton: "Verify OTP",
+      sending: "Sending OTP...",
+      verifying: "Verifying...",
+      resendOtp: "Resend OTP",
+      resendIn: "Resend OTP in {timer}s",
+      changeInput: "Change",
       backToHome: "Back to Home",
+      needHelp: "Need help?",
+      forgotPasswordHelp: "Forgot your Password?",
+      otherSigninIssues: "Other issues with Sign-In",
+      conditionsOfUse: "By continuing, you agree to GharSeKro's Conditions of Use and Privacy Notice.",
+      conditionsLink: "Conditions of Use",
+      privacyLink: "Privacy Notice",
+      newToApp: "New to GharSeKro?",
+      createAccountButtonText: "Create your GharSeKro account",
+      alreadyHaveAccount: "Already have an account?",
       loginSuccess: "Login Successful",
       welcomeBack: "Welcome back",
-      googleAuthSuccess: "Google Authentication Successful",
-      completeRegistration: "Please complete your registration with address details."
+      detailsRequired: "Details Required",
+      completeRegistration: "Please provide address details to complete your registration."
     }
   };
 
-  const currentLang = t[language];
+  const currentLang = t[language as "hi" | "en"] || t.en;
 
-  // Demo login - no backend needed
-  useEffect(() => {
-    // Check if already logged in
-    const token = localStorage.getItem('authToken');
-    if (token) navigate('/');
-  }, [navigate]);
+  // Send OTP handler
+  const handleSendOtp = async (e: React.FormEvent) => {
+    if (e) e.preventDefault();
 
-  const handleDemoLogin = () => {
+    if (authMode === "create" && !name.trim()) {
+      toast({
+        title: language === "hi" ? "त्रुटि" : "Error",
+        description: language === "hi" ? "कृपया अपना नाम दर्ज करें।" : "Please enter your name.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (!emailOrPhone.trim()) {
+      toast({
+        title: language === "hi" ? "त्रुटि" : "Error",
+        description: language === "hi" ? "कृपया वैध ईमेल या मोबाइल नंबर दर्ज करें।" : "Please enter a valid email or mobile number.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setIsLoading(true);
-    setTimeout(() => {
-      localStorage.setItem('authToken', 'demo-token-gharsekro');
-      localStorage.setItem('userName', 'Rahul Sharma');
-      localStorage.setItem('userEmail', 'rahul@gharsekro.com');
-      localStorage.setItem('userType', 'RETAILER');
-      window.dispatchEvent(new Event('auth-change'));
-      toast({ title: currentLang.loginSuccess, description: `${currentLang.welcomeBack}, Rahul Sharma!` });
-      navigate('/');
+    try {
+      const res = await sendOtp(emailOrPhone.trim());
+      if (res.success) {
+        setStep("verify");
+        setTimer(30);
+        if (res.otp) {
+          setSentOtp(res.otp);
+        }
+        toast({
+          title: language === "hi" ? "ओटीपी भेजा गया" : "OTP Sent",
+          description: res.message
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: res.message,
+          variant: "destructive"
+        });
+      }
+    } catch (err: any) {
+      toast({
+        title: "Error",
+        description: err.message || "Failed to send OTP",
+        variant: "destructive"
+      });
+    } finally {
       setIsLoading(false);
-    }, 800);
+    }
+  };
+
+  // Verify OTP handler
+  const handleVerifyOtp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!otp.trim() || otp.trim().length !== 6) {
+      toast({
+        title: language === "hi" ? "अमान्य ओटीपी" : "Invalid OTP",
+        description: language === "hi" ? "कृपया 6-अंकीय ओटीपी दर्ज करें।" : "Please enter a 6-digit OTP.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const res = await verifyOtp(
+        emailOrPhone.trim(),
+        otp.trim(),
+        authMode === "create" ? name.trim() : undefined
+      );
+
+      if (res.success) {
+        if (res.registered && res.token) {
+          // User registered - standard login success
+          localStorage.setItem("authToken", res.token);
+          localStorage.setItem("userName", res.name || name.trim() || "User");
+          localStorage.setItem("userEmail", res.email || "");
+          localStorage.setItem("userProfile", res.profile || "");
+          if (res.type) localStorage.setItem("userType", res.type);
+
+          window.dispatchEvent(new Event("auth-change"));
+          toast({
+            title: currentLang.loginSuccess,
+            description: `${currentLang.welcomeBack}, ${res.name || name.trim() || "User"}!`
+          });
+
+          const cart = localStorage.getItem("cart");
+          if (cart && JSON.parse(cart).length > 0) {
+            navigate("/cart");
+          } else {
+            navigate("/");
+          }
+        } else if (!res.registered && res.tempToken) {
+          // Profile/address registration incomplete - proceed to address modal onboarding
+          setRegistrationData({
+            token: res.tempToken,
+            name: name.trim() || res.name || undefined,
+            email: res.email || undefined,
+            profile: res.profile || undefined
+          });
+          setShowAddressModal(true);
+          toast({
+            title: currentLang.detailsRequired,
+            description: currentLang.completeRegistration
+          });
+        }
+      } else {
+        toast({
+          title: "Error",
+          description: res.message || "OTP verification failed",
+          variant: "destructive"
+        });
+      }
+    } catch (err: any) {
+      toast({
+        title: "Error",
+        description: err.message || "Failed to verify OTP",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleModeSwitch = (mode: "signin" | "create") => {
+    setAuthMode(mode);
+    setStep("input");
+    setOtp("");
+    setSentOtp(null);
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-orange-50 via-white to-green-50">
-      {/* Language Selector - Top Right */}
+    <div className="min-h-screen flex flex-col justify-between bg-white text-slate-900 font-sans antialiased">
+      
+      {/* Language Selector Top Right */}
       <div className="absolute top-4 right-4 z-10">
-        <Button
+        <button
           onClick={toggleLanguage}
-          variant="outline"
-          className="flex items-center gap-2 bg-white shadow-md hover:shadow-lg transition-all duration-200 border-2 border-orange-200"
+          className="flex items-center gap-1.5 px-3 py-1 bg-white border border-slate-200 hover:bg-slate-50 transition-colors text-xs font-semibold rounded-full text-slate-700 shadow-sm outline-none focus:ring-1 focus:ring-[#e77600]"
         >
-          <Globe className="w-4 h-4" />
-          <span className="font-semibold">{language === 'hi' ? 'हिंदी' : 'English'}</span>
-        </Button>
+          <Globe className="w-3.5 h-3.5 text-slate-500" />
+          <span>{language === "hi" ? "हिंदी" : "English"}</span>
+        </button>
       </div>
 
-      <Card className="w-full max-w-md shadow-2xl rounded-3xl border-0 bg-white overflow-hidden">
-        {/* Header with Indian flag colors gradient */}
-        <div className="h-2 bg-gradient-to-r from-orange-500 via-white to-green-500"></div>
-        
-        <CardHeader className="text-center flex flex-col items-center gap-3 pt-8 pb-6">
-          <img src={logo} alt="GharSeKro logo" className="w-24 h-24 object-contain drop-shadow-lg" />
-          
-          <CardTitle className={`text-4xl font-black bg-gradient-to-r from-orange-600 via-orange-500 to-green-600 bg-clip-text text-transparent tracking-tight ${language === 'hi' ? 'font-sans' : ''}`}>
-            {currentLang.appName}
-          </CardTitle>
-          
-          <CardDescription className="text-orange-600 font-semibold text-lg -mt-1">
-            {currentLang.tagline}
-          </CardDescription>
+      <div className="flex-1 flex flex-col items-center justify-center p-4">
+        {/* GharSeKro / BuildMart Logo */}
+        <div 
+          onClick={() => navigate("/")} 
+          className="flex justify-center mb-5 cursor-pointer select-none"
+        >
+          <img 
+            src="/logo.png" 
+            alt="GharSeKro logo" 
+            className="h-10 md:h-12 object-contain rounded-md" 
+          />
+        </div>
 
-          <CardDescription className={`text-gray-600 text-base mt-2 ${language === 'hi' ? 'font-sans text-lg' : ''}`}>
-            {currentLang.signInTitle}
-          </CardDescription>
-        </CardHeader>
+        {/* Amazon-style Card Wrapper */}
+        <div className="w-full max-w-[350px] md:max-w-[365px] bg-white border border-[#ddd] rounded-lg p-6 shadow-sm">
+          {step === "input" ? (
+            /* STEP 1: Enter email/phone or name+email/phone */
+            <form onSubmit={handleSendOtp} className="space-y-4">
+              <h1 className="text-2xl md:text-3xl font-normal tracking-tight text-slate-900 pb-1">
+                {authMode === "signin" ? currentLang.signInTitle : currentLang.createAccountTitle}
+              </h1>
 
-        <CardContent className="px-8 pb-8">
-          {/* Google Sign-in Button - Large and prominent */}
-          <div className="flex flex-col items-center">
-            <Button
-              className={`w-full flex items-center justify-center gap-3 bg-white border-2 border-gray-300 shadow-lg hover:shadow-xl hover:bg-gray-50 text-gray-800 font-bold py-6 text-lg rounded-2xl transition-all duration-200 ${language === 'hi' ? 'font-sans' : ''}`}
-              onClick={handleDemoLogin}
-              disabled={isLoading}
+              {authMode === "create" && (
+                <div className="space-y-1">
+                  <label htmlFor="name" className="text-[13px] font-bold text-slate-900">
+                    {currentLang.nameLabel}
+                  </label>
+                  <input
+                    id="name"
+                    type="text"
+                    placeholder={currentLang.namePlaceholder}
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className="w-full h-[31px] px-2.5 py-1 text-sm border border-slate-400 rounded-[3px] outline-none focus:border-[#e77600] focus:ring-[3px] focus:ring-[#e77600]/15 transition-all shadow-[0_1px_0_rgba(0,0,0,0.07)_inset]"
+                    required
+                  />
+                </div>
+              )}
+
+              <div className="space-y-1">
+                <label htmlFor="emailOrPhone" className="text-[13px] font-bold text-slate-900">
+                  {currentLang.emailOrPhoneLabel}
+                </label>
+                <input
+                  id="emailOrPhone"
+                  type="text"
+                  placeholder={currentLang.emailOrPhonePlaceholder}
+                  value={emailOrPhone}
+                  onChange={(e) => setEmailOrPhone(e.target.value)}
+                  className="w-full h-[31px] px-2.5 py-1 text-sm border border-slate-400 rounded-[3px] outline-none focus:border-[#e77600] focus:ring-[3px] focus:ring-[#e77600]/15 transition-all shadow-[0_1px_0_rgba(0,0,0,0.07)_inset]"
+                  required
+                />
+              </div>
+
+              {/* Continue Button */}
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="w-full bg-gradient-to-b from-[#f7dfa5] to-[#f0c14b] border border-[#a88734] hover:from-[#f5d78e] hover:to-[#eeb933] active:from-[#f0c14b] active:to-[#f0c14b] active:border-[#846a29] text-slate-900 text-[13px] font-medium rounded-[3px] py-1.5 shadow-[0_1px_0_rgba(255,255,255,0.4)_inset] focus:outline-none transition-all cursor-pointer text-center"
+              >
+                {isLoading ? currentLang.sending : currentLang.continueButton}
+              </button>
+
+              {/* Conditions Disclaimer */}
+              <p className="text-[12px] text-slate-600 leading-relaxed font-medium pt-1">
+                {currentLang.conditionsOfUse}
+              </p>
+
+              {/* Expandable Need Help Accordion */}
+              <div className="border-t border-slate-100 pt-3 text-[13px]">
+                <button
+                  type="button"
+                  onClick={() => setNeedHelpOpen(!needHelpOpen)}
+                  className="text-[#0066c0] hover:text-[#c45500] hover:underline flex items-center gap-1.5 font-medium outline-none"
+                >
+                  <span className={`inline-block text-[9px] transition-transform duration-100 ${needHelpOpen ? "rotate-90" : ""}`}>
+                    ▶
+                  </span>
+                  {currentLang.needHelp}
+                </button>
+                {needHelpOpen && (
+                  <div className="pl-3.5 mt-1.5 space-y-1.5 text-[#0066c0] font-medium">
+                    <p className="hover:text-[#c45500] hover:underline cursor-pointer">
+                      {currentLang.forgotPasswordHelp}
+                    </p>
+                    <p className="hover:text-[#c45500] hover:underline cursor-pointer">
+                      {currentLang.otherSigninIssues}
+                    </p>
+                  </div>
+                )}
+              </div>
+            </form>
+          ) : (
+            /* STEP 2: Verify OTP */
+            <form onSubmit={handleVerifyOtp} className="space-y-4">
+              <h1 className="text-2xl md:text-3xl font-normal tracking-tight text-slate-900 pb-1">
+                {currentLang.verifyOtpTitle}
+              </h1>
+
+              <div className="text-xs text-slate-700 font-medium pb-1">
+                <span>We sent a verification code to </span>
+                <strong className="text-slate-900 font-black">{emailOrPhone}</strong>.{" "}
+                <button
+                  type="button"
+                  onClick={() => setStep("input")}
+                  className="text-[#0066c0] hover:text-[#c45500] hover:underline font-bold"
+                >
+                  {currentLang.changeInput}
+                </button>
+              </div>
+
+              <div className="space-y-1">
+                <label htmlFor="otp" className="text-[13px] font-bold text-slate-900">
+                  {currentLang.enterOtpLabel}
+                </label>
+                <input
+                  id="otp"
+                  type="text"
+                  maxLength={6}
+                  placeholder={currentLang.otpPlaceholder}
+                  value={otp}
+                  onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                  className="w-full h-[31px] px-2.5 py-1 text-sm border border-slate-400 rounded-[3px] outline-none text-center font-bold tracking-[6px] focus:border-[#e77600] focus:ring-[3px] focus:ring-[#e77600]/15 transition-all shadow-[0_1px_0_rgba(0,0,0,0.07)_inset]"
+                  required
+                />
+              </div>
+
+              {/* Dev Mode testing OTP indicator */}
+              {sentOtp && (
+                <div className="bg-[#fcf8e3] border border-[#faebcc] rounded-[4px] p-2.5 text-xs text-[#8a6d3b] font-medium text-center">
+                  💡 Dev OTP: <strong className="text-slate-900 font-black text-sm">{sentOtp}</strong>
+                </div>
+              )}
+
+              {/* Verify OTP Button */}
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="w-full bg-gradient-to-b from-[#f7dfa5] to-[#f0c14b] border border-[#a88734] hover:from-[#f5d78e] hover:to-[#eeb933] active:from-[#f0c14b] active:to-[#f0c14b] active:border-[#846a29] text-slate-900 text-[13px] font-medium rounded-[3px] py-1.5 shadow-[0_1px_0_rgba(255,255,255,0.4)_inset] focus:outline-none transition-all cursor-pointer text-center"
+              >
+                {isLoading ? currentLang.verifying : currentLang.verifyOtpButton}
+              </button>
+
+              {/* Resend OTP control */}
+              <div className="text-xs font-semibold text-slate-600 text-center pt-1">
+                {timer > 0 ? (
+                  <span>
+                    {currentLang.resendIn.replace("{timer}", timer.toString())}
+                  </span>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={handleSendOtp}
+                    className="text-[#0066c0] hover:text-[#c45500] hover:underline font-bold focus:outline-none"
+                  >
+                    {currentLang.resendOtp}
+                  </button>
+                )}
+              </div>
+            </form>
+          )}
+
+          {/* Under-card links for swapping between Register and Sign-in inside the card */}
+          {authMode === "signin" && step === "input" && (
+            <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-medium">
+              <span className="text-slate-600">New customer?</span>
+              <button 
+                onClick={() => handleModeSwitch("create")}
+                className="text-[#0066c0] hover:text-[#c45500] hover:underline font-bold flex items-center gap-0.5"
+              >
+                Start here <ArrowRight className="w-3 h-3" />
+              </button>
+            </div>
+          )}
+
+          {authMode === "create" && step === "input" && (
+            <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-medium">
+              <span className="text-slate-600">{currentLang.alreadyHaveAccount}</span>
+              <button 
+                onClick={() => handleModeSwitch("signin")}
+                className="text-[#0066c0] hover:text-[#c45500] hover:underline font-bold flex items-center gap-0.5"
+              >
+                {currentLang.signInTitle} <ArrowRight className="w-3 h-3" />
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* Separator / Divider below card (if signing in) */}
+        {authMode === "signin" && step === "input" && (
+          <div className="w-full max-w-[350px] md:max-w-[365px] mt-6">
+            <div className="relative flex py-3 items-center">
+              <div className="flex-grow border-t border-slate-200"></div>
+              <span className="flex-shrink mx-2 text-xs font-semibold text-slate-500">
+                {currentLang.newToApp}
+              </span>
+              <div className="flex-grow border-t border-slate-200"></div>
+            </div>
+
+            {/* Create account button - secondary Gray Styled */}
+            <button
+              onClick={() => handleModeSwitch("create")}
+              className="w-full bg-gradient-to-b from-[#f7f8fa] to-[#e7e9ec] border border-[#adb1b8] hover:from-[#e7eafd] hover:to-[#d8dbdf] text-slate-900 text-[13px] font-medium rounded-[3px] py-1.5 shadow-[0_1px_0_rgba(255,255,255,0.6)_inset] focus:outline-none focus:ring-1 focus:ring-[#e77600] active:from-[#e7e9ec] active:to-[#d8dbdf] transition-all cursor-pointer text-center"
             >
-              <svg className="w-6 h-6" viewBox="0 0 48 48">
-                <g>
-                  <path fill="#4285F4" d="M24 9.5c3.54 0 6.36 1.22 8.3 2.97l6.18-6.18C34.64 2.61 29.74 0 24 0 14.82 0 6.88 5.82 2.69 14.09l7.19 5.58C12.01 13.13 17.56 9.5 24 9.5z" />
-                  <path fill="#34A853" d="M46.1 24.55c0-1.64-.15-3.22-.42-4.74H24v9.01h12.42c-.54 2.9-2.18 5.36-4.65 7.01l7.19 5.58C43.98 37.13 46.1 31.3 46.1 24.55z" />
-                  <path fill="#FBBC05" d="M9.88 28.67A14.48 14.48 0 0 1 9.5 24c0-1.62.28-3.19.78-4.67l-7.19-5.58A23.94 23.94 0 0 0 0 24c0 3.77.9 7.34 2.5 10.5l7.38-5.83z" />
-                  <path fill="#EA4335" d="M24 48c6.48 0 11.92-2.15 15.89-5.85l-7.38-5.83c-2.05 1.38-4.67 2.2-8.51 2.2-6.44 0-11.99-3.63-14.12-8.67l-7.19 5.58C6.88 42.18 14.82 48 24 48z" />
-                  <path fill="none" d="M0 0h48v48H0z" />
-                </g>
-              </svg>
-              {currentLang.continueWithGoogle}
-            </Button>
-
-            {/* Simple info text */}
-            <p className={`mt-6 text-sm text-gray-500 text-center ${language === 'hi' ? 'font-sans' : ''}`}>
-              {language === 'hi' 
-                ? 'सभी के लिए सरल और सुरक्षित' 
-                : 'Simple and secure for everyone'}
-            </p>
+              {currentLang.createAccountButtonText}
+            </button>
           </div>
+        )}
 
-          <div className="mt-8 text-center">
-            <Button
-              variant="link"
-              className={`text-orange-600 hover:text-orange-800 font-semibold text-base ${language === 'hi' ? 'font-sans' : ''}`}
-              onClick={() => navigate('/')}
-            >
-              {currentLang.backToHome}
-            </Button>
-          </div>
-        </CardContent>
+        {/* Back to Home action */}
+        <button
+          onClick={() => navigate("/")}
+          className="text-xs font-bold text-slate-500 hover:text-slate-700 hover:underline mt-6 outline-none"
+        >
+          {currentLang.backToHome}
+        </button>
+      </div>
 
-        {/* Footer with Indian flag colors gradient */}
-        <div className="h-2 bg-gradient-to-r from-orange-500 via-white to-green-500"></div>
-      </Card>
+      {/* Footer Area with legal disclosures and copyright */}
+      <footer className="w-full py-5 bg-gradient-to-t from-slate-50 to-white border-t border-slate-200 mt-8 text-center text-[11px] font-medium text-slate-500 shrink-0">
+        <div className="flex justify-center gap-6 pb-2.5">
+          <span className="text-[#0066c0] hover:text-[#c45500] hover:underline cursor-pointer">
+            {currentLang.conditionsLink}
+          </span>
+          <span className="text-[#0066c0] hover:text-[#c45500] hover:underline cursor-pointer">
+            {currentLang.privacyLink}
+          </span>
+          <span className="text-[#0066c0] hover:text-[#c45500] hover:underline cursor-pointer">
+            Help
+          </span>
+        </div>
+        <p className="text-slate-400 select-none">
+          © 2020-{new Date().getFullYear()}, GharSeKro.com, Inc. or its affiliates
+        </p>
+      </footer>
 
+      {/* Complete registration Address Modal */}
+      {registrationData && (
+        <AddressModal
+          isOpen={showAddressModal}
+          onClose={() => setShowAddressModal(false)}
+          googleAuthData={registrationData}
+        />
+      )}
     </div>
   );
 };

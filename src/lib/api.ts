@@ -127,7 +127,34 @@ export async function getProductDetail(productId: string, _signal?: AbortSignal)
   }
 }
 
-export async function signup(_signupData: SignupData, _googleToken?: string): Promise<SignupResponse> {
+export async function signup(signupData: SignupData, googleToken?: string): Promise<SignupResponse> {
+  if (url !== "__BACKEND_DISABLED__") {
+    try {
+      const response = await fetch(`${url}/auth/signup`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(googleToken ? { 'Authorization': googleToken } : {})
+        },
+        body: JSON.stringify(signupData)
+      })
+      const data = await response.json()
+      if (data.success) {
+        return {
+          success: true,
+          token: data.token,
+          name: data.name,
+          email: data.email,
+          message: data.message
+        }
+      } else {
+        throw new Error(data.message || 'Signup failed')
+      }
+    } catch (error: any) {
+      console.error("Backend signup failed:", error)
+      throw error
+    }
+  }
   return { success: true, token: 'demo-token', name: 'Demo User', email: 'demo@gharsekro.com' }
 }
 
@@ -191,15 +218,74 @@ export interface OrdersResponse {
   orders: ApiOrder[]
 }
 
-export async function createOrder(_orderData: CreateOrderData): Promise<CreateOrderResponse> {
+export async function createOrder(orderData: CreateOrderData): Promise<CreateOrderResponse> {
+  if (url !== "__BACKEND_DISABLED__") {
+    const token = localStorage.getItem('authToken')
+    if (token) {
+      try {
+        const response = await fetch(`${url}/orders`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': token
+          },
+          body: JSON.stringify(orderData)
+        })
+        const data = await response.json()
+        if (data.success && data.order) {
+          return { success: true, orderId: data.order.id }
+        }
+      } catch (error) {
+        console.error("Backend createOrder failed, falling back to mock:", error)
+      }
+    }
+  }
   return { success: true, orderId: 'DEMO-' + Date.now() }
 }
 
 export async function getOrders(_signal?: AbortSignal): Promise<ApiOrder[]> {
+  if (url !== "__BACKEND_DISABLED__") {
+    const token = localStorage.getItem('authToken')
+    if (token) {
+      try {
+        const response = await fetch(`${url}/orders`, {
+          headers: {
+            'Authorization': token
+          },
+          signal: _signal
+        })
+        const data = await response.json()
+        if (data.success && Array.isArray(data.orders)) {
+          return data.orders
+        }
+      } catch (error) {
+        console.error("Backend getOrders failed, falling back to mock:", error)
+      }
+    }
+  }
   return DEMO_ORDERS
 }
 
-export async function cancelOrder(_orderId: string): Promise<{ success: boolean; message?: string }> {
+export async function cancelOrder(orderId: string): Promise<{ success: boolean; message?: string }> {
+  if (url !== "__BACKEND_DISABLED__") {
+    const token = localStorage.getItem('authToken')
+    if (token) {
+      try {
+        const response = await fetch(`${url}/orders/${orderId}/cancel`, {
+          method: 'PUT',
+          headers: {
+            'Authorization': token
+          }
+        })
+        const data = await response.json()
+        if (data.success) {
+          return { success: true, message: data.message }
+        }
+      } catch (error) {
+        console.error("Backend cancelOrder failed, falling back to mock:", error)
+      }
+    }
+  }
   return { success: true, message: 'Order cancelled successfully' }
 }
 
@@ -212,6 +298,8 @@ export interface Address {
   flatnumber: number
   customerid: string
   shopkeeperid: string | null
+  latitude?: number | string | null
+  longitude?: number | string | null
 }
 
 export interface AddAddressData {
@@ -220,6 +308,8 @@ export interface AddAddressData {
   flatnumber: number
   state: string
   phone: string
+  latitude?: number | null
+  longitude?: number | null
 }
 
 export interface AddressResponse {
@@ -227,17 +317,6 @@ export interface AddressResponse {
   addresses?: Address[]
 }
 
-export async function addAddress(_addressData: AddAddressData): Promise<{ success: boolean }> {
-  return { success: true }
-}
-
-export async function getAllAddresses(_signal?: AbortSignal): Promise<Address[]> {
-  return DEMO_ADDRESSES
-}
-
-// ============================================================
-// DEMO DATA - Full offline mode
-// ============================================================
 
 export const DUMMY_CATEGORIES: ApiCategory[] = [
   { id: "pt-1", title: "Power Tools", image: "https://images.unsplash.com/photo-1504148455328-c376907d081c?q=80&w=300&auto=format&fit=crop" },
@@ -254,6 +333,78 @@ export const DEMO_ADDRESSES: Address[] = [
   { id: "addr-1", city: "Mumbai", state: "Maharashtra", pincode: "400001", flatnumber: 12, customerid: "demo-user", shopkeeperid: null },
   { id: "addr-2", city: "New Delhi", state: "Delhi", pincode: "110001", flatnumber: 5, customerid: "demo-user", shopkeeperid: null },
 ]
+
+// In-memory mutable addresses store
+let _addresses: Address[] = [...DEMO_ADDRESSES]
+
+export async function addAddress(addressData: AddAddressData): Promise<{ success: boolean }> {
+  if (url !== "__BACKEND_DISABLED__") {
+    const token = localStorage.getItem('authToken')
+    if (token) {
+      try {
+        const response = await fetch(`${url}/address/add`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': token
+          },
+          body: JSON.stringify({
+            city: addressData.city,
+            state: addressData.state,
+            pincode: addressData.pincode,
+            flatnumber: addressData.flatnumber,
+            latitude: addressData.latitude,
+            longitude: addressData.longitude
+          })
+        })
+        const data = await response.json()
+        if (data.success) {
+          return { success: true }
+        }
+      } catch (error) {
+        console.error("Backend addAddress failed, falling back to mock:", error)
+      }
+    }
+  }
+
+  const newAddress: Address = {
+    id: 'addr-' + Date.now(),
+    city: addressData.city,
+    state: addressData.state,
+    pincode: addressData.pincode,
+    flatnumber: addressData.flatnumber,
+    customerid: 'demo-user',
+    shopkeeperid: null,
+    latitude: addressData.latitude,
+    longitude: addressData.longitude
+  }
+  _addresses = [..._addresses, newAddress]
+  return { success: true }
+}
+
+export async function getAllAddresses(_signal?: AbortSignal): Promise<Address[]> {
+  if (url !== "__BACKEND_DISABLED__") {
+    const token = localStorage.getItem('authToken')
+    if (token) {
+      try {
+        const response = await fetch(`${url}/address/all`, {
+          headers: {
+            'Authorization': token
+          },
+          signal: _signal
+        })
+        const data = await response.json()
+        if (data.success && Array.isArray(data.addresses)) {
+          return data.addresses
+        }
+      } catch (error) {
+        console.error("Backend getAllAddresses failed, falling back to mock:", error)
+      }
+    }
+  }
+
+  return _addresses
+}
 
 export const DEMO_ORDERS: ApiOrder[] = [
   {
@@ -443,3 +594,63 @@ export function getHardwareSvgFallback(titleOrCategory: string): string {
   // 8. Default Wrench / Hand tools
   return "https://images.unsplash.com/photo-1608613304899-ea8098577e38?auto=format&fit=crop&w=400&q=80";
 }
+
+export async function sendOtp(emailOrPhone: string): Promise<{ success: boolean; message: string; otp?: string }> {
+  if (url !== "__BACKEND_DISABLED__") {
+    try {
+      const response = await fetch(`${url}/auth/send-otp`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ emailOrPhone })
+      })
+      return await response.json()
+    } catch (error: any) {
+      console.error("Backend sendOtp failed:", error)
+      return { success: false, message: error.message || "Failed to send OTP" }
+    }
+  }
+  return { success: true, message: `Mock OTP sent to ${emailOrPhone}`, otp: '123456' }
+}
+
+export async function verifyOtp(emailOrPhone: string, otp: string, name?: string): Promise<{
+  success: boolean;
+  registered: boolean;
+  token?: string;
+  tempToken?: string;
+  name?: string;
+  email?: string;
+  profile?: string;
+  type?: string;
+  message?: string;
+}> {
+  if (url !== "__BACKEND_DISABLED__") {
+    try {
+      const response = await fetch(`${url}/auth/verify-otp`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ emailOrPhone, otp, name })
+      })
+      return await response.json()
+    } catch (error: any) {
+      console.error("Backend verifyOtp failed:", error)
+      return { success: false, registered: false, message: error.message || "Verification failed" }
+    }
+  }
+  if (otp === '123456') {
+    return {
+      success: true,
+      registered: true,
+      token: 'demo-token-gharsekro',
+      name: name || 'Rahul Sharma',
+      email: 'rahul@gharsekro.com',
+      profile: 'https://github.com/identicons/mock.png',
+      type: 'RETAILER'
+    }
+  }
+  return { success: false, registered: false, message: "Invalid OTP" }
+}
+
