@@ -66,27 +66,31 @@ const ProductGrid = ({ category, wholesale = false }: ProductGridProps) => {
       ? products.filter(product =>
           product.category &&
           product.category.title &&
-          product.category.title.toLowerCase() === 'plumbing'
+          product.category.title.toLowerCase().includes('plumbing')
         )
       : products
 
   const filteredProducts = filteredByCategory.filter((product) => {
     if (!product.availability) return true
     if (product.availability === 'BOTH') return true
-    if (viewingWholesale) return product.availability === 'WHOLESALER'
+    if (viewingWholesale) return product.availability === 'WHOLESALER' || product.availability === 'WHOLESALE'
     return product.availability === 'RETAILER'
   })
 
   const getProductPrice = (product: ApiProduct) => {
     const variant = selectedVariants[product.id]
+    const isPlumbingCategory = product.category?.title?.toLowerCase().includes('plumbing')
+    const showWholesale = hasWholesaleAccess && isPlumbingCategory
     
     if (variant) {
-      return variant.price
+      if (showWholesale && variant.wholesaleprice !== undefined && variant.wholesaleprice !== null) {
+        return typeof variant.wholesaleprice === 'string' ? parseFloat(variant.wholesaleprice) : variant.wholesaleprice
+      }
+      return typeof variant.price === 'string' ? parseFloat(variant.price) : variant.price
     }
 
     // Wholesale price: agar GST verified ho ya WHOLESALER ho AND category is Plumbing
-    const isPlumbingCategory = product.category?.title?.toLowerCase() === 'plumbing'
-    if (hasWholesaleAccess && isPlumbingCategory && product.wholesaleprice) {
+    if (showWholesale && product.wholesaleprice) {
       return parseFloat(product.wholesaleprice)
     }
     return parseFloat(product.retailprice || '0')

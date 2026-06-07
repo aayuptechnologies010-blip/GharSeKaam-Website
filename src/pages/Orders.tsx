@@ -149,7 +149,7 @@ const Orders = () => {
                 <div className="flex justify-between items-start">
                   <div>
                     <CardTitle className="text-lg">Order #{order.id.slice(-8)}</CardTitle>
-                    <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground">
+                    <div className="flex flex-wrap items-center gap-4 mt-2 text-sm text-muted-foreground">
                       <div className="flex items-center gap-1">
                         <Calendar className="h-4 w-4" />
                         {formatDate(order.createdAt)}
@@ -163,6 +163,13 @@ const Orders = () => {
                         {order.paymentType}
                       </div>
                     </div>
+                    {order.estimatedDelivery && (
+                      <div className="mt-2.5 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 border border-amber-200/65 text-amber-800 text-xs font-black shadow-xs">
+                        <span className="animate-pulse">🚀</span>
+                        <span>Estimated Delivery:</span>
+                        <span className="font-extrabold uppercase tracking-wide">{order.estimatedDelivery}</span>
+                      </div>
+                    )}
                   </div>
                   <Badge className={getStatusColor(order.status)}>
                     {order.status}

@@ -264,20 +264,20 @@ const Services = () => {
       {/* Service Details & Contact Dialog */}
       <Dialog open={!!selectedService} onOpenChange={(open) => !open && setSelectedService(null)}>
         {selectedService && (
-          <DialogContent className="sm:max-w-[500px] rounded-3xl bg-white border border-slate-200 overflow-hidden shadow-2xl p-0">
+          <DialogContent className="sm:max-w-[500px] rounded-3xl bg-white border border-slate-200 overflow-hidden shadow-2xl p-0 [&>button]:top-5 [&>button]:right-5 [&>button]:bg-slate-100 [&>button]:hover:bg-slate-200 [&>button]:p-1.5 [&>button]:rounded-full [&>button]:transition-all">
             <div className={`h-2 bg-gradient-to-r ${selectedService.color}`} />
             
             <div className="p-6 md:p-8 space-y-6">
               <DialogHeader className="text-left space-y-2">
-                <div className="flex items-center gap-3">
-                  <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${selectedService.color} flex items-center justify-center text-white shadow`}>
+                <div className="flex items-start gap-3 pt-2">
+                  <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${selectedService.color} flex items-center justify-center text-white shadow shrink-0`}>
                     <selectedService.icon className="w-6 h-6" />
                   </div>
-                  <div>
-                    <DialogTitle className="text-lg font-black text-slate-800 leading-none">
+                  <div className="space-y-1">
+                    <DialogTitle className="text-lg font-black text-slate-800 leading-snug">
                       {selectedService.title}
                     </DialogTitle>
-                    <span className="text-xs font-bold text-amber-600">
+                    <span className="block text-xs font-bold text-amber-600">
                       {selectedService.titleHi}
                     </span>
                   </div>
@@ -321,10 +321,10 @@ const Services = () => {
                       className="flex-1 flex items-center justify-center gap-2 font-black text-sm text-white bg-slate-900 hover:bg-slate-800 py-3 rounded-xl shadow-md transition-all border border-transparent"
                     >
                       <Phone className="w-4.5 h-4.5 text-amber-400" />
-                      Call: +91 98765 43210
+                      Call Agent
                     </a>
                     <a
-                      href="https://wa.me/919876543210?text=Hello%20Aman%20Traders,%20I%20want%20to%20inquire%20about%20your%20site%20service:%20"
+                      href={`https://wa.me/919876543210?text=Hello%20Aman%20Traders,%20I%20want%20to%20inquire%20about%20your%20site%20service:%20${encodeURIComponent(selectedService.title)}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex-1 flex items-center justify-center gap-2 font-black text-sm text-white bg-green-600 hover:bg-green-700 py-3 rounded-xl shadow-md transition-all border border-transparent"

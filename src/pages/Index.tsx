@@ -4,8 +4,10 @@ import HeroBanner from "@/components/HeroBanner"
 import { HardwareGrids } from "@/components/HardwareGrids"
 import { DealsSection } from "@/components/DealsSection"
 import LabourPromo from "@/components/LabourPromo"
+import ServicesPromo from "@/components/ServicesPromo"
 import { GharSeKroInfo } from "@/components/GharSeKroInfo"
 import ProductGrid from "@/components/ProductGrid"
+import { BrandShowcase } from "@/components/BrandShowcase"
 import Footer from "@/components/Footer"
 import { useEffect } from "react"
 import { useLocation } from "react-router-dom"
@@ -43,6 +45,7 @@ const Index = () => {
       <CategoryNav />
       <HeroBanner />
       <HardwareGrids />
+      <BrandShowcase />
       <div id="deals-section" className="scroll-mt-20">
         <DealsSection />
       </div>
@@ -50,6 +53,7 @@ const Index = () => {
         <ProductGrid />
       </div>
       <LabourPromo />
+      <ServicesPromo />
       <div id="info-section" className="scroll-mt-20">
         <GharSeKroInfo />
       </div>

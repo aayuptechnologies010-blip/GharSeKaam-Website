@@ -6,44 +6,39 @@ import { Sparkles, Star } from "lucide-react"
 // Premium Hardcoded Category Fallbacks matching standard hardware categories
 const DUMMY_CATEGORIES: ApiCategory[] = [
   {
-    id: "pt-1",
-    title: "Power Tools",
-    image: "https://images.unsplash.com/photo-1504148455328-c376907d081c?q=80&w=250&auto=format&fit=crop"
-  },
-  {
-    id: "cs-1",
-    title: "Cement & Sand",
-    image: "https://images.unsplash.com/photo-1589939705384-5185137a7f0f?q=80&w=250&auto=format&fit=crop"
-  },
-  {
-    id: "el-1",
-    title: "Electricals",
-    image: "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?q=80&w=250&auto=format&fit=crop"
-  },
-  {
-    id: "pa-1",
-    title: "Paints",
-    image: "https://images.unsplash.com/photo-1595206133361-b1fe343e5e23?q=80&w=250&auto=format&fit=crop"
-  },
-  {
-    id: "pl-1",
-    title: "Plumbing",
-    image: "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?q=80&w=250&auto=format&fit=crop"
-  },
-  {
-    id: "sf-1",
-    title: "Safety Equipment",
-    image: "https://images.unsplash.com/photo-1586864387967-d02ef85d93e8?q=80&w=250&auto=format&fit=crop"
-  },
-  {
-    id: "hw-1",
+    id: "cat-hl",
     title: "Hardware & Locks",
     image: "https://images.unsplash.com/photo-1618220179428-22790b461013?q=80&w=250&auto=format&fit=crop"
   },
   {
-    id: "st-1",
-    title: "Steel & Iron",
-    image: "https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?q=80&w=250&auto=format&fit=crop"
+    id: "cat-el",
+    title: "Electrical",
+    image: "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?q=80&w=250&auto=format&fit=crop"
+  },
+  {
+    id: "cat-pt",
+    title: "Paint",
+    image: "https://images.unsplash.com/photo-1595206133361-b1fe343e5e23?q=80&w=250&auto=format&fit=crop"
+  },
+  {
+    id: "cat-pl",
+    title: "Plumbing Fitting",
+    image: "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?q=80&w=250&auto=format&fit=crop"
+  },
+  {
+    id: "cat-sv",
+    title: "Service",
+    image: "https://images.unsplash.com/photo-1541888946425-d81bb19240f5?q=80&w=250&auto=format&fit=crop"
+  },
+  {
+    id: "cat-ts",
+    title: "Tools & Safety Equipments",
+    image: "https://images.unsplash.com/photo-1586864387967-d02ef85d93e8?q=80&w=250&auto=format&fit=crop"
+  },
+  {
+    id: "cat-bm",
+    title: "Building Material (Cement, Sand, Iron)",
+    image: "https://images.unsplash.com/photo-1589939705384-5185137a7f0f?q=80&w=250&auto=format&fit=crop"
   }
 ];
 
@@ -107,7 +102,13 @@ const CategoryNav = () => {
                   <button
                     key={category.id}
                     className="flex flex-col items-center gap-2.5 group snap-center bg-transparent border-none outline-none cursor-pointer focus:outline-none"
-                    onClick={() => navigate(`/category/${categorySlug}`)}
+                    onClick={() => {
+                      if (categorySlug === "services") {
+                        navigate("/services");
+                      } else {
+                        navigate(`/category/${categorySlug}`);
+                      }
+                    }}
                   >
                     {/* Circle Image Wrapper with Premium Glowing Highlights */}
                     <div className="relative h-16 w-16 md:h-20 md:w-20 rounded-full flex items-center justify-center p-[2.5px] bg-white border border-slate-200 shadow-sm group-hover:shadow-md group-hover:border-amber-500/80 transition-all duration-300 transform group-hover:scale-105">

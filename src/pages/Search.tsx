@@ -48,12 +48,43 @@ export default function Search() {
   // Filter & Sorting state
   const [sortBy, setSortBy] = useState<string>("relevance");
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
   const [priceMin, setPriceMin] = useState<number>(0);
   const [priceMax, setPriceMax] = useState<number>(100000);
   const [selectedRating, setSelectedRating] = useState<number | null>(null);
   const [selectedDiscount, setSelectedDiscount] = useState<number | null>(null);
   const [inStockOnly, setInStockOnly] = useState<boolean>(false);
   const [wholesaleOnly, setWholesaleOnly] = useState<boolean>(false);
+
+  const userType = localStorage.getItem('userType');
+  const isWholesaler = userType === 'WHOLESALER';
+  const isLoggedIn = !!localStorage.getItem('authToken');
+  const hasWholesaleAccess = isWholesaler || !!sessionStorage.getItem('wholesaleGST');
+
+  const getProductPrice = (product: ApiProduct, variant?: ProductVariant) => {
+    const isPlumbingCategory = product.category?.title?.toLowerCase().includes('plumbing');
+    const showWholesale = hasWholesaleAccess && isPlumbingCategory;
+
+    if (variant) {
+      if (showWholesale && variant.wholesaleprice !== undefined && variant.wholesaleprice !== null) {
+        return typeof variant.wholesaleprice === 'string' ? parseFloat(variant.wholesaleprice) : variant.wholesaleprice;
+      }
+      return typeof variant.price === 'string' ? parseFloat(variant.price) : variant.price;
+    }
+
+    if (showWholesale && product.wholesaleprice) {
+      return parseFloat(product.wholesaleprice);
+    }
+    return parseFloat(product.retailprice || product.wholesaleprice || '0');
+  };
+
+  // Sync brand parameter when searchParams changes
+  useEffect(() => {
+    const brandParam = searchParams.get("brand");
+    if (brandParam) {
+      setSelectedBrands([brandParam]);
+    }
+  }, [searchParams]);
 
   // Load products
   useEffect(() => {
@@ -99,8 +130,16 @@ export default function Search() {
       if (!selectedCategories.includes(product.category.title)) return false;
     }
 
+    // 2.5 Brand matching
+    if (selectedBrands.length > 0) {
+      const match = selectedBrands.some(brand => 
+        product.title.toLowerCase().includes(brand.toLowerCase())
+      );
+      if (!match) return false;
+    }
+
     // 3. Price matching
-    const basePrice = parseFloat(product.retailprice || product.wholesaleprice || "0");
+    const basePrice = getProductPrice(product, product.variants && product.variants.length > 0 ? product.variants[0] : undefined);
     if (basePrice < priceMin || basePrice > priceMax) return false;
 
     // 4. Rating filter (mock values 4.0 - 5.0 for demonstration)
@@ -113,15 +152,15 @@ export default function Search() {
 
     // 6. Availability filters
     if (inStockOnly && product.currentQty === 0) return false;
-    if (wholesaleOnly && product.availability !== "WHOLESALER" && product.availability !== "BOTH") return false;
+    if (wholesaleOnly && product.availability !== "WHOLESALER" && product.availability !== "WHOLESALE" && product.availability !== "BOTH") return false;
 
     return true;
   });
 
   // Sorting logic
   const sortedProducts = [...filteredProducts].sort((a, b) => {
-    const priceA = parseFloat(a.retailprice || a.wholesaleprice || "0");
-    const priceB = parseFloat(b.retailprice || b.wholesaleprice || "0");
+    const priceA = getProductPrice(a, a.variants && a.variants.length > 0 ? a.variants[0] : undefined);
+    const priceB = getProductPrice(b, b.variants && b.variants.length > 0 ? b.variants[0] : undefined);
     const ratingA = 4.0 + (a.title.length % 11) / 10;
     const ratingB = 4.0 + (b.title.length % 11) / 10;
 
@@ -143,7 +182,7 @@ export default function Search() {
     e.stopPropagation();
     // Default to first variant if none selected
     const variant = product.variants && product.variants.length > 0 ? product.variants[0] : undefined;
-    const price = variant ? variant.price : parseFloat(product.retailprice || product.wholesaleprice || "0");
+    const price = getProductPrice(product, variant);
     const image = product.images && product.images.length > 0 ? product.images[0] : "https://images.unsplash.com/photo-1581092160607-ee22621dd758?q=80&w=300&auto=format&fit=crop";
 
     addToCart({
@@ -188,6 +227,7 @@ export default function Search() {
 
   const resetFilters = () => {
     setSelectedCategories([]);
+    setSelectedBrands([]);
     setPriceMin(0);
     setPriceMax(100000);
     setSelectedRating(null);
@@ -341,6 +381,30 @@ export default function Search() {
 
             <Separator className="my-5" />
 
+            {/* Brands Filter */}
+            <div className="space-y-3.5 mb-6 text-left">
+              <h3 className="font-bold text-slate-700 text-xs uppercase tracking-wider">Brands</h3>
+              <div className="space-y-2 max-h-48 overflow-y-auto">
+                {["Hilife", "Metro", "Prince", "Apollo", "Asian", "Indi-16", "Pidilite", "Forever", "RR Kabel", "Anchor"].map(brand => (
+                  <div key={brand} className="flex items-center gap-2.5">
+                    <Checkbox 
+                      id={`brand-${brand}`}
+                      checked={selectedBrands.includes(brand)}
+                      onCheckedChange={() => setSelectedBrands(prev => 
+                        prev.includes(brand) ? prev.filter(b => b !== brand) : [...prev, brand]
+                      )}
+                      className="rounded border-gray-300 text-amber-500 focus:ring-amber-500"
+                    />
+                    <Label htmlFor={`brand-${brand}`} className="text-xs font-semibold text-slate-600 cursor-pointer hover:text-amber-600 transition-colors">
+                      {brand}
+                    </Label>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <Separator className="my-5" />
+
             {/* Availability Filter */}
             <div className="space-y-3.5 text-left">
               <h3 className="font-bold text-slate-700 text-xs uppercase tracking-wider">Availability</h3>
@@ -472,17 +536,14 @@ export default function Search() {
             {viewMode === "grid" && sortedProducts.length > 0 && (
               <div className="grid grid-cols-2 xl:grid-cols-3 gap-6">
                 {sortedProducts.map(product => {
-                  const retailPrice = parseFloat(product.retailprice || "0");
-                  const wholesalePrice = parseFloat(product.wholesaleprice || "0");
-                  const activePrice = retailPrice > 0 ? retailPrice : wholesalePrice;
+                  const activeVariant = product.variants && product.variants.length > 0 ? product.variants[0] : undefined;
+                  const activePrice = getProductPrice(product, activeVariant);
 
                   // Dynamic calculated discount and ratings
                   const discount = (product.title.length % 3 === 0) ? 10 + (product.title.length % 20) : 0;
                   const originalPrice = activePrice * (1 + discount / 100);
                   const rating = 4.0 + (product.title.length % 11) / 10;
                   const brandName = product.title.split(' ')[0].toUpperCase();
-
-                  const activeVariant = product.variants && product.variants.length > 0 ? product.variants[0] : undefined;
                   const inCartItem = cartItems.find(item => 
                     item.id === product.id && 
                     (!activeVariant || (item.variant && item.variant.size === activeVariant.size))
@@ -627,16 +688,13 @@ export default function Search() {
             {viewMode === "list" && sortedProducts.length > 0 && (
               <div className="space-y-4">
                 {sortedProducts.map(product => {
-                  const retailPrice = parseFloat(product.retailprice || "0");
-                  const wholesalePrice = parseFloat(product.wholesaleprice || "0");
-                  const activePrice = retailPrice > 0 ? retailPrice : wholesalePrice;
+                  const activeVariant = product.variants && product.variants.length > 0 ? product.variants[0] : undefined;
+                  const activePrice = getProductPrice(product, activeVariant);
 
                   const discount = (product.title.length % 3 === 0) ? 10 + (product.title.length % 20) : 0;
                   const originalPrice = activePrice * (1 + discount / 100);
                   const rating = 4.0 + (product.title.length % 11) / 10;
                   const brandName = product.title.split(' ')[0].toUpperCase();
-
-                  const activeVariant = product.variants && product.variants.length > 0 ? product.variants[0] : undefined;
                   const inCartItem = cartItems.find(item => 
                     item.id === product.id && 
                     (!activeVariant || (item.variant && item.variant.size === activeVariant.size))

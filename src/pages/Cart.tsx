@@ -106,7 +106,7 @@ const Cart = () => {
         addressId: selectedAddressId,
         paymentType: "COD",
         items: cartItems.map(item => ({
-          itemId: item.id,
+          itemId: item.id.includes('-bundle-') ? item.id.split('-bundle-')[0] : item.id,
           quantity: item.quantity,
           variant: item.variant
         }))

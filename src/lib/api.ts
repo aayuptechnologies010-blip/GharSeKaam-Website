@@ -34,6 +34,7 @@ export interface SignupResponse {
 export interface ProductVariant {
   size: string
   price: number
+  wholesaleprice?: number
 }
 
 export interface ApiProduct {
@@ -99,15 +100,59 @@ export interface ProductsResponse {
   items: ApiProduct[]
 }
 
-export async function getCategories(_signal?: AbortSignal): Promise<ApiCategory[]> {
+export async function getCategories(signal?: AbortSignal): Promise<ApiCategory[]> {
+  if (url !== "__BACKEND_DISABLED__") {
+    try {
+      const response = await fetch(`${url}/categories`, { signal })
+      const data = await response.json()
+      if (data.success && Array.isArray(data.categories)) {
+        return data.categories
+      }
+    } catch (error) {
+      console.error("Backend getCategories failed, falling back to mock:", error)
+    }
+  }
   return DUMMY_CATEGORIES
 }
 
-export async function getProducts(_signal?: AbortSignal): Promise<ApiProduct[]> {
+export async function getProducts(signal?: AbortSignal): Promise<ApiProduct[]> {
+  if (url !== "__BACKEND_DISABLED__") {
+    const token = localStorage.getItem('authToken')
+    try {
+      const headers: HeadersInit = {}
+      if (token) {
+        headers['Authorization'] = token
+      }
+      const response = await fetch(`${url}/items`, { headers, signal })
+      const data = await response.json()
+      if (data.success && Array.isArray(data.items)) {
+        return data.items
+      }
+    } catch (error) {
+      console.error("Backend getProducts failed, falling back to mock:", error)
+    }
+  }
   return FALLBACK_HARDWARE_PRODUCTS
 }
 
-export async function getProductDetail(productId: string, _signal?: AbortSignal): Promise<ApiProductDetail> {
+export async function getProductDetail(productId: string, signal?: AbortSignal): Promise<ApiProductDetail> {
+  if (url !== "__BACKEND_DISABLED__") {
+    const token = localStorage.getItem('authToken')
+    try {
+      const headers: HeadersInit = {}
+      if (token) {
+        headers['Authorization'] = token
+      }
+      const response = await fetch(`${url}/item/${productId}`, { headers, signal })
+      const data = await response.json()
+      if (data.success && data.item) {
+        return data.item
+      }
+    } catch (error) {
+      console.error("Backend getProductDetail failed, falling back to mock:", error)
+    }
+  }
+
   const found = FALLBACK_HARDWARE_PRODUCTS.find(p => p.id === productId)
   if (!found) throw new Error('Product not found')
   return {
@@ -211,6 +256,7 @@ export interface ApiOrder {
     pincode: string
     flatnumber: number
   }
+  estimatedDelivery?: string
 }
 
 export interface OrdersResponse {
@@ -319,14 +365,13 @@ export interface AddressResponse {
 
 
 export const DUMMY_CATEGORIES: ApiCategory[] = [
-  { id: "pt-1", title: "Power Tools", image: "https://images.unsplash.com/photo-1504148455328-c376907d081c?q=80&w=300&auto=format&fit=crop" },
-  { id: "cs-1", title: "Cement & Sand", image: "https://images.unsplash.com/photo-1589939705384-5185137a7f0f?q=80&w=300&auto=format&fit=crop" },
-  { id: "el-1", title: "Electricals", image: "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?q=80&w=300&auto=format&fit=crop" },
-  { id: "pa-1", title: "Paints", image: "https://images.unsplash.com/photo-1595206133361-b1fe343e5e23?q=80&w=300&auto=format&fit=crop" },
-  { id: "pl-1", title: "Plumbing", image: "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?q=80&w=300&auto=format&fit=crop" },
-  { id: "sf-1", title: "Safety Equipment", image: "https://images.unsplash.com/photo-1586864387967-d02ef85d93e8?q=80&w=300&auto=format&fit=crop" },
-  { id: "hw-1", title: "Hardware & Locks", image: "https://images.unsplash.com/photo-1618220179428-22790b461013?q=80&w=300&auto=format&fit=crop" },
-  { id: "st-1", title: "Steel & Iron", image: "https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?q=80&w=300&auto=format&fit=crop" },
+  { id: "cat-hl", title: "Hardware & Locks", image: "https://images.unsplash.com/photo-1618220179428-22790b461013?q=80&w=300&auto=format&fit=crop" },
+  { id: "cat-el", title: "Electrical", image: "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?q=80&w=300&auto=format&fit=crop" },
+  { id: "cat-pt", title: "Paint", image: "https://images.unsplash.com/photo-1595206133361-b1fe343e5e23?q=80&w=300&auto=format&fit=crop" },
+  { id: "cat-pl", title: "Plumbing Fitting", image: "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?q=80&w=300&auto=format&fit=crop" },
+  { id: "cat-sv", title: "Service", image: "https://images.unsplash.com/photo-1541888946425-d81bb19240f5?q=80&w=300&auto=format&fit=crop" },
+  { id: "cat-ts", title: "Tools & Safety Equipments", image: "https://images.unsplash.com/photo-1586864387967-d02ef85d93e8?q=80&w=300&auto=format&fit=crop" },
+  { id: "cat-bm", title: "Building Material (Cement, Sand, Iron)", image: "https://images.unsplash.com/photo-1589939705384-5185137a7f0f?q=80&w=300&auto=format&fit=crop" },
 ]
 
 export const DEMO_ADDRESSES: Address[] = [
@@ -418,7 +463,8 @@ export const DEMO_ORDERS: ApiOrder[] = [
       { id: "oi-2", quantity: 2, unitPrice: "899", lineTotal: "1799", item: { title: "Godrej Brass Padlock 65mm", images: ["https://images.unsplash.com/photo-1618220179428-22790b461013?q=80&w=300&auto=format&fit=crop"] } },
     ],
     shopkeeper: { shopname: "GharSeKro Verified Store" },
-    deliveryAddress: { city: "Mumbai", state: "Maharashtra", pincode: "400001", flatnumber: 12 }
+    deliveryAddress: { city: "Mumbai", state: "Maharashtra", pincode: "400001", flatnumber: 12 },
+    estimatedDelivery: "Delivered on time"
   },
   {
     id: "ORD-2024-002",
@@ -430,7 +476,8 @@ export const DEMO_ORDERS: ApiOrder[] = [
       { id: "oi-3", quantity: 1, unitPrice: "3200", lineTotal: "3200", item: { title: "Asian Paints Apex Ultima 10L", images: ["https://images.unsplash.com/photo-1595206133361-b1fe343e5e23?q=80&w=300&auto=format&fit=crop"] } },
     ],
     shopkeeper: { shopname: "GharSeKro Verified Store" },
-    deliveryAddress: { city: "Mumbai", state: "Maharashtra", pincode: "400001", flatnumber: 12 }
+    deliveryAddress: { city: "Mumbai", state: "Maharashtra", pincode: "400001", flatnumber: 12 },
+    estimatedDelivery: "Within 2 Hours"
   },
 ]
 
@@ -441,7 +488,7 @@ export const FALLBACK_HARDWARE_PRODUCTS: ApiProduct[] = [
     retailprice: "2499",
     wholesaleprice: "2199",
     images: ["https://images.unsplash.com/photo-1504307651254-35680f356dfd?q=80&w=600&auto=format&fit=crop"],
-    category: { id: "pt-1", title: "Power Tools" },
+    category: { id: "cat-ts", title: "Tools & Safety Equipments" },
     availability: "BOTH",
     currentQty: 150,
     variants: [
@@ -455,7 +502,7 @@ export const FALLBACK_HARDWARE_PRODUCTS: ApiProduct[] = [
     retailprice: "375",
     wholesaleprice: "350",
     images: ["https://images.unsplash.com/photo-1589939705384-5185137a7f0f?q=80&w=600&auto=format&fit=crop"],
-    category: { id: "cs-1", title: "Cement & Sand" },
+    category: { id: "cat-bm", title: "Building Material (Cement, Sand, Iron)" },
     availability: "BOTH",
     currentQty: 500,
     variants: [
@@ -469,7 +516,7 @@ export const FALLBACK_HARDWARE_PRODUCTS: ApiProduct[] = [
     retailprice: "1599",
     wholesaleprice: "1399",
     images: ["https://images.unsplash.com/photo-1563770660941-20978e870e26?q=80&w=600&auto=format&fit=crop"],
-    category: { id: "el-1", title: "Electricals" },
+    category: { id: "cat-el", title: "Electrical" },
     availability: "BOTH",
     currentQty: 250,
     variants: [
@@ -484,7 +531,7 @@ export const FALLBACK_HARDWARE_PRODUCTS: ApiProduct[] = [
     retailprice: "799",
     wholesaleprice: "699",
     images: ["https://images.unsplash.com/photo-1618220179428-22790b461013?q=80&w=600&auto=format&fit=crop"],
-    category: { id: "hw-1", title: "Hardware" },
+    category: { id: "cat-hl", title: "Hardware & Locks" },
     availability: "BOTH",
     currentQty: 180,
     variants: [
@@ -499,7 +546,7 @@ export const FALLBACK_HARDWARE_PRODUCTS: ApiProduct[] = [
     retailprice: "3200",
     wholesaleprice: "2890",
     images: ["https://images.unsplash.com/photo-1595206133361-b1fe343e5e23?q=80&w=600&auto=format&fit=crop"],
-    category: { id: "pa-1", title: "Paints" },
+    category: { id: "cat-pt", title: "Paint" },
     availability: "BOTH",
     currentQty: 90,
     variants: [
@@ -514,7 +561,7 @@ export const FALLBACK_HARDWARE_PRODUCTS: ApiProduct[] = [
     retailprice: "499",
     wholesaleprice: "420",
     images: ["https://images.unsplash.com/photo-1621905251189-08b45d6a269e?q=80&w=600&auto=format&fit=crop"],
-    category: { id: "pl-1", title: "Plumbing" },
+    category: { id: "cat-pl", title: "Plumbing Fitting" },
     availability: "BOTH",
     currentQty: 300,
     variants: [
@@ -528,7 +575,7 @@ export const FALLBACK_HARDWARE_PRODUCTS: ApiProduct[] = [
     retailprice: "850",
     wholesaleprice: "760",
     images: ["https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?q=80&w=600&auto=format&fit=crop"],
-    category: { id: "cs-1", title: "Cement & Sand" },
+    category: { id: "cat-bm", title: "Building Material (Cement, Sand, Iron)" },
     availability: "BOTH",
     currentQty: 120,
     variants: [
@@ -543,7 +590,7 @@ export const FALLBACK_HARDWARE_PRODUCTS: ApiProduct[] = [
     retailprice: "1799",
     wholesaleprice: "1499",
     images: ["https://images.unsplash.com/photo-1584622650111-993a426fbf0a?q=80&w=600&auto=format&fit=crop"],
-    category: { id: "pl-1", title: "Plumbing" },
+    category: { id: "cat-pl", title: "Plumbing Fitting" },
     availability: "BOTH",
     currentQty: 80,
     variants: [

@@ -354,6 +354,7 @@ const ProductDetail = () => {
   const [selectedImage, setSelectedImage] = useState(0)
   const [quantity, setQuantity] = useState(1)
   const [selectedVariant, setSelectedVariant] = useState<string>('')
+  const [purchaseMode, setPurchaseMode] = useState<'piece' | 'bundle'>('piece')
   
   // Related products states
   const [relatedProducts, setRelatedProducts] = useState<ApiProduct[]>([])
@@ -466,17 +467,36 @@ const ProductDetail = () => {
   const getProductPrice = () => {
     if (!product) return 0
     
+    const isPlumbingCategory = product.category?.title?.toLowerCase().includes('plumbing')
+    const showWholesale = isLoggedIn && isWholesaler && isPlumbingCategory
+
     // If a variant is selected, use its price
     if (selectedVariant && product.variants) {
       const variant = product.variants.find(v => v.size === selectedVariant)
       if (variant) {
-        return variant.price
+        // Bundle mode pricing
+        if (purchaseMode === 'bundle') {
+          if (showWholesale && (variant as any).bundleWholesalePrice) {
+            return typeof (variant as any).bundleWholesalePrice === 'string'
+              ? parseFloat((variant as any).bundleWholesalePrice)
+              : (variant as any).bundleWholesalePrice
+          }
+          if ((variant as any).bundlePrice) {
+            return typeof (variant as any).bundlePrice === 'string'
+              ? parseFloat((variant as any).bundlePrice)
+              : (variant as any).bundlePrice
+          }
+        }
+        // Piece mode pricing
+        if (showWholesale && variant.wholesaleprice !== undefined && variant.wholesaleprice !== null) {
+          return typeof variant.wholesaleprice === 'string' ? parseFloat(variant.wholesaleprice) : variant.wholesaleprice
+        }
+        return typeof variant.price === 'string' ? parseFloat(variant.price) : variant.price
       }
     }
     
     // Show wholesale price if wholesaler is logged in AND category is Plumbing
-    const isPlumbingCategory = product.category?.title?.toLowerCase() === 'plumbing'
-    if (isLoggedIn && isWholesaler && isPlumbingCategory && product.wholesaleprice) {
+    if (showWholesale && product.wholesaleprice) {
       return parseFloat(product.wholesaleprice)
     }
     // Otherwise show retail price
@@ -498,19 +518,32 @@ const ProductDetail = () => {
       ? product.variants.find(v => v.size === selectedVariant) 
       : undefined
 
+    const bundleQty = variant && purchaseMode === 'bundle' ? (variant as any).bundleQty : null
+    const itemName = bundleQty
+      ? `${product.title}${variant ? ` (${variant.size})` : ''} — Bundle of ${bundleQty} pcs`
+      : product.title
+
+    const finalVariant = variant && purchaseMode === 'bundle' ? {
+      ...variant,
+      price: price.toString(),
+      wholesaleprice: price.toString(),
+      isBundle: true,
+      bundleQty: bundleQty.toString()
+    } : variant
+
     for (let i = 0; i < quantity; i++) {
       addToCart({
-        id: product.id,
-        name: product.title,
+        id: bundleQty ? `${product.id}-bundle-${variant?.size}` : product.id,
+        name: itemName,
         price: price,
         image: product.images && product.images.length > 0 ? product.images[0] : 'https://images.unsplash.com/photo-1608613304899-ea8098577e38?auto=format&fit=crop&w=400&q=80',
-        variant: variant
+        variant: finalVariant
       })
     }
 
     toast({
       title: "Added to Cart",
-      description: `${quantity} × ${product.title}${variant ? ` (${variant.size})` : ''} added successfully! 🛒`,
+      description: `${quantity} × ${itemName} added successfully! 🛒`,
     })
   }
 
@@ -799,7 +832,18 @@ const ProductDetail = () => {
 
                 <div className="flex justify-between items-baseline pt-1">
                   <span className="text-xs font-semibold text-slate-400">Total Price:</span>
-                  <span className="text-2xl font-black text-slate-900">₹{(price * quantity).toLocaleString()}</span>
+                  <div className="text-right">
+                    <span className="text-2xl font-black text-slate-900">₹{(price * quantity).toLocaleString()}</span>
+                    {purchaseMode === 'bundle' && selectedVariant && (() => {
+                      const v = product.variants?.find(x => x.size === selectedVariant)
+                      const bQty = v ? (v as any).bundleQty : null
+                      return bQty ? (
+                        <span className="block text-[10px] text-amber-600 font-bold">
+                          {quantity} packet × {bQty} pcs = {quantity * bQty} pcs total
+                        </span>
+                      ) : null
+                    })()}
+                  </div>
                 </div>
 
                 {/* Variant selector */}
@@ -810,7 +854,7 @@ const ProductDetail = () => {
                       {product.variants.map((v) => (
                         <button
                           key={v.size}
-                          onClick={() => setSelectedVariant(v.size)}
+                          onClick={() => { setSelectedVariant(v.size); setPurchaseMode('piece'); }}
                           className={`px-3 py-2 text-xs font-bold rounded-xl border transition-all ${
                             selectedVariant === v.size
                               ? 'border-amber-500 bg-amber-50 text-amber-700 shadow-sm'
@@ -818,10 +862,56 @@ const ProductDetail = () => {
                           }`}
                         >
                           <span>{v.size}</span>
-                          <span className="block text-[10px] text-muted-foreground font-semibold">₹{v.price.toLocaleString()}</span>
+                          <span className="block text-[10px] text-muted-foreground font-semibold">₹{v.price.toLocaleString()}/pc</span>
                         </button>
                       ))}
                     </div>
+
+                    {/* Bundle / Packet Toggle — only shows if selected variant has bundleQty */}
+                    {selectedVariant && (() => {
+                      const selV = product.variants?.find(x => x.size === selectedVariant)
+                      const bQty = selV ? (selV as any).bundleQty : null
+                      const bPrice = selV ? (selV as any).bundlePrice : null
+                      if (!bQty) return null
+                      return (
+                        <div className="space-y-2">
+                          <Label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Purchase Mode:</Label>
+                          <div className="flex rounded-xl border border-slate-200 overflow-hidden bg-slate-50 p-0.5 gap-0.5">
+                            <button
+                              onClick={() => setPurchaseMode('piece')}
+                              className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${
+                                purchaseMode === 'piece'
+                                  ? 'bg-white text-slate-800 shadow-sm border border-slate-200'
+                                  : 'text-slate-500 hover:text-slate-700'
+                              }`}
+                            >
+                              🔩 Piece
+                            </button>
+                            <button
+                              onClick={() => setPurchaseMode('bundle')}
+                              className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${
+                                purchaseMode === 'bundle'
+                                  ? 'bg-amber-500 text-slate-950 shadow-sm'
+                                  : 'text-slate-500 hover:text-slate-700'
+                              }`}
+                            >
+                              📦 Bundle
+                            </button>
+                          </div>
+                          {purchaseMode === 'bundle' && (
+                            <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 space-y-1">
+                              <p className="text-xs font-black text-amber-700">📦 Bundle of {bQty} pcs</p>
+                              <p className="text-sm font-black text-slate-900">₹{Number(bPrice).toLocaleString()} <span className="text-[10px] font-semibold text-slate-400">per packet</span></p>
+                              {selV && (selV as any).price && (
+                                <p className="text-[10px] text-green-700 font-bold">
+                                  Save ₹{Math.max(0, Math.round((Number((selV as any).price) * bQty) - Number(bPrice))).toLocaleString()} vs buying loose!
+                                </p>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      )
+                    })()}
                   </div>
                 )}
 
@@ -898,7 +988,13 @@ const ProductDetail = () => {
                     onClick={handleAddToCart}
                     className="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-black py-5 rounded-xl shadow-md shadow-amber-500/10 flex items-center justify-center gap-2 text-sm"
                   >
-                    <ShoppingCart className="h-4.5 w-4.5" /> Add to Cart
+                    <ShoppingCart className="h-4.5 w-4.5" />
+                    {purchaseMode === 'bundle' && selectedVariant && (() => {
+                      const v = product.variants?.find(x => x.size === selectedVariant)
+                      const bQty = v ? (v as any).bundleQty : null
+                      return bQty ? `Add Bundle (${bQty} pcs) to Cart` : 'Add to Cart'
+                    })()}
+                    {(purchaseMode === 'piece' || !selectedVariant || !product.variants?.find(x => x.size === selectedVariant && (x as any).bundleQty)) && 'Add to Cart'}
                   </Button>
                   
                   <div className="flex gap-2">
