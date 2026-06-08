@@ -99,6 +99,16 @@ const Cart = () => {
       return
     }
 
+    const selectedAddress = addresses.find(a => a.id === selectedAddressId)
+    if (selectedAddress && (selectedAddress.city.toLowerCase() !== 'gorakhpur' || selectedAddress.state.toLowerCase() !== 'uttar pradesh')) {
+      toast({
+        title: "Service Not Available",
+        description: "Sorry, currently we are not working in your city. We only support orders in Gorakhpur.",
+        variant: "destructive"
+      })
+      return
+    }
+
     try {
       setIsCreatingOrder(true)
 
@@ -121,6 +131,12 @@ const Cart = () => {
           description: `Order ID: ${result.orderId || 'Generated'}`,
         })
         navigate('/checkout-success', { state: { orderId: result.orderId || `GSK-${Date.now().toString().slice(-6)}`, address: addresses.find(a => a.id === selectedAddressId) } })
+      } else {
+        toast({
+          title: "Order Failed",
+          description: result.message || "Failed to place order.",
+          variant: "destructive"
+        })
       }
     } catch (error: any) {
       console.error('Order creation failed:', error)

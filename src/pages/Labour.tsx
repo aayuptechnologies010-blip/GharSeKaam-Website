@@ -5,6 +5,7 @@ import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useToast } from "@/hooks/use-toast";
 import {
   HardHat,
   Zap,
@@ -155,6 +156,7 @@ function AnimatedSection({ children, className = "" }: { children: React.ReactNo
 
 /* ─── Main Labour Page ─── */
 const Labour = () => {
+  const { toast } = useToast();
   const [categories, setCategories] = useState(labourCategories);
   const [selected, setSelected] = useState<any | null>(null);
   const [qty, setQty] = useState(1);
@@ -196,6 +198,16 @@ const Labour = () => {
 
   async function handleBooking(e: React.FormEvent) {
     e.preventDefault();
+
+    if (!form.address.toLowerCase().includes("gorakhpur")) {
+      toast({
+        title: "Service Not Available",
+        description: "Sorry, currently we are not working in your city. We only support bookings in Gorakhpur.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setFormLoading(true);
 
     const payload = {

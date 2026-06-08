@@ -43,7 +43,9 @@ const Footer = () => {
             <h4 className="text-sm font-black text-white uppercase tracking-wider">Get to Know Us</h4>
             <ul className="space-y-2 text-xs font-bold text-slate-300">
               <li><a href="#" className="hover:underline transition-all">About GharSeKro</a></li>
-              <li><span onClick={() => navigate('/wholesale')} className="hover:underline cursor-pointer transition-all">Wholesale Program</span></li>
+              {localStorage.getItem("authToken") && (
+                <li><span onClick={() => navigate('/wholesale')} className="hover:underline cursor-pointer transition-all">Wholesale Program</span></li>
+              )}
               <li><span onClick={() => navigate('/labour')} className="hover:underline cursor-pointer transition-all">Worker Portal</span></li>
               <li><a href="#" className="hover:underline transition-all">Careers</a></li>
               <li><a href="#" className="hover:underline transition-all">Press Releases</a></li>

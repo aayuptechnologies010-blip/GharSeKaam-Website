@@ -90,7 +90,7 @@ const PROMO_BANNERS = [
     title: "Cement & Steel aggregate bundle",
     desc: "Flat ₹800 discount on 50+ cement bags + 10 TMT rods purchase.",
     cta: "View Combo Details",
-    link: "/wholesale",
+    link: "/category/cement-&-sand",
     bgGradient: "from-amber-500 via-amber-600 to-amber-700",
     textCol: "text-slate-950 hover:bg-slate-900 hover:text-white"
   },
@@ -122,6 +122,7 @@ export const DealsSection = () => {
   const { toast } = useToast();
   const [timeLeft, setTimeLeft] = useState({ hours: 0, minutes: 0, seconds: 0 });
   const carouselRef = useRef<HTMLDivElement>(null);
+  const isLoggedIn = !!localStorage.getItem('authToken');
 
   const scroll = (direction: 'left' | 'right') => {
     if (carouselRef.current) {
@@ -287,192 +288,217 @@ export const DealsSection = () => {
           </div>
         </div>
 
-        {/* Horizontal Deals Carousel Grid Wrapper with floating arrow navigation */}
-        <div className="relative group/carousel z-10">
-          {/* Scroll Left Button */}
-          <button
-            onClick={() => scroll('left')}
-            className="absolute left-[-16px] top-1/2 -translate-y-1/2 bg-white hover:bg-slate-50 text-slate-700 hover:text-amber-500 border border-slate-200 h-10 w-10 rounded-full flex items-center justify-center shadow-lg cursor-pointer transition-all duration-200 hover:scale-105 z-20 opacity-0 group-hover/carousel:opacity-100 hidden md:flex"
-            aria-label="Scroll left"
-          >
-            <ChevronLeft className="h-5 w-5" />
-          </button>
-
-          {/* Scroll Right Button */}
-          <button
-            onClick={() => scroll('right')}
-            className="absolute right-[-16px] top-1/2 -translate-y-1/2 bg-white hover:bg-slate-50 text-slate-700 hover:text-amber-500 border border-slate-200 h-10 w-10 rounded-full flex items-center justify-center shadow-lg cursor-pointer transition-all duration-200 hover:scale-105 z-20 opacity-0 group-hover/carousel:opacity-100 hidden md:flex"
-            aria-label="Scroll right"
-          >
-            <ChevronRight className="h-5 w-5" />
-          </button>
-
-          {/* Carousel container */}
-          <div 
-            ref={carouselRef}
-            className="flex gap-6 overflow-x-auto pb-6 pt-2 snap-x scrollbar-none scroll-smooth"
-          >
-          {DEALS_DATA.map((deal) => {
-            const inCartItem = cartItems.find(item => item.id === deal.id);
-            const isInCart = !!inCartItem;
+        {!isLoggedIn ? (
+          <div className="relative z-10 w-full rounded-3xl bg-white border border-slate-200 p-8 shadow-xl text-center max-w-2xl mx-auto overflow-hidden group hover-pulse-glow">
+            {/* Visual ambient highlights */}
+            <div className="absolute top-0 right-0 w-32 h-32 rounded-full bg-amber-500/10 blur-2xl pointer-events-none" />
+            <div className="absolute bottom-0 left-0 w-32 h-32 rounded-full bg-blue-500/10 blur-2xl pointer-events-none" />
             
-            return (
-              <Card
-                key={deal.id}
-                onClick={() => navigate(`/product/${deal.id}`)}
-                className="w-[290px] sm:w-[320px] shrink-0 card-glossy hover-lift gold-glow cursor-pointer snap-start relative group/card rounded-2xl overflow-hidden bg-white text-left transition-all duration-300 border border-slate-200"
+            <div className="space-y-6 py-8 relative z-10 flex flex-col items-center">
+              <div className="h-16 w-16 bg-amber-50 border border-amber-200 rounded-2xl flex items-center justify-center text-amber-600 shadow-md">
+                <Flame className="h-8 w-8 fill-amber-500 text-amber-500 animate-pulse" />
+              </div>
+              <div className="space-y-2 max-w-md">
+                <h3 className="text-xl font-black text-slate-800 uppercase tracking-tight">🔒 Lightning Deals Locked</h3>
+                <p className="text-xs text-slate-500 font-extrabold uppercase tracking-wider leading-relaxed">
+                  Log in or register your account to unlock today's hot builder deals, tools discount rates, and wholesale plant pricing.
+                </p>
+              </div>
+              <Button
+                onClick={() => navigate("/login")}
+                className="bg-amber-500 hover:bg-amber-600 text-slate-950 font-black px-6 py-3 rounded-2xl shadow-lg shadow-amber-500/20 text-xs uppercase tracking-widest border-none transition-all duration-200 hover:scale-102 cursor-pointer"
               >
-                
-                {/* Clean Top Corner Badges (No overlaps!) */}
-                <div className="absolute top-3.5 left-3.5 z-10">
-                  <Badge variant="destructive" className="bg-red-600 hover:bg-red-700 text-[9px] font-black uppercase tracking-wider py-1 px-2.5 shadow-md border-none flex items-center gap-0.5 rounded-lg">
-                    <Percent className="h-3 w-3" /> {deal.discount}% Off
-                  </Badge>
-                </div>
+                Login / Register to View Deals
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <div className="relative group/carousel z-10">
+            {/* Scroll Left Button */}
+            <button
+              onClick={() => scroll('left')}
+              className="absolute left-[-16px] top-1/2 -translate-y-1/2 bg-white hover:bg-slate-50 text-slate-700 hover:text-amber-500 border border-slate-200 h-10 w-10 rounded-full flex items-center justify-center shadow-lg cursor-pointer transition-all duration-200 hover:scale-105 z-20 opacity-0 group-hover/carousel:opacity-100 hidden md:flex"
+              aria-label="Scroll left"
+            >
+              <ChevronLeft className="h-5 w-5" />
+            </button>
 
-                {/* Stock Left Urgency Badge - clean styling */}
-                <div className="absolute top-3.5 right-3.5 z-10">
-                  <span className="bg-red-50 text-red-600 border border-red-150 text-[8.5px] font-black uppercase px-2 py-1 rounded-lg animate-pulse flex items-center justify-center shadow-sm">
-                    Only {deal.stockLeft} Left!
-                  </span>
-                </div>
+            {/* Scroll Right Button */}
+            <button
+              onClick={() => scroll('right')}
+              className="absolute right-[-16px] top-1/2 -translate-y-1/2 bg-white hover:bg-slate-50 text-slate-700 hover:text-amber-500 border border-slate-200 h-10 w-10 rounded-full flex items-center justify-center shadow-lg cursor-pointer transition-all duration-200 hover:scale-105 z-20 opacity-0 group-hover/carousel:opacity-100 hidden md:flex"
+              aria-label="Scroll right"
+            >
+              <ChevronRight className="h-5 w-5" />
+            </button>
 
-                {/* Product Image Panel with beautiful visual grid-mesh background */}
-                <div className="aspect-[4/3] w-full bg-gradient-to-tr from-slate-50 via-slate-100/50 to-amber-500/5 flex items-center justify-center p-6 relative overflow-hidden border-b">
-                  {/* Glowing decorative circle grid background */}
-                  <div className="absolute h-36 w-36 rounded-full bg-gradient-to-tr from-slate-100 to-slate-200/50 p-2 scale-90 group-hover/card:scale-105 transition-transform duration-500" />
+            {/* Carousel container */}
+            <div 
+              ref={carouselRef}
+              className="flex gap-6 overflow-x-auto pb-6 pt-2 snap-x scrollbar-none scroll-smooth"
+            >
+            {DEALS_DATA.map((deal) => {
+              const inCartItem = cartItems.find(item => item.id === deal.id);
+              const isInCart = !!inCartItem;
+              
+              return (
+                <Card
+                  key={deal.id}
+                  onClick={() => navigate(`/product/${deal.id}`)}
+                  className="w-[290px] sm:w-[320px] shrink-0 card-glossy hover-lift gold-glow cursor-pointer snap-start relative group/card rounded-2xl overflow-hidden bg-white text-left transition-all duration-300 border border-slate-200"
+                >
                   
-                  <img
-                    src={deal.image}
-                    alt=""
-                    className="max-h-[140px] max-w-[80%] object-contain mix-blend-multiply group-hover/card:scale-105 transition-transform duration-500 z-10"
-                    onError={(e) => {
-                      e.currentTarget.src = getHardwareSvgFallback(deal.title);
-                    }}
-                  />
-                </div>
+                  {/* Clean Top Corner Badges (No overlaps!) */}
+                  <div className="absolute top-3.5 left-3.5 z-10">
+                    <Badge variant="destructive" className="bg-red-600 hover:bg-red-700 text-[9px] font-black uppercase tracking-wider py-1 px-2.5 shadow-md border-none flex items-center gap-0.5 rounded-lg">
+                      <Percent className="h-3 w-3" /> {deal.discount}% Off
+                    </Badge>
+                  </div>
 
-                {/* Card Main Info Content */}
-                <CardContent className="p-5 space-y-4">
-                  {/* Brand, Category, and prime-like Assured badge row */}
-                  <div className="space-y-1">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <span className="text-[10px] bg-slate-950 text-amber-500 font-black px-2 py-0.5 rounded uppercase tracking-wider shadow-sm">
-                          {deal.brand}
-                        </span>
+                  {/* Stock Left Urgency Badge - clean styling */}
+                  <div className="absolute top-3.5 right-3.5 z-10">
+                    <span className="bg-red-50 text-red-600 border border-red-150 text-[8.5px] font-black uppercase px-2 py-1 rounded-lg animate-pulse flex items-center justify-center shadow-sm">
+                      Only {deal.stockLeft} Left!
+                    </span>
+                  </div>
+
+                  {/* Product Image Panel with beautiful visual grid-mesh background */}
+                  <div className="aspect-[4/3] w-full bg-gradient-to-tr from-slate-50 via-slate-100/50 to-amber-500/5 flex items-center justify-center p-6 relative overflow-hidden border-b">
+                    {/* Glowing decorative circle grid background */}
+                    <div className="absolute h-36 w-36 rounded-full bg-gradient-to-tr from-slate-100 to-slate-200/50 p-2 scale-90 group-hover/card:scale-105 transition-transform duration-500" />
+                    
+                    <img
+                      src={deal.image}
+                      alt=""
+                      className="max-h-[140px] max-w-[80%] object-contain mix-blend-multiply group-hover/card:scale-105 transition-transform duration-500 z-10"
+                      onError={(e) => {
+                        e.currentTarget.src = getHardwareSvgFallback(deal.title);
+                      }}
+                    />
+                  </div>
+
+                  {/* Card Main Info Content */}
+                  <CardContent className="p-5 space-y-4">
+                    {/* Brand, Category, and prime-like Assured badge row */}
+                    <div className="space-y-1">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <span className="text-[10px] bg-slate-950 text-amber-500 font-black px-2 py-0.5 rounded uppercase tracking-wider shadow-sm">
+                            {deal.brand}
+                          </span>
+                          
+                          {/* GharSeKro Assured badge positioned perfectly here! */}
+                          <Badge className="bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 hover:from-amber-600 hover:to-amber-700 border-none text-[8px] font-black uppercase tracking-wider py-0.5 px-1.5 shadow flex items-center gap-0.5 shrink-0">
+                            <ShieldCheck className="h-3 w-3 text-slate-950" /> Assured
+                          </Badge>
+                        </div>
                         
-                        {/* GharSeKro Assured badge positioned perfectly here! */}
-                        <Badge className="bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 hover:from-amber-600 hover:to-amber-700 border-none text-[8px] font-black uppercase tracking-wider py-0.5 px-1.5 shadow flex items-center gap-0.5 shrink-0">
-                          <ShieldCheck className="h-3 w-3 text-slate-950" /> Assured
-                        </Badge>
+                        <span className="text-[10px] text-amber-600 font-extrabold uppercase tracking-wide">
+                          {deal.category}
+                        </span>
                       </div>
                       
-                      <span className="text-[10px] text-amber-600 font-extrabold uppercase tracking-wide">
-                        {deal.category}
-                      </span>
+                      {/* Product Title */}
+                      <h3 className="text-sm font-bold text-slate-800 line-clamp-2 leading-tight h-10 group-hover:text-amber-600 transition-colors">
+                        {deal.title}
+                      </h3>
                     </div>
-                    
-                    {/* Product Title */}
-                    <h3 className="text-sm font-bold text-slate-800 line-clamp-2 leading-tight h-10 group-hover:text-amber-600 transition-colors">
-                      {deal.title}
-                    </h3>
-                  </div>
 
-                  {/* Rating & reviews with Flipkart-Style green chip */}
-                  <div className="flex items-center gap-2">
-                    <div className="flex items-center bg-green-700 text-white text-[10px] px-2 py-0.5 rounded font-black gap-0.5 shadow-sm shadow-green-700/10">
-                      <span>{deal.rating}</span>
-                      <Star className="h-2.5 w-2.5 fill-white text-white" />
+                    {/* Rating & reviews with Flipkart-Style green chip */}
+                    <div className="flex items-center gap-2">
+                      <div className="flex items-center bg-green-700 text-white text-[10px] px-2 py-0.5 rounded font-black gap-0.5 shadow-sm shadow-green-700/10">
+                        <span>{deal.rating}</span>
+                        <Star className="h-2.5 w-2.5 fill-white text-white" />
+                      </div>
+                      <span className="text-slate-400 font-bold text-[10px]">({deal.reviews} Reviews)</span>
                     </div>
-                    <span className="text-slate-400 font-bold text-[10px]">({deal.reviews} Reviews)</span>
-                  </div>
 
-                  {/* Price Block featuring Dashed Capsule exact money saved indicator */}
-                  <div className="flex items-center justify-between gap-2 pt-0.5">
-                    <div className="space-y-0.5">
-                      <div className="flex items-baseline gap-2">
-                        <span className="font-black text-xl text-slate-900 tracking-tight">
-                          ₹{deal.dealPrice.toLocaleString()}
-                        </span>
-                        <span className="text-xs text-slate-400 line-through">
-                          ₹{deal.basePrice.toLocaleString()}
+                    {/* Price Block featuring Dashed Capsule exact money saved indicator */}
+                    <div className="flex items-center justify-between gap-2 pt-0.5">
+                      <div className="space-y-0.5">
+                        <div className="flex items-baseline gap-2">
+                          <span className="font-black text-xl text-slate-900 tracking-tight">
+                            ₹{deal.dealPrice.toLocaleString()}
+                          </span>
+                          <span className="text-xs text-slate-400 line-through">
+                            ₹{deal.basePrice.toLocaleString()}
+                          </span>
+                        </div>
+                        <span className="text-[9px] text-slate-400 font-bold uppercase block">Inclusive of GST</span>
+                      </div>
+
+                      <div className="border border-dashed border-amber-500/80 bg-amber-50/50 rounded-xl px-2.5 py-1 flex items-center justify-center shrink-0">
+                        <span className="text-[9.5px] font-black text-amber-600 uppercase tracking-wide">
+                          Save ₹{(deal.basePrice - deal.dealPrice).toLocaleString()}
                         </span>
                       </div>
-                      <span className="text-[9px] text-slate-400 font-bold uppercase block">Inclusive of GST</span>
                     </div>
 
-                    <div className="border border-dashed border-amber-500/80 bg-amber-50/50 rounded-xl px-2.5 py-1 flex items-center justify-center shrink-0">
-                      <span className="text-[9.5px] font-black text-amber-600 uppercase tracking-wide">
-                        Save ₹{(deal.basePrice - deal.dealPrice).toLocaleString()}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Claimed Indicator Progress Bar with Premium Shimmer effect */}
-                  <div className="space-y-1.5 pt-1">
-                    <div className="flex justify-between text-[10px] font-bold text-slate-600">
-                      <span className="flex items-center gap-1">
-                        <Clock className="h-3 w-3 text-red-500 animate-pulse" />
-                        <span>{deal.claimed}% Claimed</span>
-                      </span>
-                      <span className="text-red-600 font-black animate-pulse uppercase tracking-wide text-[9px]">Hurry, Almost Full!</span>
-                    </div>
-                    {/* Main Bar Wrapper */}
-                    <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden border border-slate-200/50 shadow-inner">
-                      {/* Active Shimmer fill container */}
-                      <div
-                        className="bg-gradient-to-r from-amber-500 via-orange-500 to-red-600 h-full rounded-full transition-all duration-500 animate-shimmer"
-                        style={{ width: `${deal.claimed}%` }}
-                      />
-                    </div>
-                  </div>
-
-                  {/* Dynamic delivery estimate line */}
-                  <div className="flex items-center gap-1.5 text-[10px] text-slate-500 font-bold border-t pt-3">
-                    <Truck className="h-4 w-4 text-slate-400 animate-bounce" style={{ animationDuration: "2.5s" }} />
-                    <span>FREE Delivery by <strong className="text-slate-700 font-extrabold">Tomorrow</strong></span>
-                  </div>
-
-                  {/* Dynamic plus-minus inline selector or Add to Cart button */}
-                  <div className="pt-1">
-                    {isInCart ? (
-                      <div 
-                        className="w-full flex items-center justify-between border border-amber-500 bg-amber-50/50 rounded-xl overflow-hidden shadow-sm h-9.5"
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        <button
-                          onClick={(e) => handleQtyChange(deal.id, -1, e)}
-                          className="w-11 h-full flex items-center justify-center hover:bg-amber-100 text-slate-950 font-bold transition-colors border-none bg-transparent outline-none cursor-pointer"
-                        >
-                          <Minus className="h-3.5 w-3.5" />
-                        </button>
-                        <span className="text-sm font-black text-slate-950">
-                          {inCartItem.quantity}
+                    {/* Claimed Indicator Progress Bar with Premium Shimmer effect */}
+                    <div className="space-y-1.5 pt-1">
+                      <div className="flex justify-between text-[10px] font-bold text-slate-600">
+                        <span className="flex items-center gap-1">
+                          <Clock className="h-3 w-3 text-red-500 animate-pulse" />
+                          <span>{deal.claimed}% Claimed</span>
                         </span>
-                        <button
-                          onClick={(e) => handleQtyChange(deal.id, 1, e)}
-                          className="w-11 h-full flex items-center justify-center hover:bg-amber-100 text-slate-950 font-bold transition-colors border-none bg-transparent outline-none cursor-pointer"
-                        >
-                          <Plus className="h-3.5 w-3.5" />
-                        </button>
+                        <span className="text-red-600 font-black animate-pulse uppercase tracking-wide text-[9px]">Hurry, Almost Full!</span>
                       </div>
-                    ) : (
-                      <Button
-                        className="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-black text-xs py-2.5 rounded-xl transition-all shadow-md shadow-amber-500/10 flex items-center justify-center gap-2 border-none"
-                        onClick={(e) => handleAddToCart(deal, e)}
-                      >
-                        <ShoppingCart className="h-4 w-4 text-slate-950" />
-                        Add to Cart
-                      </Button>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          })}
-        </div>
-        </div>
+                      {/* Main Bar Wrapper */}
+                      <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden border border-slate-200/50 shadow-inner">
+                        {/* Active Shimmer fill container */}
+                        <div
+                          className="bg-gradient-to-r from-amber-500 via-orange-500 to-red-600 h-full rounded-full transition-all duration-500 animate-shimmer"
+                          style={{ width: `${deal.claimed}%` }}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Dynamic delivery estimate line */}
+                    <div className="flex items-center gap-1.5 text-[10px] text-slate-500 font-bold border-t pt-3">
+                      <Truck className="h-4 w-4 text-slate-400 animate-bounce" style={{ animationDuration: "2.5s" }} />
+                      <span>FREE Delivery by <strong className="text-slate-700 font-extrabold">Tomorrow</strong></span>
+                    </div>
+
+                    {/* Dynamic plus-minus inline selector or Add to Cart button */}
+                    <div className="pt-1">
+                      {isInCart ? (
+                        <div 
+                          className="w-full flex items-center justify-between border border-amber-500 bg-amber-50/50 rounded-xl overflow-hidden shadow-sm h-9.5"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <button
+                            onClick={(e) => handleQtyChange(deal.id, -1, e)}
+                            className="w-11 h-full flex items-center justify-center hover:bg-amber-100 text-slate-950 font-bold transition-colors border-none bg-transparent outline-none cursor-pointer"
+                          >
+                            <Minus className="h-3.5 w-3.5" />
+                          </button>
+                          <span className="text-sm font-black text-slate-950">
+                            {inCartItem.quantity}
+                          </span>
+                          <button
+                            onClick={(e) => handleQtyChange(deal.id, 1, e)}
+                            className="w-11 h-full flex items-center justify-center hover:bg-amber-100 text-slate-950 font-bold transition-colors border-none bg-transparent outline-none cursor-pointer"
+                          >
+                            <Plus className="h-3.5 w-3.5" />
+                          </button>
+                        </div>
+                      ) : (
+                        <Button
+                          className="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-black text-xs py-2.5 rounded-xl transition-all shadow-md shadow-amber-500/10 flex items-center justify-center gap-2 border-none"
+                          onClick={(e) => handleAddToCart(deal, e)}
+                        >
+                          <ShoppingCart className="h-4 w-4 text-slate-950" />
+                          Add to Cart
+                        </Button>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
+            </div>
+          </div>
+        )}
       </div>
     </section>
   );

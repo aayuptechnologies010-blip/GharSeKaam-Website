@@ -433,16 +433,20 @@ const Header = () => {
           >
             <Sparkles className="h-3.5 w-3.5 text-amber-400" /> Site Services
           </span>
-          <span 
-            onClick={() => navigate('/wholesale')} 
-            className={`px-2 py-1.5 rounded-sm transition-all duration-150 cursor-pointer shrink-0 ${
-              isWholesaleActive 
-                ? "text-[#febd69] bg-white/10" 
-                : "text-white hover:text-[#febd69] hover:bg-white/5"
-            }`}
-          >
-            Wholesale Store
-          </span>
+
+          {user && (
+            <span 
+              onClick={() => navigate('/wholesale')} 
+              className={`px-2 py-1.5 rounded-sm transition-all duration-150 cursor-pointer shrink-0 ${
+                isWholesaleActive 
+                  ? "text-[#febd69] bg-white/10" 
+                  : "text-white hover:text-[#febd69] hover:bg-white/5"
+              }`}
+            >
+              Wholesale Store
+            </span>
+          )}
+
           <span 
             onClick={() => navigate('/?tab=bestsellers')} 
             className={`px-2 py-1.5 rounded-sm transition-all duration-150 cursor-pointer shrink-0 ${

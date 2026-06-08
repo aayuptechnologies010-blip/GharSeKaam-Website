@@ -1,10 +1,12 @@
-import { useParams, Link } from "react-router-dom"
+import { useParams, Link, useNavigate } from "react-router-dom"
+import { useEffect } from "react"
 import Header from "@/components/Header"
 import CategoryNav from "@/components/CategoryNav"
 import ProductGrid from "@/components/ProductGrid"
 import Footer from "@/components/Footer"
 import { Badge } from "@/components/ui/badge"
 import { ShieldCheck, Truck, Award, ChevronRight } from "lucide-react"
+import { useToast } from "@/hooks/use-toast"
 
 // Category Custom Copy & Styling configurations for premium storefront banners
 const CATEGORY_STYLES: Record<string, { desc: string; bg: string; accent: string; tagline: string }> = {
@@ -54,6 +56,20 @@ const CATEGORY_STYLES: Record<string, { desc: string; bg: string; accent: string
 
 const Category = () => {
   const { categoryName } = useParams()
+  const navigate = useNavigate()
+  const { toast } = useToast()
+  const isLoggedIn = !!localStorage.getItem('authToken')
+
+  useEffect(() => {
+    if (!isLoggedIn) {
+      toast({
+        title: "Access Restricted",
+        description: "Please login or register to view category catalogs.",
+        variant: "destructive"
+      });
+      navigate("/login", { replace: true });
+    }
+  }, [isLoggedIn, navigate]);
   
   const rawName = categoryName || "products"
   const formattedSlug = rawName.toLowerCase().replace(/\s+/g, '-')

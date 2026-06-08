@@ -281,8 +281,10 @@ export async function createOrder(orderData: CreateOrderData): Promise<CreateOrd
         if (data.success && data.order) {
           return { success: true, orderId: data.order.id }
         }
-      } catch (error) {
-        console.error("Backend createOrder failed, falling back to mock:", error)
+        return { success: false, message: data.message || "Failed to create order on backend" }
+      } catch (error: any) {
+        console.error("Backend createOrder failed:", error)
+        return { success: false, message: error.message || "Network error while placing order" }
       }
     }
   }
@@ -304,8 +306,10 @@ export async function getOrders(_signal?: AbortSignal): Promise<ApiOrder[]> {
         if (data.success && Array.isArray(data.orders)) {
           return data.orders
         }
+        throw new Error(data.message || "Failed to retrieve orders from backend")
       } catch (error) {
-        console.error("Backend getOrders failed, falling back to mock:", error)
+        console.error("Backend getOrders failed:", error)
+        throw error
       }
     }
   }
@@ -327,8 +331,10 @@ export async function cancelOrder(orderId: string): Promise<{ success: boolean; 
         if (data.success) {
           return { success: true, message: data.message }
         }
-      } catch (error) {
-        console.error("Backend cancelOrder failed, falling back to mock:", error)
+        return { success: false, message: data.message || "Failed to cancel order on backend" }
+      } catch (error: any) {
+        console.error("Backend cancelOrder failed:", error)
+        return { success: false, message: error.message || "Network error while cancelling order" }
       }
     }
   }
@@ -382,7 +388,7 @@ export const DEMO_ADDRESSES: Address[] = [
 // In-memory mutable addresses store
 let _addresses: Address[] = [...DEMO_ADDRESSES]
 
-export async function addAddress(addressData: AddAddressData): Promise<{ success: boolean }> {
+export async function addAddress(addressData: AddAddressData): Promise<{ success: boolean; message?: string }> {
   if (url !== "__BACKEND_DISABLED__") {
     const token = localStorage.getItem('authToken')
     if (token) {
@@ -406,8 +412,10 @@ export async function addAddress(addressData: AddAddressData): Promise<{ success
         if (data.success) {
           return { success: true }
         }
-      } catch (error) {
-        console.error("Backend addAddress failed, falling back to mock:", error)
+        return { success: false, message: data.message || "Failed to add address on backend" }
+      } catch (error: any) {
+        console.error("Backend addAddress failed:", error)
+        return { success: false, message: error.message || "Network error while adding address" }
       }
     }
   }
@@ -442,8 +450,10 @@ export async function getAllAddresses(_signal?: AbortSignal): Promise<Address[]>
         if (data.success && Array.isArray(data.addresses)) {
           return data.addresses
         }
+        throw new Error(data.message || "Failed to retrieve addresses from backend")
       } catch (error) {
-        console.error("Backend getAllAddresses failed, falling back to mock:", error)
+        console.error("Backend getAllAddresses failed:", error)
+        throw error
       }
     }
   }

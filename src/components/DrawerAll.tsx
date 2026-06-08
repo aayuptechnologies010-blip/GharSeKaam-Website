@@ -298,16 +298,20 @@ export default function DrawerAll({ isOpen, onClose }: DrawerAllProps) {
                     <ChevronRight className="h-4 w-4 text-slate-400 shrink-0" />
                   </button>
 
-                  <button
-                    onClick={() => handleNavigation("/wholesale")}
-                    className="w-full flex items-center justify-between py-3 px-5 hover:bg-slate-50 transition-colors text-slate-700 font-semibold text-xs sm:text-sm border-none bg-transparent cursor-pointer text-left"
-                  >
-                    <span className="flex items-center gap-3">
-                      <Store className="h-4 w-4 text-amber-500 shrink-0" />
-                      {current.items.wholesale}
-                    </span>
-                    <ChevronRight className="h-4 w-4 text-slate-400 shrink-0" />
-                  </button>
+                  {user && (
+                    <button
+                      onClick={() => handleNavigation("/wholesale")}
+                      className="w-full flex items-center justify-between py-3 px-5 hover:bg-slate-50 transition-colors text-slate-700 font-semibold text-xs sm:text-sm border-none bg-transparent cursor-pointer text-left"
+                    >
+                      <span className="flex items-center gap-3">
+                        <Store className="h-4 w-4 text-amber-500 shrink-0" />
+                        {language === "hi" ? "थोक स्टोर (Wholesale)" : "Wholesale Store"}
+                      </span>
+                      <ChevronRight className="h-4 w-4 text-slate-400 shrink-0" />
+                    </button>
+                  )}
+
+
                 </div>
               </div>
 

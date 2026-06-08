@@ -181,6 +181,15 @@ const AddressModal = ({ isOpen, onClose, googleAuthData }: AddressModalProps) =>
       return;
     }
 
+    if (!city || !stateName || stateName.toLowerCase() !== 'uttar pradesh' || city.toLowerCase() !== 'gorakhpur') {
+      toast({
+        title: 'Service Not Available',
+        description: 'Sorry, currently we are not working in your city. We only support orders in Gorakhpur.',
+        variant: 'destructive'
+      });
+      return;
+    }
+
     if (userType === 'WHOLESALER') {
       if (!shopname || !shopnumber || !gstnumber || !adhaarnumber) {
         toast({ title: 'Missing fields', description: 'Please fill all wholesaler fields', variant: 'destructive' });

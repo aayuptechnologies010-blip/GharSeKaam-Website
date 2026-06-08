@@ -57,6 +57,12 @@ const AddAddressModal = ({ isOpen, onClose, onAddressAdded }: AddAddressModalPro
       return
     }
 
+    if (!formData.city || !formData.state || formData.state.toLowerCase() !== 'uttar pradesh' || formData.city.toLowerCase() !== 'gorakhpur') {
+      setError("Sorry, currently we are not working in your city. We only support orders in Gorakhpur.")
+      setLoading(false)
+      return
+    }
+
     try {
       const result = await addAddress({
         ...formData,
@@ -74,7 +80,7 @@ const AddAddressModal = ({ isOpen, onClose, onAddressAdded }: AddAddressModalPro
         onAddressAdded()
         onClose()
       } else {
-        setError('Failed to add address')
+        setError(result.message || 'Failed to add address')
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to add address')

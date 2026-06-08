@@ -228,15 +228,33 @@ const Profile = () => {
       return;
     }
 
+    if (!newAddress.city || !newAddress.state || newAddress.state.toLowerCase() !== 'uttar pradesh' || newAddress.city.toLowerCase() !== 'gorakhpur') {
+      toast({
+        title: "Service Not Available",
+        description: "Sorry, currently we are not working in your city. We only support orders in Gorakhpur.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setAddressLoading(true);
     try {
-      await addAddress({
+      const result = await addAddress({
         city: newAddress.city,
         state: newAddress.state,
         pincode: newAddress.pincode,
         flatnumber: parseInt(newAddress.flatnumber, 10),
         phone: newAddress.phone,
       });
+
+      if (!result.success) {
+        toast({
+          title: "Failed to add address",
+          description: result.message || "Something went wrong",
+          variant: "destructive",
+        });
+        return;
+      }
 
       // Reload addresses
       const addrList = await getAllAddresses();

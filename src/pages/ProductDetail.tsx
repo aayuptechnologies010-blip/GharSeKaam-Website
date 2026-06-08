@@ -376,6 +376,16 @@ const ProductDetail = () => {
   const isLoggedIn = !!localStorage.getItem('authToken')
 
   useEffect(() => {
+    if (!isLoggedIn) {
+      toast({
+        title: "Access Restricted",
+        description: "Please login or register to view product details and pricing.",
+        variant: "destructive"
+      });
+      navigate("/login", { replace: true });
+      return;
+    }
+
     if (!id) return
 
     const fetchProduct = async () => {

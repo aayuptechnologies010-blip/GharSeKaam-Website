@@ -115,7 +115,7 @@ const HARDWARE_GRID_BOXES = [
       }
     ],
     seeAllText: "Shop Bulk Materials",
-    seeAllLink: "/wholesale"
+    seeAllLink: "/category/cement-&-sand"
   },
   {
     id: "g5",

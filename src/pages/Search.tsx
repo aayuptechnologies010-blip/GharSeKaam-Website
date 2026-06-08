@@ -86,6 +86,17 @@ export default function Search() {
     }
   }, [searchParams]);
 
+  useEffect(() => {
+    if (!isLoggedIn) {
+      toast({
+        title: "Access Restricted",
+        description: "Please login or register to search our catalog.",
+        variant: "destructive"
+      });
+      navigate("/login", { replace: true });
+    }
+  }, [isLoggedIn, navigate]);
+
   // Load products
   useEffect(() => {
     const fetchAllProducts = async () => {
