@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
-import { getProductDetail, getProducts, ApiProductDetail, ApiProduct, getHardwareSvgFallback } from '@/lib/api'
+import { getProductDetail, getProducts, ApiProductDetail, ApiProduct, getHardwareSvgFallback, FALLBACK_HARDWARE_PRODUCTS } from '@/lib/api'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -476,17 +476,14 @@ const ProductDetail = () => {
 
   const getProductPrice = () => {
     if (!product) return 0
-    
-    const isPlumbingCategory = product.category?.title?.toLowerCase().includes('plumbing')
-    const showWholesale = isLoggedIn && isWholesaler && isPlumbingCategory
 
-    // If a variant is selected, use its price
+    const hasWholesaleAccess = isLoggedIn && (isWholesaler || !!sessionStorage.getItem('wholesaleGST'))
+
     if (selectedVariant && product.variants) {
       const variant = product.variants.find(v => v.size === selectedVariant)
       if (variant) {
-        // Bundle mode pricing
         if (purchaseMode === 'bundle') {
-          if (showWholesale && (variant as any).bundleWholesalePrice) {
+          if (hasWholesaleAccess && (variant as any).bundleWholesalePrice) {
             return typeof (variant as any).bundleWholesalePrice === 'string'
               ? parseFloat((variant as any).bundleWholesalePrice)
               : (variant as any).bundleWholesalePrice
@@ -497,19 +494,16 @@ const ProductDetail = () => {
               : (variant as any).bundlePrice
           }
         }
-        // Piece mode pricing
-        if (showWholesale && variant.wholesaleprice !== undefined && variant.wholesaleprice !== null) {
+        if (hasWholesaleAccess && variant.wholesaleprice !== undefined && variant.wholesaleprice !== null) {
           return typeof variant.wholesaleprice === 'string' ? parseFloat(variant.wholesaleprice) : variant.wholesaleprice
         }
         return typeof variant.price === 'string' ? parseFloat(variant.price) : variant.price
       }
     }
-    
-    // Show wholesale price if wholesaler is logged in AND category is Plumbing
-    if (showWholesale && product.wholesaleprice) {
+
+    if (hasWholesaleAccess && product.wholesaleprice) {
       return parseFloat(product.wholesaleprice)
     }
-    // Otherwise show retail price
     return parseFloat(product.retailprice || "0")
   }
 
@@ -652,7 +646,7 @@ const ProductDetail = () => {
   const price = getProductPrice()
   const originalPrice = getOriginalPrice()
   const discount = product.discount || 0
-  const isWholesaleProduct = isLoggedIn && isWholesaler && product.wholesaleprice
+  const isWholesaleProduct = isLoggedIn && (isWholesaler || !!sessionStorage.getItem('wholesaleGST')) && product.wholesaleprice
 
   // Spec list construction
   const specifications = (product as any).specifications || {

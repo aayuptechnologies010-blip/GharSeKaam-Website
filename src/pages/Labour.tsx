@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import { url } from "@/constant";
 import {
   HardHat,
   Zap,
@@ -173,7 +174,7 @@ const Labour = () => {
 
   const fetchRates = async () => {
     try {
-      const res = await fetch("http://localhost:3000/api/v1/user/labour/categories");
+      const res = await fetch(`${url}/labour/categories`);
       const data = await res.json();
       if (data.success && data.categories) {
         setCategories(prev => prev.map(c => {
@@ -221,7 +222,7 @@ const Labour = () => {
     };
 
     try {
-      const res = await fetch("http://localhost:3000/api/v1/user/labour/book", {
+      const res = await fetch(`${url}/labour/book`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)

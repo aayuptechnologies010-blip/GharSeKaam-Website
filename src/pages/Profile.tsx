@@ -108,32 +108,32 @@ const Profile = () => {
       }
     };
 
-    // Fetch mock labour bookings from localStorage if exists
-    const fetchLabourBookings = () => {
-      // Setup some nice initial dummy bookings so the page looks incredibly rich immediately
-      const sampleBookings = [
-        {
-          id: "GSK-938210",
-          categoryName: "Mason / राजमिस्त्री",
-          qty: 2,
-          days: 5,
-          total: 9500,
-          date: "2026-05-28",
-          status: "Confirmed",
-          color: "from-amber-500 to-orange-600",
-        },
-        {
-          id: "GSK-482012",
-          categoryName: "Electrician / इलेक्ट्रिशियन",
-          qty: 1,
-          days: 2,
-          total: 2200,
-          date: "2026-05-24",
-          status: "Completed",
-          color: "from-yellow-400 to-amber-500",
+    // Fetch labour bookings from backend
+    const fetchLabourBookings = async () => {
+      try {
+        const token = localStorage.getItem("authToken");
+        const phone = localStorage.getItem("userPhone");
+        if (!phone) return;
+        const { url: apiUrl } = await import("@/constant");
+        const res = await fetch(`${apiUrl}/labour/mybookings?phone=${encodeURIComponent(phone)}`);
+        const data = await res.json();
+        if (data.success && Array.isArray(data.bookings)) {
+          setLabourBookings(
+            data.bookings.map((b: any) => ({
+              id: b.id,
+              categoryName: b.labourService?.title || "Labour",
+              qty: b.quantity,
+              days: b.days,
+              total: b.totalCost,
+              date: b.date,
+              status: b.status,
+              color: "from-amber-500 to-orange-600",
+            }))
+          );
         }
-      ];
-      setLabourBookings(sampleBookings);
+      } catch {
+        // leave empty — no dummy data
+      }
     };
 
     fetchAddresses();

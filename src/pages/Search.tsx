@@ -62,17 +62,14 @@ export default function Search() {
   const hasWholesaleAccess = isWholesaler || !!sessionStorage.getItem('wholesaleGST');
 
   const getProductPrice = (product: ApiProduct, variant?: ProductVariant) => {
-    const isPlumbingCategory = product.category?.title?.toLowerCase().includes('plumbing');
-    const showWholesale = hasWholesaleAccess && isPlumbingCategory;
-
     if (variant) {
-      if (showWholesale && variant.wholesaleprice !== undefined && variant.wholesaleprice !== null) {
+      if (hasWholesaleAccess && variant.wholesaleprice !== undefined && variant.wholesaleprice !== null) {
         return typeof variant.wholesaleprice === 'string' ? parseFloat(variant.wholesaleprice) : variant.wholesaleprice;
       }
       return typeof variant.price === 'string' ? parseFloat(variant.price) : variant.price;
     }
 
-    if (showWholesale && product.wholesaleprice) {
+    if (hasWholesaleAccess && product.wholesaleprice) {
       return parseFloat(product.wholesaleprice);
     }
     return parseFloat(product.retailprice || product.wholesaleprice || '0');

@@ -3,6 +3,7 @@ import { useEffect } from "react"
 import Header from "@/components/Header"
 import CategoryNav from "@/components/CategoryNav"
 import ProductGrid from "@/components/ProductGrid"
+import ContractingOfferings from "@/components/ContractingOfferings"
 import Footer from "@/components/Footer"
 import { Badge } from "@/components/ui/badge"
 import { ShieldCheck, Truck, Award, ChevronRight } from "lucide-react"
@@ -154,9 +155,13 @@ const Category = () => {
         </div>
       </div>
       
-      {/* 3. Upgraded product listing grid */}
+      {/* 3. Upgraded product listing grid or Service Offerings */}
       <main className="flex-1 bg-slate-50">
-        <ProductGrid category={categoryName} />
+        {formattedSlug === "service" ? (
+          <ContractingOfferings />
+        ) : (
+          <ProductGrid category={categoryName} />
+        )}
       </main>
 
       <Footer />
