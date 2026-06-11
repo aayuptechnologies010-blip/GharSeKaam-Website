@@ -215,7 +215,7 @@ export interface OrderItem {
 
 export interface CreateOrderData {
   addressId: string
-  paymentType: "COD"
+  paymentType: "COD" | "ONLINE"
   items: OrderItem[]
 }
 
@@ -257,6 +257,13 @@ export interface ApiOrder {
     flatnumber: number
   }
   estimatedDelivery?: string
+  deliveryGuy?: {
+    id: string;
+    name: string;
+    phone: string;
+    profileimage: string;
+    status: string;
+  } | null
 }
 
 export interface OrdersResponse {

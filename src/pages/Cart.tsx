@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
-import { Minus, Plus, Trash2, ShoppingBag, MapPin, PlusCircle, CheckCircle, Percent, Gift, Truck } from "lucide-react"
+import { Minus, Plus, Trash2, ShoppingBag, MapPin, PlusCircle, CheckCircle, Percent, Gift, Truck, CreditCard, Smartphone, ShieldCheck, Loader2 } from "lucide-react"
+import { motion, AnimatePresence } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -24,6 +25,15 @@ const Cart = () => {
   const [loadingAddresses, setLoadingAddresses] = useState(false)
   const [showAddAddressModal, setShowAddAddressModal] = useState(false)
   const [checkoutStep, setCheckoutStep] = useState<"cart" | "delivery">("cart")
+  const [paymentMethod, setPaymentMethod] = useState<"COD" | "ONLINE">("COD")
+  const [showPaymentModal, setShowPaymentModal] = useState(false)
+  const [paymentSimulating, setPaymentSimulating] = useState(false)
+  const [paymentSuccess, setPaymentSuccess] = useState(false)
+  const [paymentTab, setPaymentTab] = useState<"upi" | "card">("upi")
+  const [upiId, setUpiId] = useState("")
+  const [cardNumber, setCardNumber] = useState("")
+  const [cardExpiry, setCardExpiry] = useState("")
+  const [cardCvv, setCardCvv] = useState("")
 
   // Load addresses when component mounts
   useEffect(() => {
@@ -69,6 +79,48 @@ const Cart = () => {
   const shippingCharges = subtotal > 1000 ? 0 : 49
   const netTotal = subtotal + shippingCharges
 
+  const executeOrderCreation = async (type: "COD" | "ONLINE") => {
+    try {
+      setIsCreatingOrder(true)
+
+      const orderData: CreateOrderData = {
+        addressId: selectedAddressId,
+        paymentType: type,
+        items: cartItems.map(item => ({
+          itemId: item.id.includes('-bundle-') ? item.id.split('-bundle-')[0] : item.id,
+          quantity: item.quantity,
+          variant: item.variant
+        }))
+      }
+
+      const result = await createOrder(orderData)
+
+      if (result.success) {
+        clearCart()
+        toast({
+          title: "Order Placed Successfully!",
+          description: `Order ID: ${result.orderId || 'Generated'}`,
+        })
+        navigate('/checkout-success', { state: { orderId: result.orderId || `GSK-${Date.now().toString().slice(-6)}`, address: addresses.find(a => a.id === selectedAddressId) } })
+      } else {
+        toast({
+          title: "Order Failed",
+          description: result.message || "Failed to place order.",
+          variant: "destructive"
+        })
+      }
+    } catch (error: any) {
+      console.error('Order creation failed:', error)
+      toast({
+        title: "Order Failed",
+        description: error?.message || "Failed to place order. Please try again.",
+        variant: "destructive"
+      })
+    } finally {
+      setIsCreatingOrder(false)
+    }
+  }
+
   const handleCreateOrder = async () => {
     const authToken = localStorage.getItem('authToken')
     if (!authToken) {
@@ -109,45 +161,46 @@ const Cart = () => {
       return
     }
 
-    try {
-      setIsCreatingOrder(true)
+    if (paymentMethod === "ONLINE") {
+      setShowPaymentModal(true)
+      return
+    }
 
-      const orderData: CreateOrderData = {
-        addressId: selectedAddressId,
-        paymentType: "COD",
-        items: cartItems.map(item => ({
-          itemId: item.id.includes('-bundle-') ? item.id.split('-bundle-')[0] : item.id,
-          quantity: item.quantity,
-          variant: item.variant
-        }))
-      }
+    await executeOrderCreation("COD")
+  }
 
-      const result = await createOrder(orderData)
-
-      if (result.success) {
-        clearCart()
-        toast({
-          title: "Order Placed Successfully!",
-          description: `Order ID: ${result.orderId || 'Generated'}`,
-        })
-        navigate('/checkout-success', { state: { orderId: result.orderId || `GSK-${Date.now().toString().slice(-6)}`, address: addresses.find(a => a.id === selectedAddressId) } })
-      } else {
-        toast({
-          title: "Order Failed",
-          description: result.message || "Failed to place order.",
-          variant: "destructive"
-        })
-      }
-    } catch (error: any) {
-      console.error('Order creation failed:', error)
+  const handleSimulatePayment = () => {
+    if (paymentTab === "upi" && !upiId.includes("@")) {
       toast({
-        title: "Order Failed",
-        description: error?.message || "Failed to place order. Please try again.",
+        title: "Invalid UPI ID",
+        description: "Please enter a valid UPI address (e.g. user@upi)",
         variant: "destructive"
       })
-    } finally {
-      setIsCreatingOrder(false)
+      return
     }
+    if (paymentTab === "card" && (cardNumber.replace(/\D/g, "").length < 16 || cardCvv.length < 3)) {
+      toast({
+        title: "Invalid Card Details",
+        description: "Please fill out standard 16-digit card and 3-digit CVV fields.",
+        variant: "destructive"
+      })
+      return
+    }
+
+    setPaymentSimulating(true)
+    setTimeout(() => {
+      setPaymentSimulating(false)
+      setPaymentSuccess(true)
+      setTimeout(async () => {
+        setShowPaymentModal(false)
+        setPaymentSuccess(false)
+        setUpiId("")
+        setCardNumber("")
+        setCardExpiry("")
+        setCardCvv("")
+        await executeOrderCreation("ONLINE")
+      }, 1500)
+    }, 2000)
   }
 
   if (cartItems.length === 0) {
@@ -396,7 +449,37 @@ const Cart = () => {
                   </RadioGroup>
                 )}
 
-                <div className="flex justify-between items-center pt-6 border-t">
+                {/* Payment Selection */}
+                <div className="space-y-4 pt-6 border-t mt-6">
+                  <h3 className="font-extrabold text-slate-800 text-sm uppercase tracking-wider">Select Payment Method</h3>
+                  <RadioGroup value={paymentMethod} onValueChange={(val: any) => setPaymentMethod(val)}>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div 
+                        onClick={() => setPaymentMethod("COD")}
+                        className={`flex items-center space-x-3 p-4 rounded-xl border-2 bg-white cursor-pointer transition-all ${
+                          paymentMethod === "COD" ? 'border-amber-500 bg-amber-50/10' : 'border-slate-200 hover:border-slate-350'
+                        }`}
+                      >
+                        <RadioGroupItem value="COD" id="pay-cod" />
+                        <Label htmlFor="pay-cod" className="font-bold cursor-pointer text-xs text-slate-700">Cash on Delivery (COD)</Label>
+                      </div>
+                      <div 
+                        onClick={() => setPaymentMethod("ONLINE")}
+                        className={`flex items-center space-x-3 p-4 rounded-xl border-2 bg-white cursor-pointer transition-all ${
+                          paymentMethod === "ONLINE" ? 'border-amber-500 bg-amber-50/10' : 'border-slate-200 hover:border-slate-350'
+                        }`}
+                      >
+                        <RadioGroupItem value="ONLINE" id="pay-online" />
+                        <Label htmlFor="pay-online" className="font-bold cursor-pointer text-xs text-slate-700 flex items-center justify-between w-full">
+                          <span>Pay Online (Pre-paid)</span>
+                          <Badge className="bg-amber-400 text-slate-900 border-none text-[8px] font-black scale-90">Simulated PG</Badge>
+                        </Label>
+                      </div>
+                    </div>
+                  </RadioGroup>
+                </div>
+
+                <div className="flex justify-between items-center pt-6 border-t mt-6">
                   <Button 
                     variant="outline" 
                     onClick={() => setCheckoutStep("cart")}
@@ -410,7 +493,7 @@ const Cart = () => {
                     disabled={isCreatingOrder || !selectedAddressId}
                     className="bg-amber-500 hover:bg-amber-600 text-slate-950 font-black rounded-xl px-8 shadow-md"
                   >
-                    {isCreatingOrder ? "Placing Order..." : "Confirm & Place Order (COD)"}
+                    {isCreatingOrder ? "Placing Order..." : paymentMethod === "ONLINE" ? "Pay & Confirm Order" : "Confirm & Place Order"}
                   </Button>
                 </div>
               </div>
@@ -499,6 +582,161 @@ const Cart = () => {
         onClose={() => setShowAddAddressModal(false)}
         onAddressAdded={handleAddressAdded}
       />
+
+      {/* Mock Razorpay Secure Payment Gateway Modal */}
+      <AnimatePresence>
+        {showPaymentModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
+            <motion.div 
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="bg-white rounded-3xl w-full max-w-md shadow-2xl overflow-hidden border border-slate-100 flex flex-col justify-between"
+            >
+              
+              {/* Razorpay branded header */}
+              <div className="bg-[#172b4d] p-5 text-white flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center font-black text-white text-base shadow">R</span>
+                  <div>
+                    <h4 className="font-extrabold text-sm tracking-tight text-slate-100">Razorpay Secure Checkout</h4>
+                    <span className="text-[9px] text-[#febd69] font-black uppercase tracking-wider">Simulated Gateway</span>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <span className="text-[10px] font-semibold text-slate-400 block uppercase">Payable Amount</span>
+                  <span className="text-lg font-black text-white">₹{netTotal.toLocaleString()}</span>
+                </div>
+              </div>
+
+              {/* Loader screen when payment is simulating */}
+              {paymentSimulating ? (
+                <div className="p-10 flex flex-col items-center justify-center space-y-4 text-center min-h-[300px]">
+                  <Loader2 className="w-12 h-12 text-blue-600 animate-spin" />
+                  <div>
+                    <h5 className="font-bold text-slate-800 text-base">Processing Transaction...</h5>
+                    <p className="text-xs text-slate-400 mt-1">Please do not refresh the page or click back button.</p>
+                  </div>
+                </div>
+              ) : paymentSuccess ? (
+                <div className="p-10 flex flex-col items-center justify-center space-y-4 text-center min-h-[300px]">
+                  <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center shadow-inner">
+                    <CheckCircle className="w-10 h-10 text-green-600 animate-bounce" />
+                  </div>
+                  <div>
+                    <h5 className="font-black text-green-700 text-lg">Payment Successful!</h5>
+                    <p className="text-xs text-slate-500 font-semibold mt-1">₹{netTotal.toLocaleString()} successfully captured.</p>
+                  </div>
+                </div>
+              ) : (
+                /* Payment form */
+                <div className="p-6 space-y-6">
+                  {/* Tabs */}
+                  <div className="flex border-b text-xs font-bold text-slate-500">
+                    <button 
+                      onClick={() => setPaymentTab("upi")}
+                      className={`flex-1 pb-3 flex items-center justify-center gap-1.5 border-b-2 cursor-pointer transition-all ${
+                        paymentTab === "upi" ? 'border-blue-600 text-blue-600' : 'border-transparent hover:text-slate-700'
+                      }`}
+                    >
+                      <Smartphone className="w-4 h-4" /> UPI / GooglePay
+                    </button>
+                    <button 
+                      onClick={() => setPaymentTab("card")}
+                      className={`flex-1 pb-3 flex items-center justify-center gap-1.5 border-b-2 cursor-pointer transition-all ${
+                        paymentTab === "card" ? 'border-blue-600 text-blue-600' : 'border-transparent hover:text-slate-700'
+                      }`}
+                    >
+                      <CreditCard className="w-4 h-4" /> Debit/Credit Card
+                    </button>
+                  </div>
+
+                  {paymentTab === "upi" ? (
+                    <div className="space-y-4 text-left">
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Enter Virtual Payment Address (VPA)</label>
+                        <input
+                          placeholder="username@upi"
+                          value={upiId}
+                          onChange={(e) => setUpiId(e.target.value)}
+                          className="w-full h-11 border border-slate-200 rounded-xl px-4 text-sm font-bold text-slate-800 focus:outline-none focus:border-blue-600"
+                        />
+                      </div>
+                      <div className="bg-blue-50/50 rounded-xl p-3 border border-blue-100 text-[10px] text-blue-800 leading-normal font-semibold">
+                        💡 Click the simulate button below to process this virtual payment instantly. You can enter any mock address (e.g. buildmart@okhdfcbank).
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="space-y-4 text-left">
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Card Number</label>
+                        <input
+                          placeholder="4111 2222 3333 4444"
+                          maxLength={19}
+                          value={cardNumber}
+                          onChange={(e) => {
+                            let val = e.target.value.replace(/\D/g, "");
+                            let parts = [];
+                            for (let i = 0; i < val.length; i += 4) {
+                              parts.push(val.substring(i, i + 4));
+                            }
+                            setCardNumber(parts.join(" "));
+                          }}
+                          className="w-full h-11 border border-slate-200 rounded-xl px-4 text-sm font-bold text-slate-800 focus:outline-none focus:border-blue-600"
+                        />
+                      </div>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="space-y-1.5">
+                          <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Expiry Date</label>
+                          <input
+                            placeholder="MM/YY"
+                            maxLength={5}
+                            value={cardExpiry}
+                            onChange={(e) => {
+                              let val = e.target.value.replace(/\D/g, "");
+                              if (val.length > 2) val = val.substring(0, 2) + "/" + val.substring(2);
+                              setCardExpiry(val);
+                            }}
+                            className="w-full h-11 border border-slate-200 rounded-xl px-4 text-sm font-bold text-slate-800 focus:outline-none focus:border-blue-600"
+                          />
+                        </div>
+                        <div className="space-y-1.5">
+                          <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider">CVV Code</label>
+                          <input
+                            placeholder="123"
+                            maxLength={3}
+                            type="password"
+                            value={cardCvv}
+                            onChange={(e) => setCardCvv(e.target.value.replace(/\D/g, ""))}
+                            className="w-full h-11 border border-slate-200 rounded-xl px-4 text-sm font-bold text-slate-800 focus:outline-none focus:border-blue-600"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Action buttons */}
+                  <div className="flex gap-3 pt-2">
+                    <Button 
+                      variant="ghost" 
+                      onClick={() => setShowPaymentModal(false)}
+                      className="flex-1 border-none hover:bg-slate-50 text-slate-500 font-bold"
+                    >
+                      Cancel Payment
+                    </Button>
+                    <Button 
+                      onClick={handleSimulatePayment}
+                      className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-xl shadow-md gap-1"
+                    >
+                      <ShieldCheck className="w-4.5 h-4.5" /> Simulate Success
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
       <Footer />
     </div>

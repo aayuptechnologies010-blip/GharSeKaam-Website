@@ -9,6 +9,7 @@ import { getOrders, ApiOrder, cancelOrder } from "@/lib/api"
 import { useToast } from "@/hooks/use-toast"
 import Header from "@/components/Header"
 import Footer from "@/components/Footer"
+import LiveTrackingMap from "@/components/LiveTrackingMap"
 
 const Orders = () => {
   const navigate = useNavigate()
@@ -45,6 +46,81 @@ const Orders = () => {
     fetchOrders()
   }, [navigate])
 
+  // Establish WebSocket connection for real-time customer updates
+  useEffect(() => {
+    const token = localStorage.getItem('authToken')
+    if (!token) return
+
+    let customerId = ''
+    try {
+      const payloadBase64 = token.split('.')[1]
+      const payloadDecoded = JSON.parse(atob(payloadBase64.replace(/-/g, '+').replace(/_/g, '/')))
+      customerId = payloadDecoded.customerid || ''
+    } catch (e) {
+      console.error("Failed to decode token for WS:", e)
+    }
+
+    if (!customerId) return
+
+    const wsUrl = `ws://localhost:3000/?role=customer&id=${customerId}`
+    console.log("[WS Connection] Connecting to:", wsUrl)
+
+    let ws: WebSocket | null = null
+
+    try {
+      ws = new WebSocket(wsUrl)
+
+      ws.onopen = () => {
+        console.log("[WS Client] Connected to socket as customer", customerId)
+      }
+
+      ws.onmessage = (event) => {
+        try {
+          const payload = JSON.parse(event.data)
+          console.log("[WS Client] Received message:", payload)
+          if (payload.event === 'ORDER_STATUS_UPDATE' && payload.data) {
+            const updatedOrder = payload.data
+            // Show toast alert
+            toast({
+              title: `Order Update!`,
+              description: `Order #${updatedOrder.id.slice(-8)} status changed to ${updatedOrder.status}.`,
+            })
+            // Update orders state
+            setOrders((prevOrders) =>
+              prevOrders.map((o) =>
+                o.id === updatedOrder.id
+                  ? { 
+                      ...o, 
+                      status: updatedOrder.status, 
+                      deliveryGuy: updatedOrder.deliveryGuy !== undefined ? updatedOrder.deliveryGuy : o.deliveryGuy 
+                    }
+                  : o
+              )
+            )
+          }
+        } catch (err) {
+          console.error("[WS Client] Error handling message:", err)
+        }
+      }
+
+      ws.onerror = (err) => {
+        console.error("[WS Client] Error:", err)
+      }
+
+      ws.onclose = () => {
+        console.log("[WS Client] Disconnected from server")
+      }
+    } catch (err) {
+      console.error("[WS Client] Connection error:", err)
+    }
+
+    return () => {
+      if (ws) {
+        ws.close()
+      }
+    }
+  }, [toast])
+
   const getStatusColor = (status: string) => {
     switch (status.toUpperCase()) {
       case 'DELIVERED':
@@ -55,6 +131,8 @@ const Orders = () => {
         return 'bg-blue-100 text-blue-800'
       case 'CANCELLED':
         return 'bg-red-100 text-red-800'
+      case 'DELIVERY_PICKUP':
+        return 'bg-amber-100 text-amber-800 animate-pulse border border-amber-300'
       default:
         return 'bg-gray-100 text-gray-800'
     }
@@ -209,6 +287,20 @@ const Orders = () => {
                 </div>
 
                 <Separator className="my-4" />
+
+                {/* Live Rider Tracking map if in DELIVERY_PICKUP status */}
+                {order.status.toUpperCase() === "DELIVERY_PICKUP" && (
+                  <div className="mt-2 mb-6">
+                    <LiveTrackingMap
+                      orderId={order.id}
+                      riderName={order.deliveryGuy?.name}
+                      riderPhone={order.deliveryGuy?.phone}
+                      riderImage={order.deliveryGuy?.profileimage}
+                      shopName={order.shopkeeper.shopname}
+                      destinationCity={order.deliveryAddress.city}
+                    />
+                  </div>
+                )}
 
                 {/* Delivery Address */}
                 <div className="grid md:grid-cols-2 gap-6">
