@@ -10,7 +10,7 @@ export interface ApiCategory {
 export interface SignupData {
   city: string
   pincode: string
-  flatnumber: number
+  flatnumber: string
   state: string
   phone: string
   type: "RETAILER" | "WHOLESALER"
@@ -56,7 +56,7 @@ export interface ApiProduct {
   discount?: number
   shopkeeper?: {
     shopname: string
-    shopaddress: Array<{ city: string; state: string; pincode: string; flatnumber: number }>
+    shopaddress: Array<{ city: string; state: string; pincode: string; flatnumber: string }>
   }
   specifications?: Record<string, string>
   highlights?: string[]
@@ -80,7 +80,7 @@ export interface ApiProductDetail {
       city: string
       state: string
       pincode: string
-      flatnumber: number
+      flatnumber: string
     }>
   }
   category: {
@@ -167,7 +167,7 @@ export async function getProductDetail(productId: string, signal?: AbortSignal):
     addons: [],
     discount: found.discount || 20,
     variants: found.variants,
-    shopkeeper: found.shopkeeper || { shopname: 'GharSeKro Verified Store', shopaddress: [{ city: 'Mumbai', state: 'Maharashtra', pincode: '400001', flatnumber: 1 }] },
+    shopkeeper: found.shopkeeper || { shopname: 'GharSeKro Verified Store', shopaddress: [{ city: 'Mumbai', state: 'Maharashtra', pincode: '400001', flatnumber: '1' }] },
     category: found.category ? { id: found.category.id, title: found.category.title, image: '' } : { id: 'gen', title: 'Hardware', image: '' }
   }
 }
@@ -254,7 +254,7 @@ export interface ApiOrder {
     city: string
     state: string
     pincode: string
-    flatnumber: number
+    flatnumber: string
   }
   estimatedDelivery?: string
   deliveryGuy?: {
@@ -354,7 +354,7 @@ export interface Address {
   city: string
   state: string
   pincode: string
-  flatnumber: number
+  flatnumber: string
   customerid: string
   shopkeeperid: string | null
   latitude?: number | string | null
@@ -364,7 +364,7 @@ export interface Address {
 export interface AddAddressData {
   city: string
   pincode: string
-  flatnumber: number
+  flatnumber: string
   state: string
   phone: string
   latitude?: number | null
@@ -388,8 +388,8 @@ export const DUMMY_CATEGORIES: ApiCategory[] = [
 ]
 
 export const DEMO_ADDRESSES: Address[] = [
-  { id: "addr-1", city: "Mumbai", state: "Maharashtra", pincode: "400001", flatnumber: 12, customerid: "demo-user", shopkeeperid: null },
-  { id: "addr-2", city: "New Delhi", state: "Delhi", pincode: "110001", flatnumber: 5, customerid: "demo-user", shopkeeperid: null },
+  { id: "addr-1", city: "Mumbai", state: "Maharashtra", pincode: "400001", flatnumber: "12", customerid: "demo-user", shopkeeperid: null },
+  { id: "addr-2", city: "New Delhi", state: "Delhi", pincode: "110001", flatnumber: "5", customerid: "demo-user", shopkeeperid: null },
 ]
 
 // In-memory mutable addresses store
@@ -480,7 +480,7 @@ export const DEMO_ORDERS: ApiOrder[] = [
       { id: "oi-2", quantity: 2, unitPrice: "899", lineTotal: "1799", item: { title: "Godrej Brass Padlock 65mm", images: ["https://images.unsplash.com/photo-1618220179428-22790b461013?q=80&w=300&auto=format&fit=crop"] } },
     ],
     shopkeeper: { shopname: "GharSeKro Verified Store" },
-    deliveryAddress: { city: "Mumbai", state: "Maharashtra", pincode: "400001", flatnumber: 12 },
+    deliveryAddress: { city: "Mumbai", state: "Maharashtra", pincode: "400001", flatnumber: "12" },
     estimatedDelivery: "Delivered on time"
   },
   {
@@ -493,7 +493,7 @@ export const DEMO_ORDERS: ApiOrder[] = [
       { id: "oi-3", quantity: 1, unitPrice: "3200", lineTotal: "3200", item: { title: "Asian Paints Apex Ultima 10L", images: ["https://images.unsplash.com/photo-1595206133361-b1fe343e5e23?q=80&w=300&auto=format&fit=crop"] } },
     ],
     shopkeeper: { shopname: "GharSeKro Verified Store" },
-    deliveryAddress: { city: "Mumbai", state: "Maharashtra", pincode: "400001", flatnumber: 12 },
+    deliveryAddress: { city: "Mumbai", state: "Maharashtra", pincode: "400001", flatnumber: "12" },
     estimatedDelivery: "Within 2 Hours"
   },
 ]

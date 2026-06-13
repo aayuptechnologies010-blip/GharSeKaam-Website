@@ -225,15 +225,15 @@ const ContractingOfferings = () => {
                     This service requires custom site measurements and specific aggregate volume quotes. Click below to contact Aman Traders directly via phone or WhatsApp.
                   </p>
                   <div className="text-sm text-amber-950 font-black bg-amber-100/60 p-2.5 rounded-xl border border-amber-200/50 text-center tracking-wide">
-                    📞 Contact: <a href="tel:+919876543210" className="underline hover:text-amber-800 transition-colors">+91 98765 43210</a>
+                    📞 Contact: <a href="tel:+918957035082" className="underline hover:text-amber-800 transition-colors">+91 89570 35082</a>
                   </div>
                   <div className="flex flex-col sm:flex-row gap-3 pt-1">
-                    <a href="tel:+919876543210" className="flex-1 flex items-center justify-center gap-2 font-black text-sm text-white bg-slate-900 hover:bg-slate-800 py-3 rounded-xl shadow-md transition-all">
+                    <a href="tel:+918957035082" className="flex-1 flex items-center justify-center gap-2 font-black text-sm text-white bg-slate-900 hover:bg-slate-800 py-3 rounded-xl shadow-md transition-all">
                       <Phone className="w-4 h-4 text-amber-400" />
                       Call Agent
                     </a>
                     <a
-                      href={`https://wa.me/919876543210?text=Hello%20Aman%20Traders,%20I%20want%20to%20inquire%20about:%20${encodeURIComponent(selectedService.title)}`}
+                      href={`https://wa.me/918957035082?text=Hello%20Aman%20Traders,%20I%20want%20to%20inquire%20about:%20${encodeURIComponent(selectedService.title)}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex-1 flex items-center justify-center gap-2 font-black text-sm text-white bg-green-600 hover:bg-green-700 py-3 rounded-xl shadow-md transition-all"

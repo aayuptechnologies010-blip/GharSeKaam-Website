@@ -24,7 +24,7 @@ const AddAddressModal = ({ isOpen, onClose, onAddressAdded }: AddAddressModalPro
   const [formData, setFormData] = useState<AddAddressData>({
     city: 'Gorakhpur',
     pincode: '',
-    flatnumber: 0,
+    flatnumber: '',
     state: 'Uttar Pradesh',
     phone: ''
   })
@@ -36,7 +36,7 @@ const AddAddressModal = ({ isOpen, onClose, onAddressAdded }: AddAddressModalPro
       setFormData({
         city: 'Gorakhpur',
         pincode: '',
-        flatnumber: 0,
+        flatnumber: '',
         state: 'Uttar Pradesh',
         phone: ''
       })
@@ -73,7 +73,7 @@ const AddAddressModal = ({ isOpen, onClose, onAddressAdded }: AddAddressModalPro
         setFormData({
           city: 'Gorakhpur',
           pincode: '',
-          flatnumber: 0,
+          flatnumber: '',
           state: 'Uttar Pradesh',
           phone: ''
         })
@@ -197,9 +197,9 @@ const AddAddressModal = ({ isOpen, onClose, onAddressAdded }: AddAddressModalPro
             <Label htmlFor="flatnumber">Flat/House Number</Label>
             <Input
               id="flatnumber"
-              type="number"
+              type="text"
               value={formData.flatnumber}
-              onChange={(e) => handleInputChange('flatnumber', parseInt(e.target.value) || 0)}
+              onChange={(e) => handleInputChange('flatnumber', e.target.value)}
               placeholder="Enter flat/house number"
               required
             />

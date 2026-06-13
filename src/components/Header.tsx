@@ -137,13 +137,24 @@ const Header = () => {
     }
   }
 
-  const handleSavePincode = () => {
+  const handleSavePincode = async () => {
     if (!/^\d{6}$/.test(tempPincode)) {
       setPincodeError("Please enter a valid 6-digit pincode.");
       return;
     }
 
-    const city = pincodeMap[tempPincode] || "India";
+    let city = tempPincode.startsWith("273") ? "Gorakhpur" : (pincodeMap[tempPincode] || "India");
+    
+    try {
+      const res = await fetch(`https://api.postalpincode.in/pincode/${tempPincode}`);
+      const data = await res.json();
+      if (data && data[0] && data[0].Status === "Success" && data[0].PostOffice?.[0]) {
+        city = data[0].PostOffice[0].District || city;
+      }
+    } catch (e) {
+      console.warn("Pincode API lookup failed, using fallback:", e);
+    }
+
     localStorage.setItem('userPincode', tempPincode);
     localStorage.setItem('userPincodeCity', city);
     setPincode(tempPincode);

@@ -556,7 +556,7 @@ const ProductDetail = () => {
   }
 
   // Pincode validation & city match
-  const handleCheckPincode = () => {
+  const handleCheckPincode = async () => {
     if (!/^\d{6}$/.test(tempPincode)) {
       setPincodeError("Please enter a valid 6-digit pincode.");
       setPincodeChecked(false);
@@ -572,7 +572,18 @@ const ProductDetail = () => {
       "500001": "Hyderabad"
     };
 
-    const city = pincodeMap[tempPincode] || "India";
+    let city = tempPincode.startsWith("273") ? "Gorakhpur" : (pincodeMap[tempPincode] || "India");
+
+    try {
+      const res = await fetch(`https://api.postalpincode.in/pincode/${tempPincode}`);
+      const data = await res.json();
+      if (data && data[0] && data[0].Status === "Success" && data[0].PostOffice?.[0]) {
+        city = data[0].PostOffice[0].District || city;
+      }
+    } catch (e) {
+      console.warn("Pincode API lookup failed, using fallback:", e);
+    }
+
     localStorage.setItem('userPincode', tempPincode);
     localStorage.setItem('userPincodeCity', city);
     setPincode(tempPincode);
@@ -594,10 +605,12 @@ const ProductDetail = () => {
 
   // Calculate dynamic delivery date
   const getDeliveryDate = () => {
-    const daysToAdd = pincode === "400001" ? 1 : 3;
+    const isGorakhpur = pincode.startsWith("273") || pincodeCity === "Gorakhpur";
+    const daysToAdd = isGorakhpur ? 0 : (pincode === "400001" ? 1 : 3);
     const date = new Date();
     date.setDate(date.getDate() + daysToAdd);
-    return date.toLocaleDateString("en-IN", { weekday: 'long', month: 'short', day: 'numeric' });
+    const dateStr = date.toLocaleDateString("en-IN", { weekday: 'long', month: 'short', day: 'numeric' });
+    return isGorakhpur ? `Today (within 2-3 hours)` : dateStr;
   };
 
   if (loading) {

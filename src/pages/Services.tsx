@@ -1,7 +1,8 @@
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ContractingOfferings from "@/components/ContractingOfferings";
-import { Sparkles } from "lucide-react";
+import { Sparkles, Shield, Clock, Star } from "lucide-react";
+import { motion } from "framer-motion";
 
 const Services = () => {
   return (

@@ -243,7 +243,7 @@ const Profile = () => {
         city: newAddress.city,
         state: newAddress.state,
         pincode: newAddress.pincode,
-        flatnumber: parseInt(newAddress.flatnumber, 10),
+        flatnumber: newAddress.flatnumber,
         phone: newAddress.phone,
       });
 
