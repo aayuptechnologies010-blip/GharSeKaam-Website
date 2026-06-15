@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
-import { getProductDetail, getProducts, ApiProductDetail, ApiProduct, getHardwareSvgFallback, FALLBACK_HARDWARE_PRODUCTS } from '@/lib/api'
+import { getProductDetail, getProducts, ApiProductDetail, ApiProduct, getHardwareSvgFallback } from '@/lib/api'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -29,318 +29,7 @@ import {
 import { useToast } from '@/hooks/use-toast'
 
 // Mock Details for All Products (BuildMart-like High-Fidelity Dummy Data)
-const MOCK_DEAL_DETAILS: Record<string, any> = {
-  "drill-001": {
-    id: "drill-001",
-    title: "Bosch GSB 500 RE Professional Impact Drill Machine",
-    images: [
-      "https://images.unsplash.com/photo-1504307651254-35680f356dfd?q=80&w=800&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1504148455328-c376907d081c?q=80&w=800&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1504148455328-c376907d081c?q=80&w=800&auto=format&fit=crop"
-    ],
-    wholesaleprice: "2199",
-    retailprice: "2499",
-    unit: "piece",
-    description: "The Bosch GSB 500 RE is a powerful, compact, and reliable impact drill machine designed for both professional tasks and home DIY projects. Powered by a robust 500W motor, it easily cuts through concrete, masonry, steel, and wood. Its ergonomic lightweight construction reduces stress during overhead drilling.",
-    warranty: "1 Year Brand Warranty",
-    addons: [],
-    discount: 37,
-    shopkeeper: {
-      shopname: "Bosch Authorized Tools Store",
-      shopaddress: [{ city: "Mumbai", state: "Maharashtra", pincode: "400001", flatnumber: 12 }]
-    },
-    category: { id: "pt-1", title: "Power Tools", image: "" },
-    variants: [
-      { size: "500W Standard", price: 2499 },
-      { size: "600W Heavy Duty", price: 2999 }
-    ],
-    specifications: {
-      "Brand": "Bosch",
-      "Model Number": "GSB 500 RE",
-      "Power Input": "500 Watts",
-      "Chuck Capacity": "10 mm",
-      "No Load Speed": "0 - 2600 RPM",
-      "Impact Rate": "0 - 41600 BPM",
-      "Weight": "1.5 kg"
-    },
-    highlights: [
-      "Powerful 500W motor for high-performance drilling.",
-      "Dual mode option: Impact drilling or rotary drilling.",
-      "Ergonomic handle grip for ultimate comfort and control.",
-      "Includes a 1-year brand warranty card."
-    ]
-  },
-  "cement-001": {
-    id: "cement-001",
-    title: "Ultratech Premium Portland Pozzolana Cement (PPC)",
-    images: [
-      "https://images.unsplash.com/photo-1589939705384-5185137a7f0f?q=80&w=800&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1517646287270-a5a9ca602e5c?q=80&w=800&auto=format&fit=crop"
-    ],
-    wholesaleprice: "350",
-    retailprice: "375",
-    unit: "bag",
-    description: "Ultratech Premium is a concrete-specialist Portland Pozzolana Cement (PPC) manufactured using cutting-edge clinker technology. It contains high-grade active mineral additives that deliver superior concrete strength, maximum waterproofing, and high resistance against chloride and sulfate attacks.",
-    warranty: "No Warranty (Standard Expiry Checked)",
-    addons: [],
-    discount: 16,
-    shopkeeper: {
-      shopname: "Vrindavan Aggregates & Cement",
-      shopaddress: [{ city: "Mumbai", state: "Maharashtra", pincode: "400001", flatnumber: 45 }]
-    },
-    category: { id: "cs-1", title: "Cement & Sand", image: "" },
-    variants: [
-      { size: "50kg Bag", price: 375 },
-      { size: "1 Ton Bundle", price: 7200 }
-    ],
-    specifications: {
-      "Brand": "Ultratech",
-      "Type": "Premium PPC",
-      "Weight": "50 kg",
-      "Packaging": "Laminated PP Bag (Moisture Resistant)",
-      "Initial Setting Time": "30 Minutes",
-      "Compressive Strength": "53 MPa (after 28 days)"
-    },
-    highlights: [
-      "Concrete-specialist clinker gives unmatched structure durability.",
-      "Moisture-proof laminated packaging protects against moisture damage.",
-      "Superior waterproofing reduces capillary action in slabs.",
-      "Recommended for columns, beams, foundations, and slab casting."
-    ]
-  },
-  "wire-001": {
-    id: "wire-001",
-    title: "Havells Life Line FR-LSH House Wire (Length 90m)",
-    images: [
-      "https://images.unsplash.com/photo-1563770660941-20978e870e26?q=80&w=800&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?q=80&w=800&auto=format&fit=crop"
-    ],
-    wholesaleprice: "1399",
-    retailprice: "1599",
-    unit: "piece",
-    description: "Havells Life Line is a premium range of building wires insulated with flame-retardant, low-smoke, and low-halogen (FR-LSH) compound. Using 99.97% pure electrolytic grade copper conductors, it maximizes power delivery, reduces heating, and increases the overall lifespan of house wiring circuits.",
-    warranty: "20 Years Manufacturer Warranty",
-    addons: [],
-    discount: 24,
-    shopkeeper: {
-      shopname: "Havells Brand Gallery",
-      shopaddress: [{ city: "New Delhi", state: "Delhi", pincode: "110001", flatnumber: 8 }]
-    },
-    category: { id: "el-1", title: "Electricals", image: "" },
-    variants: [
-      { size: "1.0 Sqmm", price: 1299 },
-      { size: "1.5 Sqmm", price: 1599 },
-      { size: "2.5 Sqmm", price: 2499 }
-    ],
-    specifications: {
-      "Brand": "Havells",
-      "Type": "FR-LSH Single Core",
-      "Conductor": "99.97% Pure Electrolytic Copper",
-      "Length": "90 Meters",
-      "Voltage Rating": "1100 Volts",
-      "Standards": "IS 694 Certified"
-    },
-    highlights: [
-      "Flame-Retardant, Low-Smoke, and Halogen protected insulation.",
-      "High current-carrying capacity for extreme power loads.",
-      "Anti-termite and anti-rodent compound coating prevents cable damage.",
-      "Excellent flex life for smooth conduit pulling and wiring."
-    ]
-  },
-  "lock-001": {
-    id: "lock-001",
-    title: "Godrej Brass Nav-Tal Padlock 6-Levers with 3 Keys",
-    images: [
-      "https://images.unsplash.com/photo-1618220179428-22790b461013?q=80&w=800&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1509395062183-67c5ad6faff9?q=80&w=800&auto=format&fit=crop"
-    ],
-    wholesaleprice: "699",
-    retailprice: "799",
-    unit: "piece",
-    description: "The iconic Godrej Nav-Tal padlock has been safeguarding houses across India for generations. Built with an ultra-strong, rivetless brass body and a hardened steel shackle, it offers unparalleled security and robust resistance to crowbar and hacksaw attacks.",
-    warranty: "5 Years Manufacturer Warranty",
-    addons: [],
-    discount: 26,
-    shopkeeper: {
-      shopname: "National Locks & Hardware",
-      shopaddress: [{ city: "Mumbai", state: "Maharashtra", pincode: "400001", flatnumber: 89 }]
-    },
-    category: { id: "hw-1", title: "Hardware", image: "" },
-    variants: [
-      { size: "50mm Size", price: 650 },
-      { size: "65mm Size", price: 799 },
-      { size: "85mm Giant", price: 1199 }
-    ],
-    specifications: {
-      "Brand": "Godrej Lock",
-      "Model": "Nav-Tal 6 Levers",
-      "Material": "Extruded Brass Body",
-      "Shackle Material": "Hardened Alloy Steel",
-      "Levers Count": "6 Levers",
-      "Keys Included": "3 Heavy Brass Keys"
-    },
-    highlights: [
-      "Rivetless brass body with dual-locking shackle protection.",
-      "6-lever pick-resistant key technology provides heavy safety.",
-      "Hardened steel shackle resists hacksaw cutting attempts.",
-      "Highly durable construction, operational in all weather."
-    ]
-  },
-  "paint-001": {
-    id: "paint-001",
-    title: "Asian Paints Apex Ultima Exterior Emulsion White",
-    images: [
-      "https://images.unsplash.com/photo-1595206133361-b1fe343e5e23?q=80&w=800&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1562259949-e8e7689d7828?q=80&w=800&auto=format&fit=crop"
-    ],
-    wholesaleprice: "2890",
-    retailprice: "3200",
-    unit: "piece",
-    description: "Asian Paints Apex Ultima is a premium water-based, high-performance exterior wall paint. Fortified with silicone additives and advanced dirt-pick-up resistance, it forms a highly durable shield that protects exterior walls from harsh rains, heat, UV degradation, algae growth, and paint peeling.",
-    warranty: "7 Years Performance Warranty",
-    addons: [],
-    discount: 31,
-    shopkeeper: {
-      shopname: "Kamdhenu Paints & Home Decor",
-      shopaddress: [{ city: "Mumbai", state: "Maharashtra", pincode: "400002", flatnumber: 101 }]
-    },
-    category: { id: "pa-1", title: "Paints", image: "" },
-    variants: [
-      { size: "4 Litre", price: 1450 },
-      { size: "10 Litre", price: 3200 },
-      { size: "20 Litre", price: 5900 }
-    ],
-    specifications: {
-      "Brand": "Asian Paints",
-      "Type": "Premium Exterior Emulsion",
-      "Finish": "Rich Smooth Matt Finish",
-      "Coverage": "50-60 sq.ft/Litre for 2 coats",
-      "Drying Time": "30-40 Minutes",
-      "Fungus Resistance": "Yes (Advanced Anti-Algal)"
-    },
-    highlights: [
-      "Silicone additives offer outstanding water repellent protection.",
-      "Anti-algal formula prevents black spots on exterior walls.",
-      "Excellent UV-protection prevents colors from fading.",
-      "Sleek dirt-resistant paint technology keeps walls clean."
-    ]
-  },
-  "pipe-001": {
-    id: "pipe-001",
-    title: "Supreme PVC Pressure Pipe 4 Inch Class-3 (6m)",
-    images: [
-      "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?q=80&w=800&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?q=80&w=800&auto=format&fit=crop"
-    ],
-    wholesaleprice: "420",
-    retailprice: "499",
-    unit: "piece",
-    description: "Supreme Class-3 PVC Pressure Pipes are manufactured in state-of-the-art extrusion plants. Ideal for water supply networks, plumbing installations, and agricultural irrigation, they provide robust pressure handling capacity, zero leakage, chemical inertness, and a prolonged rust-free operational life.",
-    warranty: "10 Years Brand Warranty",
-    addons: [],
-    discount: 23,
-    shopkeeper: {
-      shopname: "Supreme Pipes Agency",
-      shopaddress: [{ city: "Pune", state: "Maharashtra", pincode: "411001", flatnumber: 22 }]
-    },
-    category: { id: "pl-1", title: "Plumbing", image: "" },
-    variants: [
-      { size: "3 Inch Pipe", price: 399 },
-      { size: "4 Inch Pipe", price: 499 }
-    ],
-    specifications: {
-      "Brand": "Supreme",
-      "Material": "Unplasticized PVC (uPVC)",
-      "Pipe Diameter": "4 Inches (110 mm)",
-      "Standard Length": "6 Meters",
-      "Pressure Class": "Class-3 (6 kgf/cm²)",
-      "Joint Type": "Solvent Weld socket"
-    },
-    highlights: [
-      "High tensile & impact strength handles pressure surges easily.",
-      "Lead-free, non-toxic compound ensures safe drinking water.",
-      "Chemical and corrosion resistant prevents calcification.",
-      "Smooth internal surface ensures maximum hydraulic flow."
-    ]
-  },
-  "rebar-001": {
-    id: "rebar-001",
-    title: "Tata Tiscon TMT Steel Rebar Fe 550D High Strength",
-    images: [
-      "https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?q=80&w=800&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1504307651254-35680f356dfd?q=80&w=800&auto=format&fit=crop"
-    ],
-    wholesaleprice: "760",
-    retailprice: "850",
-    unit: "piece",
-    description: "Tata Tiscon Fe 550D is a high-strength thermo-mechanically treated (TMT) steel rebar designed to provide absolute seismic safety to concrete structures. Made from pure virgin iron ore, it features uniform rib patterns for excellent bonding with cement, great ductility, and premium corrosion resistance.",
-    warranty: "No Warranty (Quality certificate provided)",
-    addons: [],
-    discount: 18,
-    shopkeeper: {
-      shopname: "Laxmi Steel & Iron Suppliers",
-      shopaddress: [{ city: "Mumbai", state: "Maharashtra", pincode: "400001", flatnumber: 56 }]
-    },
-    category: { id: "cs-1", title: "Cement & Sand", image: "" },
-    variants: [
-      { size: "10mm (per rod)", price: 650 },
-      { size: "12mm (per rod)", price: 850 },
-      { size: "16mm (per rod)", price: 1450 }
-    ],
-    specifications: {
-      "Brand": "Tata Tiscon",
-      "Grade": "Fe 550D High Ductility",
-      "Steel Type": "Virgin Steel TMT",
-      "Standard Length": "12 Meters (per rod)",
-      "Rib Design": "Uniform High-Bond Ribs",
-      "Seismic Grade": "Yes (Earthquake Resistant)"
-    },
-    highlights: [
-      "Pure virgin iron ore steel increases load-bearing capacity.",
-      "Fe 550D grade provides high ductility to absorb seismic energy.",
-      "Uniform double-helical rib pattern bonds flawlessly with cement.",
-      "Thermo-mechanically treated for excellent rust resistance."
-    ]
-  },
-  "faucet-001": {
-    id: "faucet-001",
-    title: "Cera Brass Designer Basin Faucet (Chrome Finish)",
-    images: [
-      "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?q=80&w=800&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?q=80&w=800&auto=format&fit=crop"
-    ],
-    wholesaleprice: "1499",
-    retailprice: "1799",
-    unit: "piece",
-    description: "Bring a touch of modern luxury to your bathroom with the Cera Brass Designer Basin Faucet. Fabricated from premium virgin brass and coated with a thick multilayer mirror chrome finish, it features a smooth ceramic disc cartridge that guarantees drip-free, whisper-quiet operation for years.",
-    warranty: "7 Years Manufacturer Warranty",
-    addons: [],
-    discount: 31,
-    shopkeeper: {
-      shopname: "Bath & Sanitary World",
-      shopaddress: [{ city: "Bengaluru", state: "Karnataka", pincode: "560001", flatnumber: 14 }]
-    },
-    category: { id: "pl-1", title: "Plumbing", image: "" },
-    variants: [
-      { size: "Standard Cold", price: 1799 },
-      { size: "Quarter Turn Mixer", price: 2999 }
-    ],
-    specifications: {
-      "Brand": "Cera",
-      "Material": "High-Grade Virgin Brass",
-      "Finish Type": "Multilayer Mirror Chrome",
-      "Cartridge Type": "Ceramic Disc Cartridge",
-      "Aerator": "Honeycomb aerator (soft splash-free flow)",
-      "Drip Resistance": "Verified for 5,00,000 cycles"
-    },
-    highlights: [
-      "Premium solid brass casting ensures robust durability.",
-      "Sparkling mirror chrome finish resists corrosion and tarnish.",
-      "High-performance ceramic disc cartridge ensures drip-free usage.",
-      "Honeycomb aerator provides a soft, bubbly, water-saving stream."
-    ]
-  }
-};
+const MOCK_DEAL_DETAILS: Record<string, any> = {};
 
 const ProductDetail = () => {
   const { id } = useParams<{ id: string }>()
@@ -392,65 +81,42 @@ const ProductDetail = () => {
       try {
         setLoading(true)
         
-        // 1. Resolve Special Mock Deal Details first
-        if (MOCK_DEAL_DETAILS[id]) {
-          setProduct(MOCK_DEAL_DETAILS[id]);
-          setError(null);
-        } else {
-          // 2. Fetch from real backend API
-          const productDetail = await getProductDetail(id)
-          setProduct(productDetail)
-          setError(null)
-        }
+        // Fetch from real backend API
+        const productDetail = await getProductDetail(id)
+        setProduct(productDetail)
+        setError(null)
 
-        // Fetch related products - wrapped in try-catch to be 100% offline-friendly!
+        // Fetch related products
         try {
           const allProducts = await getProducts();
           if (allProducts && allProducts.length > 0) {
-            setRelatedProducts(allProducts.filter(p => p.id !== id).slice(0, 4));
+            const viewingWholesale = isWholesaler || !!sessionStorage.getItem('wholesaleGST');
+            const filteredRelated = allProducts.filter(p => {
+              if (p.id === id) return false;
+              const avail = p.availability;
+              if (!avail) return true;
+              
+              if (avail !== 'RETAILER' && avail !== 'WHOLESALE' && avail !== 'WHOLESALER' && avail !== 'BOTH') {
+                return true;
+              }
+              
+              if (avail === 'BOTH') return true;
+              if (viewingWholesale) return avail === 'WHOLESALE' || avail === 'WHOLESALER';
+              return avail === 'RETAILER';
+            });
+            setRelatedProducts(filteredRelated.slice(0, 4));
           } else {
-            setRelatedProducts(FALLBACK_HARDWARE_PRODUCTS.filter(p => p.id !== id).slice(0, 4));
+            setRelatedProducts([]);
           }
         } catch (relErr) {
-          console.warn('Failed to fetch related products from API, using premium mock fallback:', relErr);
-          setRelatedProducts(FALLBACK_HARDWARE_PRODUCTS.filter(p => p.id !== id).slice(0, 4));
+          console.warn('Failed to fetch related products from API:', relErr);
+          setRelatedProducts([]);
         }
 
       } catch (err: any) {
-        console.error('Failed to fetch product details, trying fallback catalog:', err)
-        
-        // Try resolving this product from FALLBACK_HARDWARE_PRODUCTS to handle offline gracefully
-        const fallbackProd = FALLBACK_HARDWARE_PRODUCTS.find(p => p.id === id);
-        if (fallbackProd) {
-          const resolvedDetail: ApiProductDetail = {
-            id: fallbackProd.id,
-            title: fallbackProd.title,
-            images: fallbackProd.images,
-            wholesaleprice: fallbackProd.wholesaleprice,
-            retailprice: fallbackProd.retailprice,
-            unit: "piece",
-            description: fallbackProd.title + " - Premium grade architectural hardware product engineered for heavy structural loads, certified safety standards, and decades of reliable service life.",
-            warranty: "1 Year Brand Warranty",
-            addons: [],
-            discount: 20,
-            variants: fallbackProd.variants,
-            shopkeeper: {
-              shopname: "National Hardware Hub Store",
-              shopaddress: [{ city: "Mumbai", state: "Maharashtra", pincode: "400001", flatnumber: 22 }]
-            },
-            category: {
-              id: fallbackProd.category?.id || "gen-1",
-              title: fallbackProd.category?.title || "Hardware",
-              image: ""
-            }
-          };
-          setProduct(resolvedDetail);
-          setRelatedProducts(FALLBACK_HARDWARE_PRODUCTS.filter(p => p.id !== id).slice(0, 4));
-          setError(null);
-        } else {
-          setError(err?.message || 'Failed to load product details')
-          setProduct(null)
-        }
+        console.error('Failed to fetch product details:', err)
+        setError(err?.message || 'Failed to load product details')
+        setProduct(null)
       } finally {
         setLoading(false)
       }

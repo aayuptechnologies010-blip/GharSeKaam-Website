@@ -6,81 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useCartContext } from "@/context/CartContext";
 import { useToast } from "@/hooks/use-toast";
-import { getHardwareSvgFallback } from "@/lib/api";
-
-// Highly descriptive, premium dummy hardware items for Deals
-const DEALS_DATA = [
-  {
-    id: "drill-001",
-    title: "Bosch GSB 500 RE Professional Impact Drill Machine",
-    basePrice: 3999,
-    dealPrice: 2499,
-    discount: 37,
-    rating: 4.8,
-    reviews: 215,
-    claimed: 68,
-    image: "https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=600&q=80",
-    category: "Power Tools",
-    brand: "BOSCH",
-    stockLeft: 4
-  },
-  {
-    id: "cement-001",
-    title: "Ultratech Premium Portland Pozzolana Cement (PPC)",
-    basePrice: 450,
-    dealPrice: 375,
-    discount: 16,
-    rating: 4.7,
-    reviews: 1420,
-    claimed: 85,
-    image: "https://images.unsplash.com/photo-1589939705384-5185137a7f0f?auto=format&fit=crop&w=600&q=80",
-    category: "Cement & Sand",
-    brand: "ULTRATECH",
-    stockLeft: 12
-  },
-  {
-    id: "wire-001",
-    title: "Havells Life Line FR-LSH Fire Resistant House Wire 1.5 Sqmm (90m)",
-    basePrice: 1850,
-    dealPrice: 1399,
-    discount: 24,
-    rating: 4.9,
-    reviews: 388,
-    claimed: 42,
-    image: "https://images.unsplash.com/photo-1563770660941-20978e870e26?auto=format&fit=crop&w=600&q=80",
-    category: "Electricals",
-    brand: "HAVELLS",
-    stockLeft: 9
-  },
-  {
-    id: "lock-001",
-    title: "Godrej Brass Nav-Tal Padlock 6-Levers with 3 Original Keys",
-    basePrice: 950,
-    dealPrice: 699,
-    discount: 26,
-    rating: 4.6,
-    reviews: 94,
-    claimed: 55,
-    image: "https://images.unsplash.com/photo-1618220179428-22790b461013?auto=format&fit=crop&w=600&q=80",
-    category: "Hardware",
-    brand: "GODREJ",
-    stockLeft: 5
-  },
-  {
-    id: "faucet-001",
-    title: "Cera Brass Designer Basin Faucet (Mirror Chrome Finish)",
-    basePrice: 2200,
-    dealPrice: 1499,
-    discount: 31,
-    rating: 4.5,
-    reviews: 112,
-    claimed: 71,
-    image: "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=600&q=80",
-    category: "Plumbing",
-    brand: "CERA",
-    stockLeft: 3
-  }
-];
+import { getHardwareSvgFallback, getProducts, ApiProduct } from "@/lib/api";
 
 // E-commerce 3-Column Promo Banners Block Data
 const PROMO_BANNERS = [
@@ -121,6 +47,8 @@ export const DealsSection = () => {
   const { cartItems, addToCart, removeFromCart, updateQuantity } = useCartContext();
   const { toast } = useToast();
   const [timeLeft, setTimeLeft] = useState({ hours: 0, minutes: 0, seconds: 0 });
+  const [deals, setDeals] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const carouselRef = useRef<HTMLDivElement>(null);
   const isLoggedIn = !!localStorage.getItem('authToken');
 
@@ -133,6 +61,63 @@ export const DealsSection = () => {
       });
     }
   };
+
+  useEffect(() => {
+    const fetchDeals = async () => {
+      try {
+        setLoading(true);
+        const allProducts = await getProducts();
+        
+        const userType = localStorage.getItem('userType');
+        const isWholesaler = userType === 'WHOLESALER';
+        const viewingWholesale = isWholesaler || !!sessionStorage.getItem('wholesaleGST');
+        
+        const filtered = allProducts.filter((product) => {
+          const avail = product.availability;
+          if (!avail) return true;
+          
+          // Treat legacy/unknown values (like "In Stock") as visible to everyone
+          if (avail !== 'RETAILER' && avail !== 'WHOLESALE' && avail !== 'WHOLESALER' && avail !== 'BOTH') {
+            return true;
+          }
+          
+          if (avail === 'BOTH') return true;
+          if (viewingWholesale) return avail === 'WHOLESALE' || avail === 'WHOLESALER';
+          return avail === 'RETAILER';
+        });
+
+        const mapped = filtered.slice(0, 8).map((p, index) => {
+          const basePrice = parseFloat(p.retailprice || "0");
+          const discountPercent = p.discount || 15 + (index % 3) * 5;
+          const dealPrice = Math.round(basePrice * (1 - discountPercent / 100));
+          return {
+            id: p.id,
+            title: p.title,
+            basePrice: basePrice,
+            dealPrice: dealPrice,
+            discount: Math.round(discountPercent),
+            rating: 4.0 + (p.title.length % 11) / 10,
+            reviews: 50 + (p.title.length % 300),
+            claimed: 30 + (p.title.length % 60),
+            image: p.images && p.images.length > 0 ? p.images[0] : "",
+            category: p.category?.title || "Hardware",
+            brand: p.title.split(" ")[0].toUpperCase(),
+            stockLeft: p.currentQty || 5
+          };
+        });
+        setDeals(mapped);
+      } catch (err) {
+        console.error("Failed to load deals:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    if (isLoggedIn) {
+      fetchDeals();
+    } else {
+      setLoading(false);
+    }
+  }, [isLoggedIn]);
 
   useEffect(() => {
     const updateCountdown = () => {
@@ -158,7 +143,7 @@ export const DealsSection = () => {
     return () => clearInterval(interval);
   }, []);
 
-  const handleAddToCart = (product: typeof DEALS_DATA[0], e: React.MouseEvent) => {
+  const handleAddToCart = (product: any, e: React.MouseEvent) => {
     e.stopPropagation();
     addToCart({
       id: product.id,
@@ -189,6 +174,7 @@ export const DealsSection = () => {
   };
 
   const formatTime = (num: number) => num.toString().padStart(2, "0");
+
 
   return (
     <section className="py-16 bg-gradient-to-b from-amber-500/5 via-slate-50 to-slate-50 relative overflow-hidden border-b">
@@ -332,16 +318,24 @@ export const DealsSection = () => {
               <ChevronRight className="h-5 w-5" />
             </button>
 
-            {/* Carousel container */}
-            <div 
-              ref={carouselRef}
-              className="flex gap-6 overflow-x-auto pb-6 pt-2 snap-x scrollbar-none scroll-smooth"
-            >
-            {DEALS_DATA.map((deal) => {
-              const inCartItem = cartItems.find(item => item.id === deal.id);
-              const isInCart = !!inCartItem;
-              
-              return (
+            {loading ? (
+              <div className="text-center py-8 text-slate-400 font-semibold text-sm">
+                Loading deals...
+              </div>
+            ) : deals.length === 0 ? (
+              <div className="text-center py-8 text-slate-400 font-semibold text-sm">
+                No active deals available.
+              </div>
+            ) : (
+              <div 
+                ref={carouselRef}
+                className="flex gap-6 overflow-x-auto pb-6 pt-2 snap-x scrollbar-none scroll-smooth"
+              >
+                {deals.map((deal) => {
+                  const inCartItem = cartItems.find(item => item.id === deal.id);
+                  const isInCart = !!inCartItem;
+                  
+                  return (
                 <Card
                   key={deal.id}
                   onClick={() => navigate(`/product/${deal.id}`)}
@@ -497,6 +491,7 @@ export const DealsSection = () => {
               );
             })}
             </div>
+            )}
           </div>
         )}
       </div>

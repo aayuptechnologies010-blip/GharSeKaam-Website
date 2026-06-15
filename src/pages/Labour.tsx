@@ -233,11 +233,13 @@ const Labour = () => {
       } else {
         throw new Error(data.message);
       }
-    } catch (err) {
-      console.warn("Backend reservation logging skipped (running client-side mock fallback):", err);
-      setTimeout(() => {
-        setBookingStep("success");
-      }, 1200);
+    } catch (err: any) {
+      console.error("Labour booking failed:", err);
+      toast({
+        title: "Booking Failed",
+        description: err.message || "Failed to submit booking. Please check backend connection.",
+        variant: "destructive"
+      });
     } finally {
       setFormLoading(false);
     }

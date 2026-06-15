@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import { getProducts, ApiProduct, FALLBACK_HARDWARE_PRODUCTS } from "@/lib/api";
+import { getProducts, ApiProduct } from "@/lib/api";
 import { useCartContext } from "@/context/CartContext";
 import { useToast } from "@/hooks/use-toast";
 import Header from "@/components/Header";
@@ -103,13 +103,13 @@ export default function Search() {
         if (data && data.length > 0) {
           setProducts(data);
         } else {
-          setProducts(FALLBACK_HARDWARE_PRODUCTS);
+          setProducts([]);
         }
         setError(null);
       } catch (err: any) {
         console.error("Failed to load products in search:", err);
-        setProducts(FALLBACK_HARDWARE_PRODUCTS);
-        setError(null);
+        setProducts([]);
+        setError("Failed to load products. Please check backend connection.");
       } finally {
         setLoading(false);
       }
@@ -160,7 +160,21 @@ export default function Search() {
 
     // 6. Availability filters
     if (inStockOnly && product.currentQty === 0) return false;
-    if (wholesaleOnly && product.availability !== "WHOLESALER" && product.availability !== "WHOLESALE" && product.availability !== "BOTH") return false;
+    
+    const avail = product.availability;
+    if (avail) {
+      const isLegacy = avail !== 'RETAILER' && avail !== 'WHOLESALE' && avail !== 'WHOLESALER' && avail !== 'BOTH';
+      if (!isLegacy) {
+        if (wholesaleOnly) {
+          if (avail !== 'WHOLESALE' && avail !== 'WHOLESALER' && avail !== 'BOTH') return false;
+        } else if (!hasWholesaleAccess) {
+          if (avail !== 'RETAILER' && avail !== 'BOTH') return false;
+        }
+      } else {
+        // Legacy items (e.g. "In Stock")
+        if (wholesaleOnly) return false; // Not considered wholesale
+      }
+    }
 
     return true;
   });

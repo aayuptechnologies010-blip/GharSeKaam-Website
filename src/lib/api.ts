@@ -116,91 +116,54 @@ export async function getCategories(signal?: AbortSignal): Promise<ApiCategory[]
 }
 
 export async function getProducts(signal?: AbortSignal): Promise<ApiProduct[]> {
-  if (url !== "__BACKEND_DISABLED__") {
-    const token = localStorage.getItem('authToken')
-    try {
-      const headers: HeadersInit = {}
-      if (token) {
-        headers['Authorization'] = token
-      }
-      const response = await fetch(`${url}/items`, { headers, signal })
-      const data = await response.json()
-      if (data.success && Array.isArray(data.items)) {
-        return data.items
-      }
-    } catch (error) {
-      console.error("Backend getProducts failed, falling back to mock:", error)
-    }
+  const token = localStorage.getItem('authToken')
+  const headers: HeadersInit = {}
+  if (token) {
+    headers['Authorization'] = token
   }
-  return FALLBACK_HARDWARE_PRODUCTS
+  const response = await fetch(`${url}/items`, { headers, signal })
+  const data = await response.json()
+  if (data.success && Array.isArray(data.items)) {
+    return data.items
+  }
+  throw new Error(data.message || "Failed to retrieve items")
 }
 
 export async function getProductDetail(productId: string, signal?: AbortSignal): Promise<ApiProductDetail> {
-  if (url !== "__BACKEND_DISABLED__") {
-    const token = localStorage.getItem('authToken')
-    try {
-      const headers: HeadersInit = {}
-      if (token) {
-        headers['Authorization'] = token
-      }
-      const response = await fetch(`${url}/item/${productId}`, { headers, signal })
-      const data = await response.json()
-      if (data.success && data.item) {
-        return data.item
-      }
-    } catch (error) {
-      console.error("Backend getProductDetail failed, falling back to mock:", error)
-    }
+  const token = localStorage.getItem('authToken')
+  const headers: HeadersInit = {}
+  if (token) {
+    headers['Authorization'] = token
   }
-
-  const found = FALLBACK_HARDWARE_PRODUCTS.find(p => p.id === productId)
-  if (!found) throw new Error('Product not found')
-  return {
-    id: found.id,
-    title: found.title,
-    images: found.images,
-    wholesaleprice: found.wholesaleprice,
-    retailprice: found.retailprice,
-    unit: found.unit || 'piece',
-    description: found.description || '',
-    warranty: found.warranty || '1 Year Brand Warranty',
-    addons: [],
-    discount: found.discount || 20,
-    variants: found.variants,
-    shopkeeper: found.shopkeeper || { shopname: 'GharSeKro Verified Store', shopaddress: [{ city: 'Mumbai', state: 'Maharashtra', pincode: '400001', flatnumber: '1' }] },
-    category: found.category ? { id: found.category.id, title: found.category.title, image: '' } : { id: 'gen', title: 'Hardware', image: '' }
+  const response = await fetch(`${url}/item/${productId}`, { headers, signal })
+  const data = await response.json()
+  if (data.success && data.item) {
+    return data.item
   }
+  throw new Error(data.message || 'Product not found')
 }
 
 export async function signup(signupData: SignupData, googleToken?: string): Promise<SignupResponse> {
-  if (url !== "__BACKEND_DISABLED__") {
-    try {
-      const response = await fetch(`${url}/auth/signup`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(googleToken ? { 'Authorization': googleToken } : {})
-        },
-        body: JSON.stringify(signupData)
-      })
-      const data = await response.json()
-      if (data.success) {
-        return {
-          success: true,
-          token: data.token,
-          name: data.name,
-          email: data.email,
-          message: data.message
-        }
-      } else {
-        throw new Error(data.message || 'Signup failed')
-      }
-    } catch (error: any) {
-      console.error("Backend signup failed:", error)
-      throw error
+  const response = await fetch(`${url}/auth/signup`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(googleToken ? { 'Authorization': googleToken } : {})
+    },
+    body: JSON.stringify(signupData)
+  })
+  const data = await response.json()
+  if (data.success) {
+    return {
+      success: true,
+      token: data.token,
+      name: data.name,
+      email: data.email,
+      message: data.message
     }
+  } else {
+    throw new Error(data.message || 'Signup failed')
   }
-  return { success: true, token: 'demo-token', name: 'Demo User', email: 'demo@gharsekro.com' }
 }
 
 // Order related interfaces and functions
@@ -272,80 +235,53 @@ export interface OrdersResponse {
 }
 
 export async function createOrder(orderData: CreateOrderData): Promise<CreateOrderResponse> {
-  if (url !== "__BACKEND_DISABLED__") {
-    const token = localStorage.getItem('authToken')
-    if (token) {
-      try {
-        const response = await fetch(`${url}/orders`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': token
-          },
-          body: JSON.stringify(orderData)
-        })
-        const data = await response.json()
-        if (data.success && data.order) {
-          return { success: true, orderId: data.order.id }
-        }
-        return { success: false, message: data.message || "Failed to create order on backend" }
-      } catch (error: any) {
-        console.error("Backend createOrder failed:", error)
-        return { success: false, message: error.message || "Network error while placing order" }
-      }
-    }
+  const token = localStorage.getItem('authToken')
+  if (!token) throw new Error("Unauthorized");
+  const response = await fetch(`${url}/orders`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': token
+    },
+    body: JSON.stringify(orderData)
+  })
+  const data = await response.json()
+  if (data.success && data.order) {
+    return { success: true, orderId: data.order.id }
   }
-  return { success: true, orderId: 'DEMO-' + Date.now() }
+  return { success: false, message: data.message || "Failed to create order on backend" }
 }
 
 export async function getOrders(_signal?: AbortSignal): Promise<ApiOrder[]> {
-  if (url !== "__BACKEND_DISABLED__") {
-    const token = localStorage.getItem('authToken')
-    if (token) {
-      try {
-        const response = await fetch(`${url}/orders`, {
-          headers: {
-            'Authorization': token
-          },
-          signal: _signal
-        })
-        const data = await response.json()
-        if (data.success && Array.isArray(data.orders)) {
-          return data.orders
-        }
-        throw new Error(data.message || "Failed to retrieve orders from backend")
-      } catch (error) {
-        console.error("Backend getOrders failed:", error)
-        throw error
-      }
-    }
+  const token = localStorage.getItem('authToken')
+  if (!token) throw new Error("Unauthorized");
+  const response = await fetch(`${url}/orders`, {
+    headers: {
+      'Authorization': token
+    },
+    signal: _signal
+  })
+  const data = await response.json()
+  if (data.success && Array.isArray(data.orders)) {
+    return data.orders
   }
-  return DEMO_ORDERS
+  throw new Error(data.message || "Failed to retrieve orders from backend")
 }
 
 export async function cancelOrder(orderId: string): Promise<{ success: boolean; message?: string }> {
-  if (url !== "__BACKEND_DISABLED__") {
-    const token = localStorage.getItem('authToken')
-    if (token) {
-      try {
-        const response = await fetch(`${url}/orders/${orderId}/cancel`, {
-          method: 'PUT',
-          headers: {
-            'Authorization': token
-          }
-        })
-        const data = await response.json()
-        if (data.success) {
-          return { success: true, message: data.message }
-        }
-        return { success: false, message: data.message || "Failed to cancel order on backend" }
-      } catch (error: any) {
-        console.error("Backend cancelOrder failed:", error)
-        return { success: false, message: error.message || "Network error while cancelling order" }
-      }
+  const token = localStorage.getItem('authToken')
+  if (!token) throw new Error("Unauthorized");
+  const response = await fetch(`${url}/orders/${orderId}/cancel`, {
+    method: 'PUT',
+    headers: {
+      'Authorization': token
     }
+  })
+  const data = await response.json()
+  if (data.success) {
+    return { success: true, message: data.message }
   }
-  return { success: true, message: 'Order cancelled successfully' }
+  return { success: false, message: data.message || "Failed to cancel order on backend" }
 }
 
 // Address related interfaces and functions
@@ -387,235 +323,50 @@ export const DUMMY_CATEGORIES: ApiCategory[] = [
   { id: "cat-bm", title: "Building Material (Cement, Sand, Iron)", image: "https://images.unsplash.com/photo-1589939705384-5185137a7f0f?q=80&w=300&auto=format&fit=crop" },
 ]
 
-export const DEMO_ADDRESSES: Address[] = [
-  { id: "addr-1", city: "Mumbai", state: "Maharashtra", pincode: "400001", flatnumber: "12", customerid: "demo-user", shopkeeperid: null },
-  { id: "addr-2", city: "New Delhi", state: "Delhi", pincode: "110001", flatnumber: "5", customerid: "demo-user", shopkeeperid: null },
-]
 
-// In-memory mutable addresses store
-let _addresses: Address[] = [...DEMO_ADDRESSES]
 
 export async function addAddress(addressData: AddAddressData): Promise<{ success: boolean; message?: string }> {
-  if (url !== "__BACKEND_DISABLED__") {
-    const token = localStorage.getItem('authToken')
-    if (token) {
-      try {
-        const response = await fetch(`${url}/address/add`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': token
-          },
-          body: JSON.stringify({
-            city: addressData.city,
-            state: addressData.state,
-            pincode: addressData.pincode,
-            flatnumber: addressData.flatnumber,
-            latitude: addressData.latitude,
-            longitude: addressData.longitude
-          })
-        })
-        const data = await response.json()
-        if (data.success) {
-          return { success: true }
-        }
-        return { success: false, message: data.message || "Failed to add address on backend" }
-      } catch (error: any) {
-        console.error("Backend addAddress failed:", error)
-        return { success: false, message: error.message || "Network error while adding address" }
-      }
-    }
+  const token = localStorage.getItem('authToken')
+  if (!token) throw new Error("Unauthorized");
+  const response = await fetch(`${url}/address/add`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': token
+    },
+    body: JSON.stringify({
+      city: addressData.city,
+      state: addressData.state,
+      pincode: addressData.pincode,
+      flatnumber: addressData.flatnumber,
+      latitude: addressData.latitude,
+      longitude: addressData.longitude
+    })
+  })
+  const data = await response.json()
+  if (data.success) {
+    return { success: true }
   }
-
-  const newAddress: Address = {
-    id: 'addr-' + Date.now(),
-    city: addressData.city,
-    state: addressData.state,
-    pincode: addressData.pincode,
-    flatnumber: addressData.flatnumber,
-    customerid: 'demo-user',
-    shopkeeperid: null,
-    latitude: addressData.latitude,
-    longitude: addressData.longitude
-  }
-  _addresses = [..._addresses, newAddress]
-  return { success: true }
+  return { success: false, message: data.message || "Failed to add address on backend" }
 }
 
 export async function getAllAddresses(_signal?: AbortSignal): Promise<Address[]> {
-  if (url !== "__BACKEND_DISABLED__") {
-    const token = localStorage.getItem('authToken')
-    if (token) {
-      try {
-        const response = await fetch(`${url}/address/all`, {
-          headers: {
-            'Authorization': token
-          },
-          signal: _signal
-        })
-        const data = await response.json()
-        if (data.success && Array.isArray(data.addresses)) {
-          return data.addresses
-        }
-        throw new Error(data.message || "Failed to retrieve addresses from backend")
-      } catch (error) {
-        console.error("Backend getAllAddresses failed:", error)
-        throw error
-      }
-    }
+  const token = localStorage.getItem('authToken')
+  if (!token) throw new Error("Unauthorized");
+  const response = await fetch(`${url}/address/all`, {
+    headers: {
+      'Authorization': token
+    },
+    signal: _signal
+  })
+  const data = await response.json()
+  if (data.success && Array.isArray(data.addresses)) {
+    return data.addresses
   }
-
-  return _addresses
+  throw new Error(data.message || "Failed to retrieve addresses from backend")
 }
 
-export const DEMO_ORDERS: ApiOrder[] = [
-  {
-    id: "ORD-2024-001",
-    paymentType: "COD",
-    totalPrice: "4298",
-    status: "DELIVERED",
-    createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
-    orderItems: [
-      { id: "oi-1", quantity: 1, unitPrice: "2499", lineTotal: "2499", item: { title: "Bosch GSB 500 RE Impact Drill", images: ["https://images.unsplash.com/photo-1504307651254-35680f356dfd?q=80&w=300&auto=format&fit=crop"] } },
-      { id: "oi-2", quantity: 2, unitPrice: "899", lineTotal: "1799", item: { title: "Godrej Brass Padlock 65mm", images: ["https://images.unsplash.com/photo-1618220179428-22790b461013?q=80&w=300&auto=format&fit=crop"] } },
-    ],
-    shopkeeper: { shopname: "GharSeKro Verified Store" },
-    deliveryAddress: { city: "Mumbai", state: "Maharashtra", pincode: "400001", flatnumber: "12" },
-    estimatedDelivery: "Delivered on time"
-  },
-  {
-    id: "ORD-2024-002",
-    paymentType: "COD",
-    totalPrice: "3200",
-    status: "PROCESSING",
-    createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
-    orderItems: [
-      { id: "oi-3", quantity: 1, unitPrice: "3200", lineTotal: "3200", item: { title: "Asian Paints Apex Ultima 10L", images: ["https://images.unsplash.com/photo-1595206133361-b1fe343e5e23?q=80&w=300&auto=format&fit=crop"] } },
-    ],
-    shopkeeper: { shopname: "GharSeKro Verified Store" },
-    deliveryAddress: { city: "Mumbai", state: "Maharashtra", pincode: "400001", flatnumber: "12" },
-    estimatedDelivery: "Within 2 Hours"
-  },
-]
 
-export const FALLBACK_HARDWARE_PRODUCTS: ApiProduct[] = [
-  {
-    id: "drill-001",
-    title: "Bosch GSB 500 RE Professional Impact Drill Machine",
-    retailprice: "2499",
-    wholesaleprice: "2199",
-    images: ["https://images.unsplash.com/photo-1504307651254-35680f356dfd?q=80&w=600&auto=format&fit=crop"],
-    category: { id: "cat-ts", title: "Tools & Safety Equipments" },
-    availability: "BOTH",
-    currentQty: 150,
-    variants: [
-      { size: "500W Standard", price: 2499 },
-      { size: "600W Heavy Duty", price: 2999 }
-    ]
-  },
-  {
-    id: "cement-001",
-    title: "Ultratech Premium Portland Pozzolana Cement (PPC)",
-    retailprice: "375",
-    wholesaleprice: "350",
-    images: ["https://images.unsplash.com/photo-1589939705384-5185137a7f0f?q=80&w=600&auto=format&fit=crop"],
-    category: { id: "cat-bm", title: "Building Material (Cement, Sand, Iron)" },
-    availability: "BOTH",
-    currentQty: 500,
-    variants: [
-      { size: "50kg Bag", price: 375 },
-      { size: "1 Ton Bundle", price: 7200 }
-    ]
-  },
-  {
-    id: "wire-001",
-    title: "Havells Life Line FR-LSH House Wire (Length 90m)",
-    retailprice: "1599",
-    wholesaleprice: "1399",
-    images: ["https://images.unsplash.com/photo-1563770660941-20978e870e26?q=80&w=600&auto=format&fit=crop"],
-    category: { id: "cat-el", title: "Electrical" },
-    availability: "BOTH",
-    currentQty: 250,
-    variants: [
-      { size: "1.0 Sqmm", price: 1299 },
-      { size: "1.5 Sqmm", price: 1599 },
-      { size: "2.5 Sqmm", price: 2499 }
-    ]
-  },
-  {
-    id: "lock-001",
-    title: "Godrej Brass Nav-Tal Padlock 6-Levers with 3 Keys",
-    retailprice: "799",
-    wholesaleprice: "699",
-    images: ["https://images.unsplash.com/photo-1618220179428-22790b461013?q=80&w=600&auto=format&fit=crop"],
-    category: { id: "cat-hl", title: "Hardware & Locks" },
-    availability: "BOTH",
-    currentQty: 180,
-    variants: [
-      { size: "50mm Size", price: 650 },
-      { size: "65mm Size", price: 799 },
-      { size: "85mm Giant", price: 1199 }
-    ]
-  },
-  {
-    id: "paint-001",
-    title: "Asian Paints Apex Ultima Exterior Emulsion White",
-    retailprice: "3200",
-    wholesaleprice: "2890",
-    images: ["https://images.unsplash.com/photo-1595206133361-b1fe343e5e23?q=80&w=600&auto=format&fit=crop"],
-    category: { id: "cat-pt", title: "Paint" },
-    availability: "BOTH",
-    currentQty: 90,
-    variants: [
-      { size: "4 Litre", price: 1450 },
-      { size: "10 Litre", price: 3200 },
-      { size: "20 Litre", price: 5900 }
-    ]
-  },
-  {
-    id: "pipe-001",
-    title: "Supreme PVC Pressure Pipe 4 Inch Class-3 (6m)",
-    retailprice: "499",
-    wholesaleprice: "420",
-    images: ["https://images.unsplash.com/photo-1621905251189-08b45d6a269e?q=80&w=600&auto=format&fit=crop"],
-    category: { id: "cat-pl", title: "Plumbing Fitting" },
-    availability: "BOTH",
-    currentQty: 300,
-    variants: [
-      { size: "3 Inch Pipe", price: 399 },
-      { size: "4 Inch Pipe", price: 499 }
-    ]
-  },
-  {
-    id: "rebar-001",
-    title: "Tata Tiscon TMT Steel Rebar Fe 550D High Strength",
-    retailprice: "850",
-    wholesaleprice: "760",
-    images: ["https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?q=80&w=600&auto=format&fit=crop"],
-    category: { id: "cat-bm", title: "Building Material (Cement, Sand, Iron)" },
-    availability: "BOTH",
-    currentQty: 120,
-    variants: [
-      { size: "10mm (per rod)", price: 650 },
-      { size: "12mm (per rod)", price: 850 },
-      { size: "16mm (per rod)", price: 1450 }
-    ]
-  },
-  {
-    id: "faucet-001",
-    title: "Cera Brass Designer Basin Faucet (Chrome Finish)",
-    retailprice: "1799",
-    wholesaleprice: "1499",
-    images: ["https://images.unsplash.com/photo-1584622650111-993a426fbf0a?q=80&w=600&auto=format&fit=crop"],
-    category: { id: "cat-pl", title: "Plumbing Fitting" },
-    availability: "BOTH",
-    currentQty: 80,
-    variants: [
-      { size: "Standard Cold", price: 1799 },
-      { size: "Quarter Turn Mixer", price: 2999 }
-    ]
-  }
-];
 
 export function getHardwareSvgFallback(titleOrCategory: string): string {
   const query = (titleOrCategory || '').toLowerCase();
@@ -660,22 +411,23 @@ export function getHardwareSvgFallback(titleOrCategory: string): string {
 }
 
 export async function sendOtp(emailOrPhone: string): Promise<{ success: boolean; message: string; otp?: string }> {
-  if (url !== "__BACKEND_DISABLED__") {
-    try {
-      const response = await fetch(`${url}/auth/send-otp`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ emailOrPhone })
-      })
-      return await response.json()
-    } catch (error: any) {
-      console.error("Backend sendOtp failed:", error)
-      return { success: false, message: error.message || "Failed to send OTP" }
+  try {
+    const response = await fetch(`${url}/auth/send-otp`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ emailOrPhone })
+    })
+    const data = await response.json()
+    if (!response.ok) {
+      throw new Error(data.message || "Failed to send OTP")
     }
+    return data
+  } catch (error: any) {
+    console.error("Backend sendOtp failed:", error)
+    return { success: false, message: error.message || "Failed to send OTP" }
   }
-  return { success: true, message: `Mock OTP sent to ${emailOrPhone}`, otp: '123456' }
 }
 
 export async function verifyOtp(emailOrPhone: string, otp: string, name?: string): Promise<{
@@ -689,32 +441,22 @@ export async function verifyOtp(emailOrPhone: string, otp: string, name?: string
   type?: string;
   message?: string;
 }> {
-  if (url !== "__BACKEND_DISABLED__") {
-    try {
-      const response = await fetch(`${url}/auth/verify-otp`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ emailOrPhone, otp, name })
-      })
-      return await response.json()
-    } catch (error: any) {
-      console.error("Backend verifyOtp failed:", error)
-      return { success: false, registered: false, message: error.message || "Verification failed" }
+  try {
+    const response = await fetch(`${url}/auth/verify-otp`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ emailOrPhone, otp, name })
+    })
+    const data = await response.json()
+    if (!response.ok) {
+      throw new Error(data.message || "Verification failed")
     }
+    return data
+  } catch (error: any) {
+    console.error("Backend verifyOtp failed:", error)
+    return { success: false, registered: false, message: error.message || "Verification failed" }
   }
-  if (otp === '123456') {
-    return {
-      success: true,
-      registered: true,
-      token: 'demo-token-gharsekro',
-      name: name || 'Rahul Sharma',
-      email: 'rahul@gharsekro.com',
-      profile: 'https://github.com/identicons/mock.png',
-      type: 'RETAILER'
-    }
-  }
-  return { success: false, registered: false, message: "Invalid OTP" }
 }
 

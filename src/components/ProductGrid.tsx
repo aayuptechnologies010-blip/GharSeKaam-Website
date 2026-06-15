@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge"
 import { Heart, ShoppingCart, Star, Minus, Plus, Truck, ShieldCheck, Tag } from "lucide-react"
 import { useCartContext } from "@/context/CartContext"
 import { useEffect, useState } from "react"
-import { getProducts, ApiProduct, ProductVariant, FALLBACK_HARDWARE_PRODUCTS, getHardwareSvgFallback } from "@/lib/api"
+import { getProducts, ApiProduct, ProductVariant, getHardwareSvgFallback } from "@/lib/api"
 import { useNavigate } from "react-router-dom"
 import { useToast } from "@/hooks/use-toast"
 
@@ -42,13 +42,13 @@ const ProductGrid = ({ category, wholesale = false }: ProductGridProps) => {
         if (fetchedProducts && fetchedProducts.length > 0) {
           setProducts(fetchedProducts)
         } else {
-          setProducts(FALLBACK_HARDWARE_PRODUCTS)
+          setProducts([])
         }
         setError(null)
       } catch (err: any) {
-        console.error('Failed to fetch products, using premium hardcoded fallbacks:', err)
-        setProducts(FALLBACK_HARDWARE_PRODUCTS)
-        setError(null)
+        console.error('Failed to fetch products:', err)
+        setProducts([])
+        setError("Failed to load products. Please check backend connection.")
       } finally {
         setLoading(false)
       }
@@ -56,21 +56,53 @@ const ProductGrid = ({ category, wholesale = false }: ProductGridProps) => {
     fetchProducts()
   }, [])
 
+  const getNormalizedCategory = (catName: string) => {
+    const s = catName.toLowerCase().trim();
+    if (s === 'power-tools' || s === 'safety-equipment' || s === 'tools-&-safety-equipments') {
+      return ['tools & safety equipments', 'tools-&-safety-equipments'];
+    }
+    if (s === 'plumbing' || s === 'plumbing-fitting') {
+      return ['plumbing fitting', 'plumbing-fitting'];
+    }
+    if (s === 'electricals' || s === 'electrical') {
+      return ['electrical'];
+    }
+    if (s === 'cement-&-sand' || s === 'building-material-(cement,-sand,-iron)') {
+      return ['building material (cement, sand, iron)', 'cement-&-sand'];
+    }
+    if (s === 'paints' || s === 'paint') {
+      return ['paint'];
+    }
+    if (s === 'hardware-&-locks') {
+      return ['hardware & locks'];
+    }
+    return [s];
+  }
+
   const filteredByCategory = category
-    ? products.filter(product =>
-        product.category &&
-        product.category.title &&
-        product.category.title.toLowerCase().replace(/\s+/g, '-') === category.toLowerCase()
-      )
-    : viewingWholesale
-      ? products
-      : products
+    ? products.filter(product => {
+        if (!product.category || !product.category.title) return false;
+        const productCat = product.category.title.toLowerCase().trim();
+        const targets = getNormalizedCategory(category);
+        return targets.some(target => 
+          productCat === target || 
+          productCat.replace(/\s+/g, '-') === target
+        );
+      })
+    : products
 
   const filteredProducts = filteredByCategory.filter((product) => {
-    if (!product.availability) return true
-    if (product.availability === 'BOTH') return true
-    if (viewingWholesale) return product.availability === 'WHOLESALER' || product.availability === 'WHOLESALE'
-    return product.availability === 'RETAILER'
+    const avail = product.availability;
+    if (!avail) return true;
+    
+    // Treat legacy / unknown values (like "In Stock") as visible to everyone
+    if (avail !== 'RETAILER' && avail !== 'WHOLESALE' && avail !== 'WHOLESALER' && avail !== 'BOTH') {
+      return true;
+    }
+    
+    if (avail === 'BOTH') return true;
+    if (viewingWholesale) return avail === 'WHOLESALE' || avail === 'WHOLESALER';
+    return avail === 'RETAILER';
   })
 
   const getProductPrice = (product: ApiProduct) => {
