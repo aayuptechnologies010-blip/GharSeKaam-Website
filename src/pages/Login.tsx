@@ -217,6 +217,14 @@ const Login = () => {
           localStorage.setItem("userEmail", res.email || "");
           localStorage.setItem("userProfile", res.profile || "");
           if (res.type) localStorage.setItem("userType", res.type);
+          if ((res as any).gstnumber) {
+            localStorage.setItem("userGST", (res as any).gstnumber);
+            sessionStorage.setItem("wholesaleGST", (res as any).gstnumber);
+          }
+          if ((res as any).shopname) {
+            localStorage.setItem("userShopName", (res as any).shopname);
+            sessionStorage.setItem("wholesaleShopName", (res as any).shopname);
+          }
 
           window.dispatchEvent(new Event("auth-change"));
           toast({

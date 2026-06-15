@@ -27,12 +27,13 @@ const ProductGrid = ({ category, wholesale = false }: ProductGridProps) => {
   const [selectedVariants, setSelectedVariants] = useState<SelectedVariants>({})
 
   const userType = localStorage.getItem('userType')
-  const isWholesaler = userType === 'WHOLESALER'
+  const userGST = localStorage.getItem('userGST') || sessionStorage.getItem('wholesaleGST')
+  const isWholesaler = userType === 'WHOLESALER' && !!userGST
   const isLoggedIn = !!localStorage.getItem('authToken')
   const viewingWholesale = wholesale || isWholesaler
 
   // Wholesale price show karo agar: wholesale page ho, ya userType WHOLESALER ho, ya GST verified ho
-  const hasWholesaleAccess = wholesale || isWholesaler || !!sessionStorage.getItem('wholesaleGST')
+  const hasWholesaleAccess = wholesale || isWholesaler
 
   useEffect(() => {
     const fetchProducts = async () => {

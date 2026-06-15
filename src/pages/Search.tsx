@@ -57,9 +57,10 @@ export default function Search() {
   const [wholesaleOnly, setWholesaleOnly] = useState<boolean>(false);
 
   const userType = localStorage.getItem('userType');
-  const isWholesaler = userType === 'WHOLESALER';
+  const userGST = localStorage.getItem('userGST') || sessionStorage.getItem('wholesaleGST');
+  const isWholesaler = userType === 'WHOLESALER' && !!userGST;
   const isLoggedIn = !!localStorage.getItem('authToken');
-  const hasWholesaleAccess = isWholesaler || !!sessionStorage.getItem('wholesaleGST');
+  const hasWholesaleAccess = isWholesaler;
 
   const getProductPrice = (product: ApiProduct, variant?: ProductVariant) => {
     if (variant) {

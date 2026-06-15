@@ -225,6 +225,12 @@ const AddressModal = ({ isOpen, onClose, googleAuthData }: AddressModalProps) =>
       if (googleAuthData.profile) localStorage.setItem('userProfile', googleAuthData.profile);
 
       localStorage.setItem('userType', userType);
+      if (userType === 'WHOLESALER') {
+        localStorage.setItem('userGST', gstnumber);
+        sessionStorage.setItem('wholesaleGST', gstnumber);
+        localStorage.setItem('userShopName', shopname);
+        sessionStorage.setItem('wholesaleShopName', shopname);
+      }
 
       // Dispatch custom event to update Header state immediately
       window.dispatchEvent(new Event('auth-change'));

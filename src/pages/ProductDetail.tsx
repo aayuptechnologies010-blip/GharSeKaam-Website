@@ -61,7 +61,8 @@ const ProductDetail = () => {
 
   // Check if user is logged in and their type
   const userType = localStorage.getItem('userType')
-  const isWholesaler = userType === 'WHOLESALER'
+  const userGST = localStorage.getItem('userGST') || sessionStorage.getItem('wholesaleGST')
+  const isWholesaler = userType === 'WHOLESALER' && !!userGST
   const isLoggedIn = !!localStorage.getItem('authToken')
 
   useEffect(() => {
@@ -143,7 +144,7 @@ const ProductDetail = () => {
   const getProductPrice = () => {
     if (!product) return 0
 
-    const hasWholesaleAccess = isLoggedIn && (isWholesaler || !!sessionStorage.getItem('wholesaleGST'))
+    const hasWholesaleAccess = isLoggedIn && isWholesaler
 
     if (selectedVariant && product.variants) {
       const variant = product.variants.find(v => v.size === selectedVariant)
