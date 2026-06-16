@@ -136,7 +136,7 @@ const HeroBanner = () => {
             <div className="space-y-6 text-left">
               <div className="space-y-3">
                 <Badge variant="secondary" className="bg-amber-500 hover:bg-amber-600 text-slate-950 font-black px-3.5 py-1 rounded-full uppercase tracking-widest text-[9px] flex items-center gap-1.5 w-max shadow-md shadow-amber-500/20">
-                  <Sparkles className="h-3.5 w-3.5 fill-slate-950 text-slate-950" /> {currentSlide.badge}
+                  <Sparkles className="h-3.5 w-3.5 fill-sbhailate-950 text-slate-950" /> {currentSlide.badge}
                 </Badge>
                 <h1 className="text-3xl md:text-5xl font-black leading-tight tracking-tight uppercase">
                   {currentSlide.title}

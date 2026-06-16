@@ -7,6 +7,7 @@ export interface CartItem {
   price: number
   quantity: number
   image: string
+  isWholesale?: boolean
   variant?: {
     size: string
     price: number
@@ -42,15 +43,15 @@ export const useCart = () => {
 
   const addToCart = useCallback((product: Omit<CartItem, 'quantity'>) => {
     setCartItems(prevItems => {
-      // Create a unique identifier that includes variant information
+      // Create a unique identifier that includes variant information and wholesale status
       const itemKey = product.variant 
-        ? `${product.id}-${product.variant.size}` 
-        : product.id
+        ? `${product.id}-${product.variant.size}-${product.isWholesale ? 'wholesale' : 'retail'}` 
+        : `${product.id}-${product.isWholesale ? 'wholesale' : 'retail'}`
       
       const existingItem = prevItems.find(item => {
         const existingKey = item.variant 
-          ? `${item.id}-${item.variant.size}` 
-          : item.id
+          ? `${item.id}-${item.variant.size}-${item.isWholesale ? 'wholesale' : 'retail'}` 
+          : `${item.id}-${item.isWholesale ? 'wholesale' : 'retail'}`
         return existingKey === itemKey
       })
       
@@ -61,8 +62,8 @@ export const useCart = () => {
         })
         return prevItems.map(item => {
           const existingKey = item.variant 
-            ? `${item.id}-${item.variant.size}` 
-            : item.id
+            ? `${item.id}-${item.variant.size}-${item.isWholesale ? 'wholesale' : 'retail'}` 
+            : `${item.id}-${item.isWholesale ? 'wholesale' : 'retail'}`
           return existingKey === itemKey
             ? { ...item, quantity: item.quantity + 1 }
             : item
@@ -77,13 +78,14 @@ export const useCart = () => {
     })
   }, [toast])
 
-  const removeFromCart = useCallback((productId: string, variant?: { size: string }) => {
+  const removeFromCart = useCallback((productId: string, variant?: { size: string }, isWholesale?: boolean) => {
     setCartItems(prevItems => {
       const itemToRemove = prevItems.find(item => {
+        const matchWholesale = isWholesale !== undefined ? item.isWholesale === isWholesale : true
         if (variant) {
-          return item.id === productId && item.variant?.size === variant.size
+          return item.id === productId && item.variant?.size === variant.size && matchWholesale
         }
-        return item.id === productId
+        return item.id === productId && matchWholesale
       })
       
       if (itemToRemove) {
@@ -95,28 +97,30 @@ export const useCart = () => {
       }
       
       return prevItems.filter(item => {
+        const matchWholesale = isWholesale !== undefined ? item.isWholesale === isWholesale : true
         if (variant) {
-          return !(item.id === productId && item.variant?.size === variant.size)
+          return !(item.id === productId && item.variant?.size === variant.size && matchWholesale)
         }
-        return item.id !== productId
+        return !(item.id === productId && matchWholesale)
       })
     })
   }, [toast])
 
-  const updateQuantity = useCallback((productId: string, quantity: number, variant?: { size: string }) => {
+  const updateQuantity = useCallback((productId: string, quantity: number, variant?: { size: string }, isWholesale?: boolean) => {
     if (quantity <= 0) {
-      removeFromCart(productId, variant)
+      removeFromCart(productId, variant, isWholesale)
       return
     }
     
     setCartItems(prevItems =>
       prevItems.map(item => {
+        const matchWholesale = isWholesale !== undefined ? item.isWholesale === isWholesale : true
         if (variant) {
-          return (item.id === productId && item.variant?.size === variant.size)
+          return (item.id === productId && item.variant?.size === variant.size && matchWholesale)
             ? { ...item, quantity }
             : item
         }
-        return item.id === productId
+        return (item.id === productId && matchWholesale)
           ? { ...item, quantity }
           : item
       })

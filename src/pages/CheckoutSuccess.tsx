@@ -188,7 +188,9 @@ export default function CheckoutSuccess() {
                   <MapPin className="h-4 w-4 text-slate-400" /> Shipping Destination Address
                 </h4>
                 <div className="text-sm font-semibold text-slate-700 leading-relaxed bg-slate-50/50 p-4 border border-dashed rounded-2xl">
-                  <div className="font-extrabold text-slate-800 text-sm mb-1">GharSeKro Customer</div>
+                  <div className="font-extrabold text-slate-800 text-sm mb-1">
+                    {localStorage.getItem("userName") || "GharSeKro Customer"}
+                  </div>
                   <div>
                     {address.flatnumber}
                     {address.building && `, ${address.building}`}

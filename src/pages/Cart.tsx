@@ -64,11 +64,11 @@ const Cart = () => {
     loadAddresses()
   }
 
-  const handleQuantityChange = (productId: string, newQuantity: number, variant?: { size: string }) => {
+  const handleQuantityChange = (productId: string, newQuantity: number, variant?: { size: string }, isWholesale?: boolean) => {
     if (newQuantity < 1) {
-      removeFromCart(productId, variant)
+      removeFromCart(productId, variant, isWholesale)
     } else {
-      updateQuantity(productId, newQuantity, variant)
+      updateQuantity(productId, newQuantity, variant, isWholesale)
     }
   }
 
@@ -89,7 +89,8 @@ const Cart = () => {
         items: cartItems.map(item => ({
           itemId: item.id.includes('-bundle-') ? item.id.split('-bundle-')[0] : item.id,
           quantity: item.quantity,
-          variant: item.variant
+          variant: item.variant,
+          isWholesale: !!item.isWholesale
         }))
       }
 
@@ -290,8 +291,8 @@ const Cart = () => {
                 <div className="space-y-4">
                   {cartItems.map((item) => {
                     const uniqueKey = item.variant 
-                      ? `${item.id}-${item.variant.size}` 
-                      : item.id
+                      ? `${item.id}-${item.variant.size}-${item.isWholesale ? 'wholesale' : 'retail'}` 
+                      : `${item.id}-${item.isWholesale ? 'wholesale' : 'retail'}`
                     return (
                       <Card key={uniqueKey} className="border border-slate-200 hover:shadow-md transition-shadow rounded-2xl overflow-hidden bg-white">
                         <CardContent className="p-5">
@@ -329,7 +330,7 @@ const Cart = () => {
                                 size="icon"
                                 variant="ghost"
                                 className="h-8 w-8 hover:bg-slate-100 border-none rounded-none"
-                                onClick={() => handleQuantityChange(item.id, item.quantity - 1, item.variant)}
+                                onClick={() => handleQuantityChange(item.id, item.quantity - 1, item.variant, item.isWholesale)}
                               >
                                 <Minus className="h-3.5 w-3.5" />
                               </Button>
@@ -338,7 +339,7 @@ const Cart = () => {
                                 size="icon"
                                 variant="ghost"
                                 className="h-8 w-8 hover:bg-slate-100 border-none rounded-none"
-                                onClick={() => handleQuantityChange(item.id, item.quantity + 1, item.variant)}
+                                onClick={() => handleQuantityChange(item.id, item.quantity + 1, item.variant, item.isWholesale)}
                               >
                                 <Plus className="h-3.5 w-3.5" />
                               </Button>
@@ -355,7 +356,7 @@ const Cart = () => {
                               size="icon"
                               variant="ghost"
                               className="h-9 w-9 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-xl"
-                              onClick={() => removeFromCart(item.id, item.variant)}
+                              onClick={() => removeFromCart(item.id, item.variant, item.isWholesale)}
                             >
                               <Trash2 className="h-4.5 w-4.5" />
                             </Button>

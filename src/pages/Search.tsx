@@ -62,7 +62,7 @@ export default function Search() {
   const userGST = localStorage.getItem('userGST') || sessionStorage.getItem('wholesaleGST');
   const isWholesaler = userType === 'WHOLESALER' && !!userGST;
   const isLoggedIn = !!localStorage.getItem('authToken');
-  const hasWholesaleAccess = isWholesaler;
+  const hasWholesaleAccess = false;
 
   const getProductPrice = (product: ApiProduct, variant?: ProductVariant) => {
     if (variant) {
@@ -158,7 +158,7 @@ export default function Search() {
     if (selectedRating !== null && rating < selectedRating) return false;
 
     // 5. Discount filter
-    const discount = (product.title.length % 3 === 0) ? 10 + (product.title.length % 20) : 0;
+    const discount = product.discount || 0;
     if (selectedDiscount !== null && discount < selectedDiscount) return false;
 
     // 6. Availability filters
@@ -215,7 +215,8 @@ export default function Search() {
       name: product.title,
       price: price,
       image: image,
-      variant: variant
+      variant: variant,
+      isWholesale: false
     });
 
     toast({
@@ -565,7 +566,7 @@ export default function Search() {
                   const activePrice = getProductPrice(product, activeVariant);
 
                   // Dynamic calculated discount and ratings
-                  const discount = (product.title.length % 3 === 0) ? 10 + (product.title.length % 20) : 0;
+                  const discount = product.discount || 0;
                   const originalPrice = activePrice * (1 + discount / 100);
                   const rating = 4.0 + (product.title.length % 11) / 10;
                   const brandName = product.title.split(' ')[0].toUpperCase();
@@ -718,7 +719,7 @@ export default function Search() {
                   const activeVariant = product.variants && product.variants.length > 0 ? product.variants[0] : undefined;
                   const activePrice = getProductPrice(product, activeVariant);
 
-                  const discount = (product.title.length % 3 === 0) ? 10 + (product.title.length % 20) : 0;
+                  const discount = product.discount || 0;
                   const originalPrice = activePrice * (1 + discount / 100);
                   const rating = 4.0 + (product.title.length % 11) / 10;
                   const brandName = product.title.split(' ')[0].toUpperCase();

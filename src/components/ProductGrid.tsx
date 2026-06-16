@@ -34,8 +34,8 @@ const ProductGrid = ({ category, wholesale = false }: ProductGridProps) => {
   const isLoggedIn = !!localStorage.getItem('authToken')
   const viewingWholesale = wholesale || isWholesaler
 
-  // Wholesale price show karo agar: wholesale page ho, ya userType WHOLESALER ho, ya GST verified ho
-  const hasWholesaleAccess = wholesale || isWholesaler
+  // Wholesale price show karo agar: wholesale page ho
+  const hasWholesaleAccess = !!wholesale
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -155,7 +155,8 @@ const ProductGrid = ({ category, wholesale = false }: ProductGridProps) => {
       name: product.title,
       price: price,
       image: getProductImage(product),
-      variant: variant
+      variant: variant,
+      isWholesale: hasWholesaleAccess
     })
 
     toast({

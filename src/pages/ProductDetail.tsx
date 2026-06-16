@@ -146,7 +146,7 @@ const ProductDetail = () => {
   const getProductPrice = () => {
     if (!product) return 0
 
-    const hasWholesaleAccess = isLoggedIn && isWholesaler
+    const hasWholesaleAccess = false
 
     if (selectedVariant && product.variants) {
       const variant = product.variants.find(v => v.size === selectedVariant)
@@ -210,7 +210,8 @@ const ProductDetail = () => {
         name: itemName,
         price: price,
         image: product.images && product.images.length > 0 ? product.images[0] : 'https://images.unsplash.com/photo-1608613304899-ea8098577e38?auto=format&fit=crop&w=400&q=80',
-        variant: finalVariant
+        variant: finalVariant,
+        isWholesale: false
       })
     }
 
@@ -328,7 +329,7 @@ const ProductDetail = () => {
   const price = getProductPrice()
   const originalPrice = getOriginalPrice()
   const discount = product.discount || 0
-  const isWholesaleProduct = isLoggedIn && (isWholesaler || !!sessionStorage.getItem('wholesaleGST')) && product.wholesaleprice
+  const isWholesaleProduct = false
 
   // Spec list construction
   const specifications = (product as any).specifications || {
