@@ -50,6 +50,10 @@ const Profile = () => {
   const [addresses, setAddresses] = useState<Address[]>([]);
   const [newAddress, setNewAddress] = useState({
     flatnumber: "",
+    building: "",
+    street: "",
+    area: "",
+    landmark: "",
     city: "Gorakhpur",
     state: "Uttar Pradesh",
     pincode: "",
@@ -219,10 +223,10 @@ const Profile = () => {
   // Add new address
   const handleAddAddress = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newAddress.flatnumber || !newAddress.pincode || !newAddress.phone) {
+    if (!newAddress.flatnumber || !newAddress.street || !newAddress.area || !newAddress.pincode || !newAddress.phone) {
       toast({
         title: "Required Fields",
-        description: "Please fill out all address details",
+        description: "Please fill out all required address details (marked with *)",
         variant: "destructive",
       });
       return;
@@ -244,6 +248,10 @@ const Profile = () => {
         state: newAddress.state,
         pincode: newAddress.pincode,
         flatnumber: newAddress.flatnumber,
+        building: newAddress.building || undefined,
+        street: newAddress.street || undefined,
+        area: newAddress.area || undefined,
+        landmark: newAddress.landmark || undefined,
         phone: newAddress.phone,
       });
 
@@ -262,6 +270,10 @@ const Profile = () => {
       
       setNewAddress({
         flatnumber: "",
+        building: "",
+        street: "",
+        area: "",
+        landmark: "",
         city: "Gorakhpur",
         state: "Uttar Pradesh",
         pincode: "",
@@ -522,7 +534,7 @@ const Profile = () => {
                               className="border border-amber-200 bg-amber-50/30 rounded-xl p-5 mb-6 space-y-4 overflow-hidden"
                             >
                               <h4 className="font-bold text-slate-800 text-sm">Create New Address</h4>
-                              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div className="space-y-1.5">
                                   <Label className="text-xs font-bold text-slate-600">Flat / House No. *</Label>
                                   <Input
@@ -530,6 +542,40 @@ const Profile = () => {
                                     placeholder="Eg: 27B"
                                     value={newAddress.flatnumber}
                                     onChange={e => setNewAddress(a => ({ ...a, flatnumber: e.target.value }))}
+                                  />
+                                </div>
+                                <div className="space-y-1.5">
+                                  <Label className="text-xs font-bold text-slate-600">Building / Apartment Name (Optional)</Label>
+                                  <Input
+                                    placeholder="Eg: Vrindavan Heights"
+                                    value={newAddress.building}
+                                    onChange={e => setNewAddress(a => ({ ...a, building: e.target.value }))}
+                                  />
+                                </div>
+                                <div className="space-y-1.5">
+                                  <Label className="text-xs font-bold text-slate-600">Street / Colony / Road *</Label>
+                                  <Input
+                                    required
+                                    placeholder="Eg: Park Road, Sector 4"
+                                    value={newAddress.street}
+                                    onChange={e => setNewAddress(a => ({ ...a, street: e.target.value }))}
+                                  />
+                                </div>
+                                <div className="space-y-1.5">
+                                  <Label className="text-xs font-bold text-slate-600">Locality / Area / Sector *</Label>
+                                  <Input
+                                    required
+                                    placeholder="Eg: Golghar"
+                                    value={newAddress.area}
+                                    onChange={e => setNewAddress(a => ({ ...a, area: e.target.value }))}
+                                  />
+                                </div>
+                                <div className="space-y-1.5">
+                                  <Label className="text-xs font-bold text-slate-600">Landmark / Nearby Famous Place (Optional)</Label>
+                                  <Input
+                                    placeholder="Eg: Near Hanuman Temple"
+                                    value={newAddress.landmark}
+                                    onChange={e => setNewAddress(a => ({ ...a, landmark: e.target.value }))}
                                   />
                                 </div>
                                 <div className="space-y-1.5">
@@ -542,7 +588,7 @@ const Profile = () => {
                                     onChange={e => setNewAddress(a => ({ ...a, pincode: e.target.value.replace(/\D/g, "") }))}
                                   />
                                 </div>
-                                <div className="space-y-1.5">
+                                <div className="space-y-1.5 md:col-span-2">
                                   <Label className="text-xs font-bold text-slate-600">Contact Number *</Label>
                                   <Input
                                     required
@@ -590,7 +636,12 @@ const Profile = () => {
                                   Home Address
                                 </span>
                                 <p className="text-sm text-slate-800 font-semibold leading-relaxed">
-                                  Flat {addr.flatnumber}, {addr.city}, {addr.state} - {addr.pincode}
+                                  {addr.flatnumber}
+                                  {addr.building && `, ${addr.building}`}
+                                  {addr.street && `, ${addr.street}`}
+                                  {addr.area && `, ${addr.area}`}
+                                  {addr.landmark && `, Near ${addr.landmark}`}
+                                  , {addr.city}, {addr.state} - {addr.pincode}
                                 </p>
                               </div>
                             ))}

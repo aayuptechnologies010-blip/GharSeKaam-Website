@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { getProducts, ApiProduct } from "@/lib/api";
 import { useCartContext } from "@/context/CartContext";
+import { useWishlistContext } from "@/context/WishlistContext";
 import { useToast } from "@/hooks/use-toast";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -36,6 +37,7 @@ export default function Search() {
   const query = searchParams.get("q") || "";
   const navigate = useNavigate();
   const { cartItems, addToCart, removeFromCart, updateQuantity } = useCartContext();
+  const { toggleWishlist, isInWishlist } = useWishlistContext();
   const { toast } = useToast();
 
   const [products, setProducts] = useState<ApiProduct[]>([]);
@@ -601,16 +603,18 @@ export default function Search() {
                         <Button
                           size="icon"
                           variant="ghost"
-                          className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity bg-white hover:bg-slate-100 text-slate-400 hover:text-red-500 shadow-sm rounded-full h-8 w-8 z-10"
+                          className="absolute top-3 right-3 bg-white hover:bg-slate-100 shadow-sm rounded-full h-8 w-8 z-10"
                           onClick={(e) => {
                             e.stopPropagation();
-                            toast({
-                              title: "Saved",
-                              description: "Product saved to wishlist.",
+                            toggleWishlist({
+                              id: product.id,
+                              title: product.title,
+                              price: activePrice,
+                              image: product.images && product.images.length > 0 ? product.images[0] : "https://images.unsplash.com/photo-1581092160607-ee22621dd758?q=80&w=300&auto=format&fit=crop"
                             });
                           }}
                         >
-                          <Heart className="h-4.5 w-4.5" />
+                          <Heart className={`h-4.5 w-4.5 ${isInWishlist(product.id) ? 'fill-red-500 text-red-500' : 'text-slate-400 hover:text-red-500'}`} />
                         </Button>
                       </div>
 
@@ -771,16 +775,18 @@ export default function Search() {
                             <Button
                               size="icon"
                               variant="ghost"
-                              className="text-slate-400 hover:text-red-500 shrink-0 h-8 w-8 rounded-full"
+                              className="shrink-0 h-8 w-8 rounded-full"
                               onClick={(e) => {
                                 e.stopPropagation();
-                                toast({
-                                  title: "Saved",
-                                  description: "Product saved to wishlist.",
+                                toggleWishlist({
+                                  id: product.id,
+                                  title: product.title,
+                                  price: activePrice,
+                                  image: product.images && product.images.length > 0 ? product.images[0] : "https://images.unsplash.com/photo-1581092160607-ee22621dd758?q=80&w=300&auto=format&fit=crop"
                                 });
                               }}
                             >
-                              <Heart className="h-4.5 w-4.5" />
+                              <Heart className={`h-4.5 w-4.5 ${isInWishlist(product.id) ? 'fill-red-500 text-red-500' : 'text-slate-400 hover:text-red-500'}`} />
                             </Button>
                           </div>
 

@@ -189,7 +189,13 @@ export default function CheckoutSuccess() {
                 </h4>
                 <div className="text-sm font-semibold text-slate-700 leading-relaxed bg-slate-50/50 p-4 border border-dashed rounded-2xl">
                   <div className="font-extrabold text-slate-800 text-sm mb-1">GharSeKro Customer</div>
-                  <div>{address.flatnumber}</div>
+                  <div>
+                    {address.flatnumber}
+                    {address.building && `, ${address.building}`}
+                    {address.street && `, ${address.street}`}
+                    {address.area && `, ${address.area}`}
+                  </div>
+                  {address.landmark && <div className="text-xs text-slate-500">Near {address.landmark}</div>}
                   <div>{address.city}, {address.state} - <span className="font-bold">{address.pincode}</span></div>
                 </div>
               </div>

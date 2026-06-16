@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { CartProvider } from "@/context/CartContext";
+import { WishlistProvider } from "@/context/WishlistContext";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Wholesale from "./pages/Wholesale";
@@ -25,9 +26,10 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <CartProvider>
-        <Toaster />
-        <Sonner />
+      <WishlistProvider>
+        <CartProvider>
+          <Toaster />
+          <Sonner />
         <BrowserRouter>
           <ScrollToTop />
           <BackToTopButton />
@@ -49,8 +51,9 @@ const App = () => (
           </Routes>
         </BrowserRouter>
       </CartProvider>
-    </TooltipProvider>
-  </QueryClientProvider>
+    </WishlistProvider>
+  </TooltipProvider>
+</QueryClientProvider>
 );
 
 export default App;

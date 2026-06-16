@@ -1,14 +1,16 @@
-import { Search, ShoppingCart, User, Package, LogOut, HardHat, MapPin, Sparkles, Menu, ChevronDown, Flag } from "lucide-react";
+import { Search, ShoppingCart, User, Package, LogOut, HardHat, MapPin, Sparkles, Menu, ChevronDown, Flag, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useCartContext } from "@/context/CartContext";
+import { useWishlistContext } from "@/context/WishlistContext";
 import { useEffect, useState, useRef } from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import DrawerCart from "./DrawerCart";
 import DrawerAll from "./DrawerAll";
+import DrawerWishlist from "./DrawerWishlist";
 
 const POPULAR_SUGGESTIONS = [
   { text: "Ultratech Cement 50kg", category: "Cement & Sand" },
@@ -56,12 +58,14 @@ const Header = () => {
   const isCustomerServiceActive = location.pathname === '/' && activeTab === 'customerservice';
 
   const { getTotalItems } = useCartContext();
+  const { wishlistItems } = useWishlistContext();
   const [user, setUser] = useState<{ name?: string; email?: string; profile?: string } | null>(null);
   const [showLogout, setShowLogout] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const [searchFocused, setSearchFocused] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("All Departments");
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [isWishlistOpen, setIsWishlistOpen] = useState(false);
   const [isAllMenuOpen, setIsAllMenuOpen] = useState(false);
   
   // Pincode Location States
@@ -312,12 +316,21 @@ const Header = () => {
             </Button>
           </div>
 
-          {/* Interactive Language/Country indicator dropdown */}
-          <div className="hidden lg:flex items-center gap-1 px-2.5 py-2.5 rounded-sm border border-transparent hover:border-white/20 cursor-pointer select-none text-white text-xs font-black tracking-wide shrink-0 transition-all duration-150">
-            <span className="text-base" role="img" aria-label="India Flag">🇮🇳</span>
-            <span>IN</span>
-            <ChevronDown className="h-3 w-3 text-gray-400 mt-0.5" />
-          </div>
+          {/* Interactive Wishlist indicator */}
+          <button
+            onClick={() => setIsWishlistOpen(true)}
+            className="hidden lg:flex items-center gap-1.5 px-2.5 py-1.5 rounded-sm border border-transparent hover:border-white/20 text-white shrink-0 bg-transparent border-none outline-none cursor-pointer select-none transition-all duration-150 relative"
+          >
+            <div className="relative flex items-center">
+              <Heart className="h-5 w-5 stroke-[2] text-white" />
+              {wishlistItems.length > 0 && (
+                <Badge variant="destructive" className="absolute -top-2.5 left-2.5 h-4.5 min-w-4.5 rounded-full p-0 flex items-center justify-center text-[9px] font-black bg-red-500 text-white border-none shadow animate-scale-in">
+                  {wishlistItems.length}
+                </Badge>
+              )}
+            </div>
+            <span className="text-xs font-black tracking-wide mb-0.5">Wishlist</span>
+          </button>
 
           {/* Accounts & Lists Dropdown Trigger */}
           {user && user.name ? (
@@ -553,6 +566,9 @@ const Header = () => {
 
       {/* Drawer Cart slide-over */}
       <DrawerCart isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
+
+      {/* Drawer Wishlist slide-over */}
+      <DrawerWishlist isOpen={isWishlistOpen} onClose={() => setIsWishlistOpen(false)} />
 
       {/* Drawer All slide-over left-sided menu */}
       <DrawerAll isOpen={isAllMenuOpen} onClose={() => setIsAllMenuOpen(false)} />

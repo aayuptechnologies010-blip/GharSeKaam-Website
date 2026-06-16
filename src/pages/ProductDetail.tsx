@@ -8,6 +8,7 @@ import { Separator } from '@/components/ui/separator'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useCartContext } from '@/context/CartContext'
+import { useWishlistContext } from '@/context/WishlistContext'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import {
@@ -35,6 +36,7 @@ const ProductDetail = () => {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const { addToCart } = useCartContext()
+  const { toggleWishlist, isInWishlist } = useWishlistContext()
   const { toast } = useToast()
 
   const [product, setProduct] = useState<ApiProductDetail | null>(null)
@@ -682,8 +684,22 @@ const ProductDetail = () => {
                   </Button>
                   
                   <div className="flex gap-2">
-                    <Button variant="outline" className="flex-1 rounded-xl h-10 hover:bg-slate-50 border-slate-200">
-                      <Heart className="h-4 w-4 mr-1 text-red-500" /> Wishlist
+                    <Button
+                      variant="outline"
+                      className={`flex-1 rounded-xl h-10 border-slate-200 transition-all ${
+                        isInWishlist(product.id) ? 'bg-red-50 hover:bg-red-100 border-red-100' : 'hover:bg-slate-50'
+                      }`}
+                      onClick={() => {
+                        toggleWishlist({
+                          id: product.id,
+                          title: product.title,
+                          price: price,
+                          image: product.images && product.images.length > 0 ? product.images[0] : 'https://images.unsplash.com/photo-1608613304899-ea8098577e38?auto=format&fit=crop&w=400&q=80'
+                        });
+                      }}
+                    >
+                      <Heart className={`h-4 w-4 mr-1.5 ${isInWishlist(product.id) ? 'fill-red-500 text-red-500' : 'text-slate-400'}`} />
+                      <span>{isInWishlist(product.id) ? 'Wishlisted' : 'Wishlist'}</span>
                     </Button>
                     <Button variant="outline" className="flex-1 rounded-xl h-10 hover:bg-slate-50 border-slate-200">
                       <Share2 className="h-4 w-4 mr-1 text-slate-500" /> Share
@@ -701,7 +717,11 @@ const ProductDetail = () => {
                 <span className="font-extrabold text-slate-800 text-sm block">{product.shopkeeper?.shopname}</span>
                 {product.shopkeeper?.shopaddress && product.shopkeeper.shopaddress.map((address, index) => (
                   <span key={index} className="text-xs text-muted-foreground leading-normal block mt-1">
-                    {address.flatnumber}, {address.city}, {address.state} - {address.pincode}
+                    {address.flatnumber}
+                    {(address as any).building && `, ${(address as any).building}`}
+                    {(address as any).street && `, ${(address as any).street}`}
+                    {(address as any).area && `, ${(address as any).area}`}
+                    , {address.city}, {address.state} - {address.pincode}
                   </span>
                 ))}
               </div>

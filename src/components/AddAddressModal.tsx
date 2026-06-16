@@ -25,6 +25,10 @@ const AddAddressModal = ({ isOpen, onClose, onAddressAdded }: AddAddressModalPro
     city: 'Gorakhpur',
     pincode: '',
     flatnumber: '',
+    building: '',
+    street: '',
+    area: '',
+    landmark: '',
     state: 'Uttar Pradesh',
     phone: ''
   })
@@ -37,6 +41,10 @@ const AddAddressModal = ({ isOpen, onClose, onAddressAdded }: AddAddressModalPro
         city: 'Gorakhpur',
         pincode: '',
         flatnumber: '',
+        building: '',
+        street: '',
+        area: '',
+        landmark: '',
         state: 'Uttar Pradesh',
         phone: ''
       })
@@ -63,6 +71,12 @@ const AddAddressModal = ({ isOpen, onClose, onAddressAdded }: AddAddressModalPro
       return
     }
 
+    if (!formData.flatnumber || !formData.street || !formData.area) {
+      setError('Please fill all required address fields (marked with *)')
+      setLoading(false)
+      return
+    }
+
     try {
       const result = await addAddress({
         ...formData,
@@ -74,6 +88,10 @@ const AddAddressModal = ({ isOpen, onClose, onAddressAdded }: AddAddressModalPro
           city: 'Gorakhpur',
           pincode: '',
           flatnumber: '',
+          building: '',
+          street: '',
+          area: '',
+          landmark: '',
           state: 'Uttar Pradesh',
           phone: ''
         })
@@ -193,15 +211,61 @@ const AddAddressModal = ({ isOpen, onClose, onAddressAdded }: AddAddressModalPro
             </div>
           </div>
 
-	  <div className="space-y-2">
-            <Label htmlFor="flatnumber">Flat/House Number</Label>
+          <div className="space-y-2">
+            <Label htmlFor="flatnumber">Flat/House Number *</Label>
             <Input
               id="flatnumber"
               type="text"
               value={formData.flatnumber}
               onChange={(e) => handleInputChange('flatnumber', e.target.value)}
-              placeholder="Enter flat/house number"
+              placeholder="e.g. Flat 4B, House No. 12"
               required
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="building">Building / Apartment Name (Optional)</Label>
+            <Input
+              id="building"
+              type="text"
+              value={formData.building}
+              onChange={(e) => handleInputChange('building', e.target.value)}
+              placeholder="e.g. Vrindavan Heights"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="street">Street / Colony / Road Name *</Label>
+            <Input
+              id="street"
+              type="text"
+              value={formData.street}
+              onChange={(e) => handleInputChange('street', e.target.value)}
+              placeholder="e.g. Park Road, Sector 4"
+              required
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="area">Locality / Area / Sector *</Label>
+            <Input
+              id="area"
+              type="text"
+              value={formData.area}
+              onChange={(e) => handleInputChange('area', e.target.value)}
+              placeholder="e.g. Golghar / Medical College Area"
+              required
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="landmark">Landmark / Famous Place Nearby (Optional)</Label>
+            <Input
+              id="landmark"
+              type="text"
+              value={formData.landmark}
+              onChange={(e) => handleInputChange('landmark', e.target.value)}
+              placeholder="e.g. Near Hanuman Temple"
             />
           </div>
 

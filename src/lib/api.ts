@@ -14,6 +14,10 @@ export interface SignupData {
   state: string
   phone: string
   type: "RETAILER" | "WHOLESALER"
+  landmark?: string
+  building?: string
+  street?: string
+  area?: string
   // Optional wholesaler fields
   shopname?: string
   shopnumber?: string
@@ -218,6 +222,10 @@ export interface ApiOrder {
     state: string
     pincode: string
     flatnumber: string
+    landmark?: string | null
+    building?: string | null
+    street?: string | null
+    area?: string | null
   }
   estimatedDelivery?: string
   deliveryGuy?: {
@@ -291,6 +299,10 @@ export interface Address {
   state: string
   pincode: string
   flatnumber: string
+  landmark?: string | null
+  building?: string | null
+  street?: string | null
+  area?: string | null
   customerid: string
   shopkeeperid: string | null
   latitude?: number | string | null
@@ -301,6 +313,10 @@ export interface AddAddressData {
   city: string
   pincode: string
   flatnumber: string
+  landmark?: string
+  building?: string
+  street?: string
+  area?: string
   state: string
   phone: string
   latitude?: number | null
@@ -339,6 +355,10 @@ export async function addAddress(addressData: AddAddressData): Promise<{ success
       state: addressData.state,
       pincode: addressData.pincode,
       flatnumber: addressData.flatnumber,
+      landmark: addressData.landmark,
+      building: addressData.building,
+      street: addressData.street,
+      area: addressData.area,
       latitude: addressData.latitude,
       longitude: addressData.longitude
     })

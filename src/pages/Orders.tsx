@@ -310,7 +310,13 @@ const Orders = () => {
                       Delivery Address
                     </h4>
                     <div className="text-sm text-muted-foreground">
-                      <p>Flat {order.deliveryAddress.flatnumber}</p>
+                      <p>
+                        {order.deliveryAddress.flatnumber}
+                        {order.deliveryAddress.building && `, ${order.deliveryAddress.building}`}
+                        {order.deliveryAddress.street && `, ${order.deliveryAddress.street}`}
+                        {order.deliveryAddress.area && `, ${order.deliveryAddress.area}`}
+                      </p>
+                      {order.deliveryAddress.landmark && <p>Landmark: {order.deliveryAddress.landmark}</p>}
                       <p>{order.deliveryAddress.city}, {order.deliveryAddress.state}</p>
                       <p>PIN: {order.deliveryAddress.pincode}</p>
                     </div>

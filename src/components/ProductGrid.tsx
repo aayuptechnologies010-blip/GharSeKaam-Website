@@ -7,6 +7,7 @@ import { useEffect, useState } from "react"
 import { getProducts, ApiProduct, ProductVariant, getHardwareSvgFallback } from "@/lib/api"
 import { useNavigate } from "react-router-dom"
 import { useToast } from "@/hooks/use-toast"
+import { useWishlistContext } from "@/context/WishlistContext"
 
 interface ProductGridProps {
   category?: string
@@ -19,6 +20,7 @@ interface SelectedVariants {
 
 const ProductGrid = ({ category, wholesale = false }: ProductGridProps) => {
   const { cartItems, addToCart, removeFromCart, updateQuantity } = useCartContext()
+  const { toggleWishlist, isInWishlist } = useWishlistContext()
   const { toast } = useToast()
   const navigate = useNavigate()
   const [products, setProducts] = useState<ApiProduct[]>([])
@@ -353,16 +355,18 @@ const ProductGrid = ({ category, wholesale = false }: ProductGridProps) => {
                   <Button
                     size="icon"
                     variant="ghost"
-                    className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity bg-white hover:bg-slate-100 text-slate-400 hover:text-red-500 shadow-sm rounded-full h-8 w-8 z-10"
+                    className="absolute top-3 right-3 bg-white hover:bg-slate-100 shadow-sm rounded-full h-8 w-8 z-10"
                     onClick={(e) => {
                       e.stopPropagation();
-                      toast({
-                        title: "Added to Wishlist",
-                        description: `${product.title} saved to your favorites.`,
+                      toggleWishlist({
+                        id: product.id,
+                        title: product.title,
+                        price: price,
+                        image: getProductImage(product)
                       });
                     }}
                   >
-                    <Heart className="h-4.5 w-4.5" />
+                    <Heart className={`h-4.5 w-4.5 ${isInWishlist(product.id) ? 'fill-red-500 text-red-500' : 'text-slate-400 hover:text-red-500'}`} />
                   </Button>
                 </div>
 
@@ -554,14 +558,16 @@ const ProductGrid = ({ category, wholesale = false }: ProductGridProps) => {
                   <button
                     className="absolute top-1 right-1 p-1 bg-white rounded-full shadow border border-slate-100 z-10"
                     onClick={(e) => {
-                      e.stopPropagation()
-                      toast({
-                        title: "Saved",
-                        description: "Product saved to wishlist.",
-                      })
+                      e.stopPropagation();
+                      toggleWishlist({
+                        id: product.id,
+                        title: product.title,
+                        price: price,
+                        image: getProductImage(product)
+                      });
                     }}
                   >
-                    <Heart className="h-3 w-3 text-slate-400 hover:text-red-500" />
+                    <Heart className={`h-3 w-3 ${isInWishlist(product.id) ? 'fill-red-500 text-red-500' : 'text-slate-400 hover:text-red-500'}`} />
                   </button>
                 </div>
 

@@ -434,8 +434,16 @@ const Cart = () => {
                             <RadioGroupItem value={address.id} id={address.id} className="mt-1" />
                             <Label htmlFor={address.id} className="text-xs leading-relaxed cursor-pointer text-left space-y-1 block flex-1">
                               <div className="font-extrabold text-sm text-slate-800">Address Location</div>
-                              <div className="font-bold text-slate-700">{address.flatnumber}, {address.city}</div>
-                              <div className="text-slate-500 font-semibold">{address.state} - <span className="font-bold text-slate-800">{address.pincode}</span></div>
+                              <div className="font-bold text-slate-700">
+                                {address.flatnumber}
+                                {address.building && `, ${address.building}`}
+                                {address.street && `, ${address.street}`}
+                                {address.area && `, ${address.area}`}
+                              </div>
+                              <div className="text-slate-500 font-semibold">
+                                {address.landmark && <span className="block text-slate-500 text-xs mt-0.5">Near {address.landmark}</span>}
+                                {address.city}, {address.state} - <span className="font-bold text-slate-800">{address.pincode}</span>
+                              </div>
                               {isSelected && (
                                 <Badge className="bg-amber-500 text-slate-950 font-bold uppercase tracking-wider text-[8px] mt-2 border-none">
                                   Selected Destination

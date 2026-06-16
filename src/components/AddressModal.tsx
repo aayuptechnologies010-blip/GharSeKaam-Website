@@ -23,11 +23,13 @@ const AddressModal = ({ isOpen, onClose, googleAuthData }: AddressModalProps) =>
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
 
-  // Form state
-  // default to Uttar Pradesh / Gorakhpur since service available there
   const [city, setCity] = useState('Gorakhpur');
   const [pincode, setPincode] = useState('');
-  const [flatnumber, setFlatnumber] = useState<number | ''>('');
+  const [flatnumber, setFlatnumber] = useState('');
+  const [building, setBuilding] = useState('');
+  const [street, setStreet] = useState('');
+  const [area, setArea] = useState('');
+  const [landmark, setLandmark] = useState('');
   const [stateName, setStateName] = useState('Uttar Pradesh');
   const [phone, setPhone] = useState('');
   const [userType, setUserType] = useState<'RETAILER' | 'WHOLESALER'>('RETAILER');
@@ -163,10 +165,10 @@ const AddressModal = ({ isOpen, onClose, googleAuthData }: AddressModalProps) =>
 
   const handleSubmit = async () => {
     // Client-side validation
-    if (!city || !pincode || !flatnumber || !stateName || !phone) {
+    if (!city || !pincode || !flatnumber || !street || !area || !stateName || !phone) {
       toast({
         title: 'Missing fields',
-        description: 'Please fill all address fields',
+        description: 'Please fill all required address fields (marked with *)',
         variant: 'destructive'
       });
       return;
@@ -202,10 +204,14 @@ const AddressModal = ({ isOpen, onClose, googleAuthData }: AddressModalProps) =>
       const signupData: SignupData = {
         city,
         pincode,
-        flatnumber: Number(flatnumber),
+        flatnumber,
         state: stateName,
         phone,
         type: userType,
+        landmark: landmark || undefined,
+        building: building || undefined,
+        street: street || undefined,
+        area: area || undefined,
         ...(userType === 'WHOLESALER' ? {
           shopname,
           shopnumber,
@@ -335,13 +341,48 @@ const AddressModal = ({ isOpen, onClose, googleAuthData }: AddressModalProps) =>
             />
           </div>
           <div>
-            <Label htmlFor="modal-flatnumber">Flat Number</Label>
+            <Label htmlFor="modal-flatnumber">Flat / House No. / Office *</Label>
             <Input
               id="modal-flatnumber"
-              type="number"
-              value={flatnumber as any}
-              onChange={(e) => setFlatnumber(Number(e.target.value) || '')}
-              placeholder="e.g., 277"
+              value={flatnumber}
+              onChange={(e) => setFlatnumber(e.target.value)}
+              placeholder="e.g., Flat 4B / House No. 12"
+            />
+          </div>
+          <div>
+            <Label htmlFor="modal-building">Building / Apartment / Society Name (Optional)</Label>
+            <Input
+              id="modal-building"
+              value={building}
+              onChange={(e) => setBuilding(e.target.value)}
+              placeholder="e.g., Vrindavan Heights"
+            />
+          </div>
+          <div>
+            <Label htmlFor="modal-street">Street / Colony / Road Name *</Label>
+            <Input
+              id="modal-street"
+              value={street}
+              onChange={(e) => setStreet(e.target.value)}
+              placeholder="e.g., Park Road / Sector 4"
+            />
+          </div>
+          <div>
+            <Label htmlFor="modal-area">Locality / Area / Sector *</Label>
+            <Input
+              id="modal-area"
+              value={area}
+              onChange={(e) => setArea(e.target.value)}
+              placeholder="e.g., Golghar / Medical College Area"
+            />
+          </div>
+          <div>
+            <Label htmlFor="modal-landmark">Landmark / Famous Nearby Place (Optional)</Label>
+            <Input
+              id="modal-landmark"
+              value={landmark}
+              onChange={(e) => setLandmark(e.target.value)}
+              placeholder="e.g., Near Hanuman Temple"
             />
           </div>
          
