@@ -324,7 +324,7 @@ const Header = () => {
             <div className="relative flex items-center">
               <Heart className="h-5 w-5 stroke-[2] text-white" />
               {wishlistItems.length > 0 && (
-                <Badge variant="destructive" className="absolute -top-2.5 left-2.5 h-4.5 min-w-4.5 rounded-full p-0 flex items-center justify-center text-[9px] font-black bg-red-500 text-white border-none shadow animate-scale-in">
+                <Badge variant="destructive" className="absolute -top-2.5 left-2.5 h-4 min-w-4 rounded-full p-0 flex items-center justify-center text-[9px] font-black bg-red-500 text-white border-none shadow animate-scale-in">
                   {wishlistItems.length}
                 </Badge>
               )}

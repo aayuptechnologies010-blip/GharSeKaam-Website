@@ -715,7 +715,9 @@ const ProductDetail = () => {
             <Card className="border border-slate-200 rounded-3xl overflow-hidden shadow bg-white text-left p-4 space-y-3">
               <h4 className="font-bold text-xs uppercase tracking-wider text-slate-500">Sold & Serviced By</h4>
               <div>
-                <span className="font-extrabold text-slate-800 text-sm block">{product.shopkeeper?.shopname}</span>
+                <span className="font-extrabold text-slate-800 text-sm block">
+                  {product.shopkeeper?.shopname === "abc" ? "Aman Traders" : product.shopkeeper?.shopname}
+                </span>
                 {product.shopkeeper?.shopaddress && product.shopkeeper.shopaddress.map((address, index) => (
                   <span key={index} className="text-xs text-muted-foreground leading-normal block mt-1">
                     {address.flatnumber}

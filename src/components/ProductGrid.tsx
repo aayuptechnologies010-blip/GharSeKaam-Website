@@ -404,21 +404,16 @@ const ProductGrid = ({ category, wholesale = false }: ProductGridProps) => {
                         <span className="font-black text-lg text-slate-900">
                           ₹{price.toLocaleString()}
                         </span>
-                        {isWholesaleProduct && product.retailprice && (
-                          <span className="text-xs text-slate-400 line-through">
-                            ₹{parseFloat(product.retailprice).toLocaleString()}
-                          </span>
-                        )}
                         {!isWholesaleProduct && (
-                          <span className="text-xs text-slate-400 line-through">
-                            ₹{Math.round(price * 1.3).toLocaleString()}
-                          </span>
+                          <>
+                            <span className="text-xs text-slate-400 line-through">
+                              ₹{Math.round(price * 1.3).toLocaleString()}
+                            </span>
+                            <span className="text-xs font-black text-green-600">
+                              23% OFF
+                            </span>
+                          </>
                         )}
-                        <span className="text-xs font-black text-green-600">
-                          {isWholesaleProduct && product.retailprice
-                            ? `${Math.round((1 - parseFloat(product.wholesaleprice!) / parseFloat(product.retailprice)) * 100)}% OFF`
-                            : '23% OFF'}
-                        </span>
                       </div>
                       
                       {isWholesaleProduct ? (
@@ -600,9 +595,11 @@ const ProductGrid = ({ category, wholesale = false }: ProductGridProps) => {
                       <span className="font-black text-[13px] text-slate-950">
                         ₹{price.toLocaleString()}
                       </span>
-                      <span className="text-[9px] text-slate-400 line-through">
-                        ₹{Math.round(price * 1.3).toLocaleString()}
-                      </span>
+                      {!isWholesaleProduct && (
+                        <span className="text-[9px] text-slate-400 line-through">
+                          ₹{Math.round(price * 1.3).toLocaleString()}
+                        </span>
+                      )}
                     </div>
 
                     {/* Delivery estimate */}

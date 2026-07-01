@@ -2,7 +2,6 @@ import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
 import { Bike, Phone, MapPin, Store, Compass, Shield, Clock } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
 
 interface LiveTrackingMapProps {
   orderId: string
@@ -15,12 +14,25 @@ interface LiveTrackingMapProps {
 
 const LiveTrackingMap = ({
   orderId,
-  riderName = "Rajesh Kumar",
-  riderPhone = "+91 91234 56789",
+  riderName = "Aman Singh",
+  riderPhone = "8957035082",
   riderImage = "",
-  shopName = "BuildMart Gorakhpur Store",
+  shopName = "Aman Traders",
   destinationCity = "Gorakhpur"
 }: LiveTrackingMapProps) => {
+  const displayRiderName = riderName || "Aman Singh"
+  const displayRiderPhone = (
+    riderPhone &&
+    riderPhone !== "null" &&
+    riderPhone !== "undefined" &&
+    riderPhone.trim() !== ""
+  ) ? riderPhone.trim() : "8957035082"
+  const displayShopName = (
+    shopName &&
+    shopName !== "abc" &&
+    shopName.trim() !== ""
+  ) ? shopName : "Aman Traders"
+
   const [progress, setProgress] = useState(0.1)
   const [estimatedMinutes, setEstimatedMinutes] = useState(15)
 
@@ -175,22 +187,28 @@ const LiveTrackingMap = ({
         <div className="flex items-center gap-4 bg-slate-900/50 p-3 rounded-2xl border border-slate-800/60">
           <div className="w-12 h-12 bg-amber-500 rounded-full flex items-center justify-center font-black text-slate-950 uppercase border-2 border-slate-700 shadow-md overflow-hidden">
             {riderImage ? (
-              <img src={riderImage} alt={riderName} className="w-full h-full object-cover" />
+              <img src={riderImage} alt={displayRiderName} className="w-full h-full object-cover" />
             ) : (
-              riderName.split(" ").map(n => n[0]).join("")
+              displayRiderName.split(" ").map(n => n[0]).join("")
             )}
           </div>
           <div className="flex-1 text-left">
-            <h4 className="font-extrabold text-sm tracking-wide text-slate-200">{riderName}</h4>
+            <h4 className="font-extrabold text-sm tracking-wide text-slate-200">{displayRiderName}</h4>
             <p className="text-xs text-slate-400 flex items-center gap-1">
               <Shield className="h-3.5 w-3.5 text-green-500 fill-green-500/25" />
               <span>GharSeKro Verified Rider</span>
             </p>
           </div>
-          <a href={`tel:${riderPhone}`}>
-            <Button size="icon" className="bg-amber-500 hover:bg-amber-600 text-slate-950 rounded-xl h-10 w-10 shadow-md transition-all">
-              <Phone className="h-4.5 w-4.5 stroke-[2.5]" />
-            </Button>
+          <a
+            href={`tel:${displayRiderPhone}`}
+            onClick={(e) => {
+              e.stopPropagation();
+              window.location.href = `tel:${displayRiderPhone}`;
+            }}
+            className="flex items-center justify-center bg-amber-500 hover:bg-amber-600 text-slate-950 rounded-xl h-10 w-10 shadow-md transition-all cursor-pointer relative z-50"
+            title={`Call Rider: ${displayRiderPhone}`}
+          >
+            <Phone className="h-4.5 w-4.5 stroke-[2.5] pointer-events-none" />
           </a>
         </div>
 
@@ -198,7 +216,7 @@ const LiveTrackingMap = ({
         <div className="grid grid-cols-2 gap-3 text-left">
           <div className="bg-slate-900/40 p-3 rounded-xl border border-slate-800/40 space-y-1">
             <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Pickup From</p>
-            <p className="text-xs font-extrabold text-slate-300 truncate">{shopName}</p>
+            <p className="text-xs font-extrabold text-slate-300 truncate">{displayShopName}</p>
           </div>
           <div className="bg-slate-900/40 p-3 rounded-xl border border-slate-800/40 space-y-1">
             <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Deliver To</p>

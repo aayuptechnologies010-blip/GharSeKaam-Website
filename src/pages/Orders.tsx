@@ -234,7 +234,7 @@ const Orders = () => {
                       </div>
                       <div className="flex items-center gap-1">
                         <Store className="h-4 w-4" />
-                        {order.shopkeeper.shopname}
+                        {order.shopkeeper.shopname === "abc" ? "Aman Traders" : order.shopkeeper.shopname}
                       </div>
                       <div className="flex items-center gap-1">
                         <CreditCard className="h-4 w-4" />

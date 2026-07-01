@@ -145,153 +145,155 @@ const AddAddressModal = ({ isOpen, onClose, onAddressAdded }: AddAddressModalPro
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="state">State</Label>
-            <select
-              id="state"
-              value={formData.state}
-              onChange={e => {
-                const val = e.target.value
-                handleInputChange('state', val)
-                // auto-select Gorakhpur when Uttar Pradesh is picked
-                if (val === 'Uttar Pradesh') handleInputChange('city', 'Gorakhpur')
-                else handleInputChange('city', '')
-              }}
-              className="w-full rounded-md border p-2"
-              required
-            >
-              {IndiaStates.map((s) => (
-                <option key={s} value={s}>{s}</option>
-              ))}
-            </select>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="city">City</Label>
-            {formData.state === 'Uttar Pradesh' ? (
-              <select id="city" value={formData.city} onChange={e => handleInputChange('city', e.target.value)} className="w-full rounded-md border p-2" required>
-                {UttarPradeshDistricts.map((d) => (
-                  <option key={d} value={d}>{d}</option>
+          <div className="max-h-[60vh] overflow-y-auto pr-3 space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="state">State</Label>
+              <select
+                id="state"
+                value={formData.state}
+                onChange={e => {
+                  const val = e.target.value
+                  handleInputChange('state', val)
+                  // auto-select Gorakhpur when Uttar Pradesh is picked
+                  if (val === 'Uttar Pradesh') handleInputChange('city', 'Gorakhpur')
+                  else handleInputChange('city', '')
+                }}
+                className="w-full rounded-md border p-2"
+                required
+              >
+                {IndiaStates.map((s) => (
+                  <option key={s} value={s}>{s}</option>
                 ))}
               </select>
-            ) : (
-              <Input
-                id="city"
-                value={formData.city}
-                onChange={e => handleInputChange('city', e.target.value)}
-                placeholder="Enter city"
-                required
-              />
-            )}
-          </div>
+            </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="pincode">Pincode</Label>
-            <Input
-              id="pincode"
-              value={formData.pincode}
-              onChange={(e) => handlePincodeChange(e.target.value)}
-              placeholder="Enter pincode"
-              inputMode="numeric"
-              pattern="[0-9]*"
-              maxLength={6}
-              autoComplete="postal-code"
-              required
-            />
-          </div>
-
-          <div className="flex items-center gap-2">
-            <Button type="button" variant="outline" onClick={handleUseMyLocation}>Use my location</Button>
-            <div className="text-sm text-muted-foreground">
-              {latitude && longitude ? (
-                <div>Lat: {latitude.toFixed(4)}, Lon: {longitude.toFixed(4)}</div>
+            <div className="space-y-2">
+              <Label htmlFor="city">City</Label>
+              {formData.state === 'Uttar Pradesh' ? (
+                <select id="city" value={formData.city} onChange={e => handleInputChange('city', e.target.value)} className="w-full rounded-md border p-2" required>
+                  {UttarPradeshDistricts.map((d) => (
+                    <option key={d} value={d}>{d}</option>
+                  ))}
+                </select>
               ) : (
-                <div>No location</div>
+                <Input
+                  id="city"
+                  value={formData.city}
+                  onChange={e => handleInputChange('city', e.target.value)}
+                  placeholder="Enter city"
+                  required
+                />
               )}
             </div>
-          </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="flatnumber">Flat/House Number *</Label>
-            <Input
-              id="flatnumber"
-              type="text"
-              value={formData.flatnumber}
-              onChange={(e) => handleInputChange('flatnumber', e.target.value)}
-              placeholder="e.g. Flat 4B, House No. 12"
-              required
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="building">Building / Apartment Name (Optional)</Label>
-            <Input
-              id="building"
-              type="text"
-              value={formData.building}
-              onChange={(e) => handleInputChange('building', e.target.value)}
-              placeholder="e.g. Vrindavan Heights"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="street">Street / Colony / Road Name *</Label>
-            <Input
-              id="street"
-              type="text"
-              value={formData.street}
-              onChange={(e) => handleInputChange('street', e.target.value)}
-              placeholder="e.g. Park Road, Sector 4"
-              required
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="area">Locality / Area / Sector *</Label>
-            <Input
-              id="area"
-              type="text"
-              value={formData.area}
-              onChange={(e) => handleInputChange('area', e.target.value)}
-              placeholder="e.g. Golghar / Medical College Area"
-              required
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="landmark">Landmark / Famous Place Nearby (Optional)</Label>
-            <Input
-              id="landmark"
-              type="text"
-              value={formData.landmark}
-              onChange={(e) => handleInputChange('landmark', e.target.value)}
-              placeholder="e.g. Near Hanuman Temple"
-            />
-          </div>
-
-          {/* Service availability warning */}
-          {formData.state === 'Uttar Pradesh' && formData.city === 'Gorakhpur' ? null : (
-            <div className="rounded-md bg-yellow-50 border border-yellow-200 p-3 text-sm text-yellow-800">
-              Service not available in <strong>{formData.city || 'your city'}</strong>, <strong>{formData.state}</strong> yet. Coming soon — we'll notify you when we expand.
+            <div className="space-y-2">
+              <Label htmlFor="pincode">Pincode</Label>
+              <Input
+                id="pincode"
+                value={formData.pincode}
+                onChange={(e) => handlePincodeChange(e.target.value)}
+                placeholder="Enter pincode"
+                inputMode="numeric"
+                pattern="[0-9]*"
+                maxLength={6}
+                autoComplete="postal-code"
+                required
+              />
             </div>
-          )}
 
-          <div className="space-y-2">
-            <Label htmlFor="phone">Phone Number</Label>
-            <Input
-              id="phone"
-              value={formData.phone}
-              onChange={(e) => handleInputChange('phone', e.target.value)}
-              placeholder="Enter phone number"
-              required
-            />
+            <div className="flex items-center gap-2">
+              <Button type="button" variant="outline" onClick={handleUseMyLocation}>Use my location</Button>
+              <div className="text-sm text-muted-foreground">
+                {latitude && longitude ? (
+                  <div>Lat: {latitude.toFixed(4)}, Lon: {longitude.toFixed(4)}</div>
+                ) : (
+                  <div>No location</div>
+                )}
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="flatnumber">Flat/House Number *</Label>
+              <Input
+                id="flatnumber"
+                type="text"
+                value={formData.flatnumber}
+                onChange={(e) => handleInputChange('flatnumber', e.target.value)}
+                placeholder="e.g. Flat 4B, House No. 12"
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="building">Building / Apartment Name (Optional)</Label>
+              <Input
+                id="building"
+                type="text"
+                value={formData.building}
+                onChange={(e) => handleInputChange('building', e.target.value)}
+                placeholder="e.g. Vrindavan Heights"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="street">Street / Colony / Road Name *</Label>
+              <Input
+                id="street"
+                type="text"
+                value={formData.street}
+                onChange={(e) => handleInputChange('street', e.target.value)}
+                placeholder="e.g. Park Road, Sector 4"
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="area">Locality / Area / Sector *</Label>
+              <Input
+                id="area"
+                type="text"
+                value={formData.area}
+                onChange={(e) => handleInputChange('area', e.target.value)}
+                placeholder="e.g. Golghar / Medical College Area"
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="landmark">Landmark / Famous Place Nearby (Optional)</Label>
+              <Input
+                id="landmark"
+                type="text"
+                value={formData.landmark}
+                onChange={(e) => handleInputChange('landmark', e.target.value)}
+                placeholder="e.g. Near Hanuman Temple"
+              />
+            </div>
+
+            {/* Service availability warning */}
+            {formData.state === 'Uttar Pradesh' && formData.city === 'Gorakhpur' ? null : (
+              <div className="rounded-md bg-yellow-50 border border-yellow-200 p-3 text-sm text-yellow-800">
+                Service not available in <strong>{formData.city || 'your city'}</strong>, <strong>{formData.state}</strong> yet. Coming soon — we'll notify you when we expand.
+              </div>
+            )}
+
+            <div className="space-y-2">
+              <Label htmlFor="phone">Phone Number</Label>
+              <Input
+                id="phone"
+                value={formData.phone}
+                onChange={(e) => handleInputChange('phone', e.target.value)}
+                placeholder="Enter phone number"
+                required
+              />
+            </div>
           </div>
 
           {error && (
             <div className="text-red-500 text-sm">{error}</div>
           )}
 
-          <div className="flex gap-2 pt-4">
+          <div className="flex gap-2 pt-4 border-t">
             <Button type="button" variant="outline" onClick={onClose} disabled={loading}>
               Cancel
             </Button>
