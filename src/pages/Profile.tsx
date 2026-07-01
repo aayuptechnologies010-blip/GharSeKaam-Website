@@ -165,23 +165,46 @@ const Profile = () => {
   };
 
   // Save info edits
-  const handleSaveInfo = () => {
+  const handleSaveInfo = async () => {
     setIsEditing(false); // Close edit mode immediately so user can't type further
     setIsSaving(true);
-    setTimeout(() => {
+    try {
+      const token = localStorage.getItem("authToken");
+      if (token) {
+        const { url: apiUrl } = await import("@/constant");
+        await fetch(`${apiUrl}/address/update-details`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': token
+          },
+          body: JSON.stringify({
+            name: userInfo.name,
+            phone: userInfo.phone
+          })
+        });
+      }
+      
       localStorage.setItem("userName", userInfo.name);
       localStorage.setItem("userPhone", userInfo.phone);
       localStorage.setItem("userProfile", userInfo.profile);
       
       // Dispatch event to update layout header
       window.dispatchEvent(new Event("auth-change"));
-
-      setIsSaving(false);
+      
       toast({
         title: "Profile Updated",
         description: "Your personal details have been saved successfully.",
       });
-    }, 800);
+    } catch (err: any) {
+      toast({
+        title: "Failed to update profile",
+        description: err.message || "Failed to sync changes with backend",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   // Handle Profile Pic File selection & convert to base64
