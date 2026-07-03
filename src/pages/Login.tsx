@@ -522,8 +522,18 @@ const Login = () => {
             Help
           </span>
         </div>
-        <p className="text-slate-400 select-none">
-          © 2020-{new Date().getFullYear()}, GharSeKro.com, Inc. or its affiliates
+        <p className="text-slate-400 select-none flex flex-wrap justify-center items-center gap-1 mt-1">
+          <span>© 2020-{new Date().getFullYear()}, GharSeKro.com, Inc. or its affiliates</span>
+          <span className="text-slate-300 hidden sm:inline">|</span>
+          <span className="text-slate-400 font-medium">Created by</span>
+          <a 
+            href="https://www.aayuptechnologies.com/" 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className="text-[#0066c0] hover:text-[#c45500] font-bold hover:underline"
+          >
+            Aayup Technologies
+          </a>
         </p>
       </footer>
 

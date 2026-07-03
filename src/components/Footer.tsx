@@ -9,7 +9,8 @@ import {
   Phone, 
   MapPin,
   Globe,
-  DollarSign
+  DollarSign,
+  Code2
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
@@ -125,9 +126,32 @@ const Footer = () => {
       </div>
 
       {/* 3. Bottom Legal strip (Amazon style #131921) */}
-      <div className="bg-[#131921] py-8 text-slate-400 text-xs font-bold">
-        <div className="container mx-auto px-4 max-w-4xl text-center space-y-4">
+      <div className="bg-[#131921] py-8 text-slate-400 text-xs font-bold border-t border-slate-800/40">
+        <div className="container mx-auto px-4 max-w-4xl text-center space-y-6">
           
+          {/* Prominent Technology Partner Badge */}
+          <div className="bg-[#1a232d]/90 border border-slate-800 hover:border-[#febd69]/30 rounded-xl py-3 px-5 max-w-xl mx-auto shadow-lg flex flex-col sm:flex-row items-center justify-between gap-4 transition-all duration-300 hover:bg-[#1a232d]">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-[#232f3e] text-[#febd69] border border-slate-700/50 flex items-center justify-center">
+                <Code2 className="h-4.5 w-4.5" />
+              </div>
+              <div className="text-left">
+                <h5 className="text-[10px] uppercase tracking-wider text-slate-400 font-extrabold leading-none mb-1">Official Tech Partner</h5>
+                <p className="text-xs text-slate-200 font-bold">Platform Engineered & Maintained By</p>
+              </div>
+            </div>
+            
+            <a 
+              href="https://www.aayuptechnologies.com/" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="group text-[#febd69] hover:text-[#ff9900] text-xs font-black tracking-wide transition-all duration-300 flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#131921] border border-slate-800 hover:border-slate-600 hover:scale-[1.02] shadow-sm select-none"
+            >
+              <span>Aayup Technologies</span>
+              <span className="inline-block transition-transform duration-300 transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 text-xs text-[#febd69] group-hover:text-[#ff9900]">↗</span>
+            </a>
+          </div>
+
           {/* Sub-Footer fine links */}
           <div className="flex flex-wrap gap-x-6 gap-y-2 justify-center text-[10.5px]">
             <a href="#" className="hover:underline">Conditions of Use & Sale</a>
