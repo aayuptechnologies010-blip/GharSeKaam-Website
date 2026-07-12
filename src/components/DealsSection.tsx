@@ -88,7 +88,7 @@ export const DealsSection = () => {
 
         const mapped = filtered.slice(0, 8).map((p, index) => {
           const basePrice = parseFloat(p.retailprice || "0");
-          const discountPercent = p.discount || 15 + (index % 3) * 5;
+          const discountPercent = p.discount || 0;
           const dealPrice = Math.round(basePrice * (1 - discountPercent / 100));
           return {
             id: p.id,
