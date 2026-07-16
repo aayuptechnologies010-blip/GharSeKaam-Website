@@ -15,6 +15,17 @@ import Header from "@/components/Header"
 import Footer from "@/components/Footer"
 import AddAddressModal from "@/components/AddAddressModal"
 
+const loadRazorpayScript = () => {
+  return new Promise((resolve) => {
+    const script = document.createElement("script")
+    script.src = "https://checkout.razorpay.com/v1/checkout.js"
+    script.async = true
+    script.onload = () => resolve(true)
+    script.onerror = () => resolve(false)
+    document.body.appendChild(script)
+  })
+}
+
 const Cart = () => {
   const navigate = useNavigate()
   const { toast } = useToast()
@@ -163,7 +174,48 @@ const Cart = () => {
     }
 
     if (paymentMethod === "ONLINE") {
-      setShowPaymentModal(true)
+      setIsCreatingOrder(true)
+      const sdkLoaded = await loadRazorpayScript()
+      if (!sdkLoaded) {
+        toast({
+          title: "Razorpay SDK Error",
+          description: "Failed to load payment gateway. Please check your internet connection.",
+          variant: "destructive"
+        })
+        setIsCreatingOrder(false)
+        return
+      }
+
+      const options = {
+        key: import.meta.env.VITE_RAZORPAY_KEY_ID || "rzp_live_TE6fr1TqKLYn5F",
+        amount: Math.round(netTotal * 100),
+        currency: "INR",
+        name: "GharSeKro",
+        description: "Payment for order",
+        image: "/logo.png",
+        handler: async function (response: any) {
+          toast({
+            title: "Payment Successful",
+            description: `Payment ID: ${response.razorpay_payment_id}. Creating order...`,
+          })
+          await executeOrderCreation("ONLINE")
+        },
+        prefill: {
+          name: localStorage.getItem('userName') || '',
+          email: localStorage.getItem('userEmail') || '',
+        },
+        theme: {
+          color: "#f59e0b"
+        },
+        modal: {
+          ondismiss: function() {
+            setIsCreatingOrder(false)
+          }
+        }
+      }
+
+      const rzp = new (window as any).Razorpay(options)
+      rzp.open()
       return
     }
 
