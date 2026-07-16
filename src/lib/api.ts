@@ -8,6 +8,7 @@ export interface ApiCategory {
 }
 
 export interface SignupData {
+  name?: string
   city: string
   pincode: string
   flatnumber: string

@@ -23,6 +23,7 @@ const AddressModal = ({ isOpen, onClose, googleAuthData }: AddressModalProps) =>
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
 
+  const [name, setName] = useState(googleAuthData.name || '');
   const [city, setCity] = useState('Gorakhpur');
   const [pincode, setPincode] = useState('');
   const [flatnumber, setFlatnumber] = useState('');
@@ -165,6 +166,15 @@ const AddressModal = ({ isOpen, onClose, googleAuthData }: AddressModalProps) =>
 
   const handleSubmit = async () => {
     // Client-side validation
+    if (!name.trim()) {
+      toast({
+        title: 'Name Required',
+        description: 'Please enter your full name',
+        variant: 'destructive'
+      });
+      return;
+    }
+
     if (!city || !pincode || !flatnumber || !street || !area || !stateName || !phone) {
       toast({
         title: 'Missing fields',
@@ -202,6 +212,7 @@ const AddressModal = ({ isOpen, onClose, googleAuthData }: AddressModalProps) =>
     setIsLoading(true);
     try {
       const signupData: SignupData = {
+        name: name.trim(),
         city,
         pincode,
         flatnumber,
@@ -226,7 +237,7 @@ const AddressModal = ({ isOpen, onClose, googleAuthData }: AddressModalProps) =>
 
       // Store all auth and user data
       if (response.token) localStorage.setItem('authToken', response.token);
-      if (googleAuthData.name || response.name) localStorage.setItem('userName', googleAuthData.name || response.name || '');
+      if (name || response.name) localStorage.setItem('userName', name || response.name || '');
       if (googleAuthData.email || response.email) localStorage.setItem('userEmail', googleAuthData.email || response.email || '');
       if (googleAuthData.profile) localStorage.setItem('userProfile', googleAuthData.profile);
 
@@ -290,8 +301,19 @@ const AddressModal = ({ isOpen, onClose, googleAuthData }: AddressModalProps) =>
             Please provide your address details to complete signup.
           </DialogDescription>
         </DialogHeader>
-         <div>
-            <Label htmlFor="modal-state">State</Label>
+         <div className="space-y-3 pt-2">
+           <div>
+             <Label htmlFor="modal-name">Full Name *</Label>
+             <Input
+               id="modal-name"
+               value={name}
+               onChange={(e) => setName(e.target.value)}
+               placeholder="First and last name"
+               required
+             />
+           </div>
+           <div>
+             <Label htmlFor="modal-state">State</Label>
             <select
               id="modal-state"
               value={stateName}
@@ -309,6 +331,7 @@ const AddressModal = ({ isOpen, onClose, googleAuthData }: AddressModalProps) =>
               ))}
             </select>
           </div>
+         </div>
         <div className="grid gap-4 py-4">
           <div>
             <Label htmlFor="modal-city">City</Label>
