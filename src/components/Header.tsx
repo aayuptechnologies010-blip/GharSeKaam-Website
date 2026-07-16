@@ -129,6 +129,7 @@ const Header = () => {
     localStorage.removeItem('userEmail');
     localStorage.removeItem('userProfile');
     setUser(null);
+    setShowLogout(false);
     navigate('/');
   };
 
