@@ -119,8 +119,12 @@ export default function CheckoutSuccess() {
     pincode: "400001"
   };
 
-  // Dynamic calculated delivery date (tomorrow or in 2-3 days based on city)
+  // Dynamic calculated delivery date (today, tomorrow or in 2-3 days based on city)
   const getDeliveryDate = () => {
+    const isGorakhpur = address.city.toLowerCase() === "gorakhpur" || (address.pincode && address.pincode.startsWith("273"));
+    if (isGorakhpur) {
+      return "Today (Same Day Delivery)";
+    }
     const daysToAdd = address.city.toLowerCase() === "mumbai" ? 1 : 3;
     const date = new Date();
     date.setDate(date.getDate() + daysToAdd);
