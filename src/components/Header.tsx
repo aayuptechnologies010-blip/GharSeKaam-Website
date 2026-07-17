@@ -11,6 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import DrawerCart from "./DrawerCart";
 import DrawerAll from "./DrawerAll";
 import DrawerWishlist from "./DrawerWishlist";
+import { getAllAddresses } from "@/lib/api";
 
 const POPULAR_SUGGESTIONS = [
   { text: "Ultratech Cement 50kg", category: "Cement & Sand" },
@@ -92,6 +93,25 @@ const Header = () => {
     };
 
     updateUserState();
+
+    const fetchAddressIfNeeded = async () => {
+      const token = localStorage.getItem('authToken');
+      const storedPincode = localStorage.getItem('userPincode');
+      if (token && (!storedPincode || storedPincode === '400001')) {
+        try {
+          const addrs = await getAllAddresses();
+          if (addrs && addrs.length > 0) {
+            localStorage.setItem('userPincode', addrs[0].pincode);
+            localStorage.setItem('userPincodeCity', addrs[0].city);
+            setPincode(addrs[0].pincode);
+            setPincodeCity(addrs[0].city);
+          }
+        } catch (e) {
+          console.error("Failed to fetch addresses for header location", e);
+        }
+      }
+    };
+    fetchAddressIfNeeded();
 
     window.addEventListener('storage', updateUserState);
     window.addEventListener('auth-change', updateUserState);
