@@ -248,9 +248,13 @@ const AddressModal = ({ isOpen, onClose, googleAuthData }: AddressModalProps) =>
         localStorage.setItem('userShopName', shopname);
         sessionStorage.setItem('wholesaleShopName', shopname);
       }
+      
+      if (city) localStorage.setItem('userPincodeCity', city);
+      if (pincode) localStorage.setItem('userPincode', pincode);
 
       // Dispatch custom event to update Header state immediately
       window.dispatchEvent(new Event('auth-change'));
+      window.dispatchEvent(new Event('pincode-updated'));
 
       toast({
         title: 'Signup successful',

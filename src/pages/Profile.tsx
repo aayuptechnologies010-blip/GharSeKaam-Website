@@ -291,6 +291,10 @@ const Profile = () => {
       const addrList = await getAllAddresses();
       setAddresses(addrList);
       
+      localStorage.setItem('userPincode', newAddress.pincode);
+      localStorage.setItem('userPincodeCity', newAddress.city);
+      window.dispatchEvent(new Event('pincode-updated'));
+      
       setNewAddress({
         flatnumber: "",
         building: "",

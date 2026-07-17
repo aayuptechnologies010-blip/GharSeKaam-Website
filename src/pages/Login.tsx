@@ -226,8 +226,15 @@ const Login = () => {
             localStorage.setItem("userShopName", (res as any).shopname);
             sessionStorage.setItem("wholesaleShopName", (res as any).shopname);
           }
+          if ((res as any).city) {
+            localStorage.setItem("userPincodeCity", (res as any).city);
+          }
+          if ((res as any).pincode) {
+            localStorage.setItem("userPincode", (res as any).pincode);
+          }
 
           window.dispatchEvent(new Event("auth-change"));
+          window.dispatchEvent(new Event("pincode-updated"));
           toast({
             title: currentLang.loginSuccess,
             description: `${currentLang.welcomeBack}, ${res.name || name.trim() || "User"}!`

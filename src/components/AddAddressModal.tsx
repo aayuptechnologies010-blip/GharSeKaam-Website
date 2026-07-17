@@ -84,6 +84,10 @@ const AddAddressModal = ({ isOpen, onClose, onAddressAdded }: AddAddressModalPro
         longitude
       })
       if (result.success) {
+        localStorage.setItem('userPincode', formData.pincode);
+        localStorage.setItem('userPincodeCity', formData.city);
+        window.dispatchEvent(new Event('pincode-updated'));
+        
         setFormData({
           city: 'Gorakhpur',
           pincode: '',
