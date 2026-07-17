@@ -113,7 +113,7 @@ const Cart = () => {
           title: "Order Placed Successfully!",
           description: `Order ID: ${result.orderId || 'Generated'}`,
         })
-        navigate('/checkout-success', { state: { orderId: result.orderId || `GSK-${Date.now().toString().slice(-6)}`, address: addresses.find(a => a.id === selectedAddressId) } })
+        navigate('/checkout-success', { state: { orderId: result.orderId || `GSK-${Date.now().toString().slice(-6)}`, address: addresses.find(a => a.id === selectedAddressId), paymentType: type } })
       } else {
         toast({
           title: "Order Failed",

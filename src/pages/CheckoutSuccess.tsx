@@ -109,7 +109,7 @@ const ConfettiCelebration = () => {
 export default function CheckoutSuccess() {
   const navigate = useNavigate();
   const location = useLocation();
-  const state = location.state as { orderId?: string; address?: any } || {};
+  const state = location.state as { orderId?: string; address?: any; paymentType?: string } || {};
 
   const orderId = state.orderId || `GSK-${Date.now().toString().slice(-6)}`;
   const address = state.address || {
@@ -167,7 +167,9 @@ export default function CheckoutSuccess() {
                 </div>
                 <div className="space-y-1 sm:text-right">
                   <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Payment Method</span>
-                  <span className="font-extrabold text-green-600 block text-sm">Cash on Delivery (COD)</span>
+                  <span className="font-extrabold text-green-600 block text-sm">
+                    {state.paymentType === "ONLINE" ? "Online Payment" : "Cash on Delivery (COD)"}
+                  </span>
                 </div>
               </div>
 

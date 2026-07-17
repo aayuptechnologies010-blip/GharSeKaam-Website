@@ -70,8 +70,8 @@ const Login = () => {
       createAccountTitle: "खाता बनाएं",
       nameLabel: "आपका नाम",
       namePlaceholder: "पहला और आखिरी नाम",
-      emailOrPhoneLabel: "ईमेल या मोबाइल फ़ोन नंबर",
-      emailOrPhonePlaceholder: "",
+      emailOrPhoneLabel: "मोबाइल नंबर",
+      emailOrPhonePlaceholder: "10 अंकों का मोबाइल नंबर दर्ज करें",
       continueButton: "आगे बढ़ें",
       signInButton: "लॉग इन करें",
       verifyOtpTitle: "सत्यापन आवश्यक",
@@ -104,8 +104,8 @@ const Login = () => {
       createAccountTitle: "Create account",
       nameLabel: "Your name",
       namePlaceholder: "First and last name",
-      emailOrPhoneLabel: "Email or mobile phone number",
-      emailOrPhonePlaceholder: "",
+      emailOrPhoneLabel: "Mobile number",
+      emailOrPhonePlaceholder: "Enter 10-digit mobile number",
       continueButton: "Continue",
       signInButton: "Sign in",
       verifyOtpTitle: "Verification required",
@@ -149,10 +149,11 @@ const Login = () => {
       return;
     }
 
-    if (!emailOrPhone.trim()) {
+    const phoneRegex = /^[0-9]{10}$/;
+    if (!emailOrPhone.trim() || !phoneRegex.test(emailOrPhone.trim())) {
       toast({
         title: language === "hi" ? "त्रुटि" : "Error",
-        description: language === "hi" ? "कृपया वैध ईमेल या मोबाइल नंबर दर्ज करें।" : "Please enter a valid email or mobile number.",
+        description: language === "hi" ? "कृपया 10 अंकों का वैध मोबाइल नंबर दर्ज करें।" : "Please enter a valid 10-digit mobile number.",
         variant: "destructive"
       });
       return;
@@ -336,10 +337,14 @@ const Login = () => {
                 </label>
                 <input
                   id="emailOrPhone"
-                  type="text"
+                  type="tel"
+                  maxLength={10}
                   placeholder={currentLang.emailOrPhonePlaceholder}
                   value={emailOrPhone}
-                  onChange={(e) => setEmailOrPhone(e.target.value)}
+                  onChange={(e) => {
+                    const val = e.target.value.replace(/\D/g, "");
+                    setEmailOrPhone(val);
+                  }}
                   className="w-full h-[31px] px-2.5 py-1 text-sm border border-slate-400 rounded-[3px] outline-none focus:border-[#e77600] focus:ring-[3px] focus:ring-[#e77600]/15 transition-all shadow-[0_1px_0_rgba(0,0,0,0.07)_inset]"
                   required
                 />
