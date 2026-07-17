@@ -533,7 +533,6 @@ const Cart = () => {
                         <RadioGroupItem value="ONLINE" id="pay-online" />
                         <Label htmlFor="pay-online" className="font-bold cursor-pointer text-xs text-slate-700 flex items-center justify-between w-full">
                           <span>Pay Online (Pre-paid)</span>
-                          <Badge className="bg-amber-400 text-slate-900 border-none text-[8px] font-black scale-90">Razorpay</Badge>
                         </Label>
                       </div>
                     </div>
@@ -660,8 +659,8 @@ const Cart = () => {
                 <div className="flex items-center gap-2">
                   <span className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center font-black text-white text-base shadow">R</span>
                   <div>
-                    <h4 className="font-extrabold text-sm tracking-tight text-slate-100">Razorpay Secure Checkout</h4>
-                    <span className="text-[9px] text-[#febd69] font-black uppercase tracking-wider">Razorpay Gateway</span>
+                    <h4 className="font-extrabold text-sm tracking-tight text-slate-100">Secure Checkout</h4>
+                    <span className="text-[9px] text-[#febd69] font-black uppercase tracking-wider">Secure Payment Gateway</span>
                   </div>
                 </div>
                 <div className="text-right">
