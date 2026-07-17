@@ -201,7 +201,7 @@ const Header = () => {
       {/* Top Banner Highlight Strip */}
       <div className="bg-gradient-to-r from-amber-500 via-amber-600 to-amber-700 text-slate-950 text-[9px] md:text-xs font-black py-1.5 px-4 text-center tracking-wider uppercase flex items-center justify-center gap-1.5 shadow-inner">
         <Sparkles className="h-3.5 w-3.5 fill-slate-950 text-slate-950 animate-pulse" />
-        <span>Powered by Aman Traders – Your Premium Partner for Wholesale & Retail Site Supplies</span>
+        <span>Powered by GharSeKro – Your Premium Partner for Wholesale & Retail Site Supplies</span>
       </div>
 
       {/* 1. Main Nav Belt (Upper Row - Deep Navy #131921) */}
@@ -219,7 +219,7 @@ const Header = () => {
           />
           <div className="hidden lg:flex flex-col text-slate-800 pr-1 select-none leading-none">
             <span className="text-[9px] font-bold text-amber-600 uppercase tracking-wider">Sponsored by</span>
-            <span className="text-[11px] font-extrabold text-slate-900 tracking-tight">Aman Traders</span>
+            <span className="text-[11px] font-extrabold text-slate-900 tracking-tight">GharSeKro</span>
           </div>
         </div>
 

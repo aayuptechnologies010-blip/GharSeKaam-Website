@@ -716,7 +716,7 @@ const ProductDetail = () => {
               <h4 className="font-bold text-xs uppercase tracking-wider text-slate-500">Sold & Serviced By</h4>
               <div>
                 <span className="font-extrabold text-slate-800 text-sm block">
-                  {product.shopkeeper?.shopname === "abc" ? "Aman Traders" : product.shopkeeper?.shopname}
+                  {product.shopkeeper?.shopname === "abc" ? "GharSeKro" : product.shopkeeper?.shopname}
                 </span>
                 {product.shopkeeper?.shopaddress && product.shopkeeper.shopaddress.map((address, index) => (
                   <span key={index} className="text-xs text-muted-foreground leading-normal block mt-1">

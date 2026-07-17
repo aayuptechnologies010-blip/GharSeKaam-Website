@@ -178,7 +178,7 @@ const Cart = () => {
       const sdkLoaded = await loadRazorpayScript()
       if (!sdkLoaded) {
         toast({
-          title: "Razorpay SDK Error",
+          title: "Payment Gateway Error",
           description: "Failed to load payment gateway. Please check your internet connection.",
           variant: "destructive"
         })
@@ -657,7 +657,7 @@ const Cart = () => {
               {/* Razorpay branded header */}
               <div className="bg-[#172b4d] p-5 text-white flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <span className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center font-black text-white text-base shadow">R</span>
+                  <span className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center font-black text-white text-base shadow">GSK</span>
                   <div>
                     <h4 className="font-extrabold text-sm tracking-tight text-slate-100">Secure Checkout</h4>
                     <span className="text-[9px] text-[#febd69] font-black uppercase tracking-wider">Secure Payment Gateway</span>

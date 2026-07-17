@@ -107,7 +107,7 @@ const ContractingOfferings = () => {
           {[
             { icon: Shield, title: "100% Quality Assurance", desc: "No compromised materials or shortcuts" },
             { icon: Clock, title: "Punctual Delivery", desc: "Scheduled dispatch on your timelines" },
-            { icon: Star, title: "Expert Support", desc: "Consult directly with Aman Traders" }
+            { icon: Star, title: "Expert Support", desc: "Consult directly with GharSeKro" }
           ].map((item, idx) => (
             <div key={idx} className="flex items-center justify-center gap-3 bg-white p-3.5 rounded-xl border border-slate-200 shadow-xs">
               <item.icon className="h-6 w-6 text-amber-500 shrink-0" />
@@ -222,7 +222,7 @@ const ContractingOfferings = () => {
                     B2B Booking & Inquiry
                   </div>
                   <p className="text-xs text-amber-700 font-semibold leading-relaxed">
-                    This service requires custom site measurements and specific aggregate volume quotes. Click below to contact Aman Traders directly via phone or WhatsApp.
+                    This service requires custom site measurements and specific aggregate volume quotes. Click below to contact GharSeKro directly via phone or WhatsApp.
                   </p>
                   <div className="text-sm text-amber-950 font-black bg-amber-100/60 p-2.5 rounded-xl border border-amber-200/50 text-center tracking-wide">
                     📞 Contact: <a href="tel:+918957035082" className="underline hover:text-amber-800 transition-colors">+91 89570 35082</a>

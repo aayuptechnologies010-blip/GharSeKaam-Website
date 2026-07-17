@@ -14,13 +14,13 @@ interface LiveTrackingMapProps {
 
 const LiveTrackingMap = ({
   orderId,
-  riderName = "Aman Singh",
+  riderName = "GharSeKro",
   riderPhone = "8957035082",
   riderImage = "",
-  shopName = "Aman Traders",
+  shopName = "GharSeKro",
   destinationCity = "Gorakhpur"
 }: LiveTrackingMapProps) => {
-  const displayRiderName = riderName || "Aman Singh"
+  const displayRiderName = riderName || "GharSeKro"
   const displayRiderPhone = (
     riderPhone &&
     riderPhone !== "null" &&
@@ -31,7 +31,7 @@ const LiveTrackingMap = ({
     shopName &&
     shopName !== "abc" &&
     shopName.trim() !== ""
-  ) ? shopName : "Aman Traders"
+  ) ? shopName : "GharSeKro"
 
   const [progress, setProgress] = useState(0.1)
   const [estimatedMinutes, setEstimatedMinutes] = useState(15)

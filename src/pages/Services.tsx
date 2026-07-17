@@ -45,7 +45,7 @@ const Services = () => {
           {[
             { icon: Shield, title: "100% Quality Assurance", desc: "No compromised materials or shortcuts" },
             { icon: Clock, title: "Punctual Delivery", desc: "Scheduled dispatch on your timelines" },
-            { icon: Star, title: "Expert Support", desc: "Consult directly with Aman Traders" }
+            { icon: Star, title: "Expert Support", desc: "Consult directly with GharSeKro" }
           ].map((item, idx) => (
             <div key={idx} className="flex items-center justify-center gap-3 bg-white p-3.5 rounded-xl border border-slate-250/70 shadow-xs">
               <item.icon className="h-6 w-6 text-amber-500 shrink-0" />

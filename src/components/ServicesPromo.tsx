@@ -232,7 +232,7 @@ export default function ServicesPromo() {
                     Direct Booking & Inquiry
                   </div>
                   <p className="text-xs text-amber-700 font-semibold leading-relaxed">
-                    This service requires custom measurements. Contact **Aman Traders** directly to book or receive estimates.
+                    This service requires custom measurements. Contact **GharSeKro** directly to book or receive estimates.
                   </p>
                   
                   <div className="text-sm text-amber-950 font-black bg-amber-100/60 p-2.5 rounded-xl border border-amber-200/50 text-center tracking-wide">
