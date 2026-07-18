@@ -443,11 +443,7 @@ export const DealsSection = () => {
                     {/* Dynamic delivery estimate line */}
                     <div className="flex items-center gap-1.5 text-[10px] text-slate-500 font-bold border-t pt-3">
                       <Truck className="h-4 w-4 text-slate-400 animate-bounce" style={{ animationDuration: "2.5s" }} />
-                      {pincode.startsWith("273") || localStorage.getItem('userPincodeCity')?.toLowerCase() === "gorakhpur" ? (
-                        <span>FREE Delivery <strong className="text-slate-700 font-extrabold">Today (Same Day)</strong></span>
-                      ) : (
-                        <span>FREE Delivery by <strong className="text-slate-700 font-extrabold">Tomorrow</strong></span>
-                      )}
+                      <span>FREE Delivery <strong className="text-slate-700 font-extrabold">Today (Same Day)</strong></span>
                     </div>
 
                     {/* Dynamic plus-minus inline selector or Add to Cart button */}

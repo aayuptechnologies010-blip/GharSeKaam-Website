@@ -274,12 +274,7 @@ const ProductDetail = () => {
 
   // Calculate dynamic delivery date
   const getDeliveryDate = () => {
-    const isGorakhpur = pincode.startsWith("273") || pincodeCity === "Gorakhpur";
-    const daysToAdd = isGorakhpur ? 0 : (pincode === "400001" ? 1 : 3);
-    const date = new Date();
-    date.setDate(date.getDate() + daysToAdd);
-    const dateStr = date.toLocaleDateString("en-IN", { weekday: 'long', month: 'short', day: 'numeric' });
-    return isGorakhpur ? `Today (within 2-3 hours)` : dateStr;
+    return `Today (within 2-3 hours)`;
   };
 
   if (loading) {

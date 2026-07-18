@@ -278,26 +278,7 @@ export default function Search() {
 
   // Live Shipping estimates helper
   const getDeliveryEstimateText = (id: string) => {
-    const savedPin = pincode || localStorage.getItem('userPincode') || "";
-    const savedCity = localStorage.getItem('userPincodeCity') || "";
-    const isSameDay = savedPin.startsWith("273") || savedCity.toLowerCase() === "gorakhpur";
-    
-    if (isSameDay) {
-      return "FREE Delivery Today (Same Day)";
-    }
-
-    const seed = id.charCodeAt(id.length - 1) || 0;
-    const now = new Date();
-    const est = new Date();
-    
-    if (seed % 2 === 0) {
-      return "FREE Delivery by Tomorrow";
-    } else {
-      est.setDate(now.getDate() + 2);
-      const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-      const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-      return `FREE Delivery by ${days[est.getDay()]}, ${months[est.getMonth()]} ${est.getDate()}`;
-    }
+    return "FREE Delivery Today (Same Day)";
   };
 
 
