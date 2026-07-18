@@ -219,7 +219,7 @@ const Header = () => {
           />
           <div className="hidden lg:flex flex-col text-slate-800 pr-1 select-none leading-none">
             <span className="text-[9px] font-bold text-amber-600 uppercase tracking-wider">Sponsored by</span>
-            <span className="text-[11px] font-extrabold text-slate-900 tracking-tight">GharSeKro</span>
+            <span className="text-[11px] font-extrabold text-slate-900 tracking-tight">Aman Traders</span>
           </div>
         </div>
 
