@@ -87,7 +87,7 @@ const Cart = () => {
   const subtotal = getTotalPrice()
   const discountSavings = Math.round(subtotal * 0.18) // Simulated 18% general discount
   const originalSubtotal = subtotal + discountSavings
-  const shippingCharges = subtotal > 999 ? 0 : 49
+  const shippingCharges = subtotal >= 1000 ? 0 : (subtotal >= 500 ? 25 : 49)
   const netTotal = subtotal + shippingCharges
 
   const executeOrderCreation = async (type: "COD" | "ONLINE") => {
@@ -576,7 +576,7 @@ const Cart = () => {
                 {/* Stepper info */}
                 <div className="flex items-center gap-2 bg-slate-50 border rounded-xl p-2.5 text-[11px] font-semibold text-slate-600">
                   <Truck className="h-4 w-4 text-amber-500 shrink-0" />
-                  <span>Free shipping above ₹999 orders!</span>
+                  <span>Free delivery above ₹1000 orders! (₹25 below ₹1000, ₹49 below ₹500)</span>
                 </div>
 
                 <div className="space-y-3.5 text-xs">
