@@ -67,16 +67,7 @@ const ProductDetail = () => {
   const isWholesaler = userType === 'WHOLESALER' && !!userGST
   const isLoggedIn = !!localStorage.getItem('authToken')
 
-  useEffect(() => {
-    if (!isLoggedIn) {
-      toast({
-        title: "Access Restricted",
-        description: "Please login or register to view product details and pricing.",
-        variant: "destructive"
-      });
-      navigate("/login", { replace: true });
-      return;
-    }
+
 
     if (!id) return
 
@@ -185,6 +176,16 @@ const ProductDetail = () => {
 
   const handleAddToCart = () => {
     if (!product) return
+
+    if (!isLoggedIn) {
+      toast({
+        title: "Login Required",
+        description: "Please login to add items to your cart.",
+        variant: "destructive"
+      });
+      navigate(`/login?redirect=${encodeURIComponent(window.location.pathname + window.location.search)}`);
+      return;
+    }
 
     const price = getProductPrice()
     const variant = selectedVariant && product.variants 

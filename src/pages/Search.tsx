@@ -86,16 +86,7 @@ export default function Search() {
     }
   }, [searchParams]);
 
-  useEffect(() => {
-    if (!isLoggedIn) {
-      toast({
-        title: "Access Restricted",
-        description: "Please login or register to search our catalog.",
-        variant: "destructive"
-      });
-      navigate("/login", { replace: true });
-    }
-  }, [isLoggedIn, navigate]);
+
 
   // Load products
   useEffect(() => {
@@ -205,6 +196,17 @@ export default function Search() {
   // Add to Cart
   const handleAddToCart = (product: ApiProduct, e: React.MouseEvent) => {
     e.stopPropagation();
+
+    if (!isLoggedIn) {
+      toast({
+        title: "Login Required",
+        description: "Please login to add items to your cart.",
+        variant: "destructive"
+      });
+      navigate(`/login?redirect=${encodeURIComponent(window.location.pathname + window.location.search)}`);
+      return;
+    }
+
     // Default to first variant if none selected
     const variant = product.variants && product.variants.length > 0 ? product.variants[0] : undefined;
     const price = getProductPrice(product, variant);

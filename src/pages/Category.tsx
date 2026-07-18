@@ -61,16 +61,7 @@ const Category = () => {
   const { toast } = useToast()
   const isLoggedIn = !!localStorage.getItem('authToken')
 
-  useEffect(() => {
-    if (!isLoggedIn) {
-      toast({
-        title: "Access Restricted",
-        description: "Please login or register to view category catalogs.",
-        variant: "destructive"
-      });
-      navigate("/login", { replace: true });
-    }
-  }, [isLoggedIn, navigate]);
+
   
   const rawName = categoryName || "products"
   const formattedSlug = rawName.toLowerCase().replace(/\s+/g, '-')

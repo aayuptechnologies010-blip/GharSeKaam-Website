@@ -258,11 +258,14 @@ const AddressModal = ({ isOpen, onClose, googleAuthData }: AddressModalProps) =>
 
       toast({
         title: 'Signup successful',
-        description: 'Welcome! Redirecting to home.'
+        description: 'Welcome! Redirecting...'
       });
 
+      const searchParams = new URLSearchParams(window.location.search);
+      const redirectUrl = searchParams.get("redirect") || "/";
+
       onClose();
-      navigate('/');
+      navigate(redirectUrl);
     } catch (err: any) {
       console.error('Signup error', err);
       toast({

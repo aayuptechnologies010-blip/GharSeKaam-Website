@@ -123,12 +123,8 @@ export const DealsSection = () => {
         setLoading(false);
       }
     };
-    if (isLoggedIn) {
-      fetchDeals();
-    } else {
-      setLoading(false);
-    }
-  }, [isLoggedIn]);
+    fetchDeals();
+  }, []);
 
   useEffect(() => {
     const updateCountdown = () => {
@@ -156,6 +152,17 @@ export const DealsSection = () => {
 
   const handleAddToCart = (product: any, e: React.MouseEvent) => {
     e.stopPropagation();
+
+    if (!isLoggedIn) {
+      toast({
+        title: "Login Required",
+        description: "Please login to add items to your cart.",
+        variant: "destructive"
+      });
+      navigate(`/login?redirect=${encodeURIComponent(window.location.pathname + window.location.search)}`);
+      return;
+    }
+
     addToCart({
       id: product.id,
       name: product.title,
@@ -285,31 +292,6 @@ export const DealsSection = () => {
           </div>
         </div>
 
-        {!isLoggedIn ? (
-          <div className="relative z-10 w-full rounded-3xl bg-white border border-slate-200 p-8 shadow-xl text-center max-w-2xl mx-auto overflow-hidden group hover-pulse-glow">
-            {/* Visual ambient highlights */}
-            <div className="absolute top-0 right-0 w-32 h-32 rounded-full bg-amber-500/10 blur-2xl pointer-events-none" />
-            <div className="absolute bottom-0 left-0 w-32 h-32 rounded-full bg-blue-500/10 blur-2xl pointer-events-none" />
-            
-            <div className="space-y-6 py-8 relative z-10 flex flex-col items-center">
-              <div className="h-16 w-16 bg-amber-50 border border-amber-200 rounded-2xl flex items-center justify-center text-amber-600 shadow-md">
-                <Flame className="h-8 w-8 fill-amber-500 text-amber-500 animate-pulse" />
-              </div>
-              <div className="space-y-2 max-w-md">
-                <h3 className="text-xl font-black text-slate-800 uppercase tracking-tight">🔒 Lightning Deals Locked</h3>
-                <p className="text-xs text-slate-500 font-extrabold uppercase tracking-wider leading-relaxed">
-                  Log in or register your account to unlock today's hot builder deals, tools discount rates, and wholesale plant pricing.
-                </p>
-              </div>
-              <Button
-                onClick={() => navigate("/login")}
-                className="bg-amber-500 hover:bg-amber-600 text-slate-950 font-black px-6 py-3 rounded-2xl shadow-lg shadow-amber-500/20 text-xs uppercase tracking-widest border-none transition-all duration-200 hover:scale-102 cursor-pointer"
-              >
-                Login / Register to View Deals
-              </Button>
-            </div>
-          </div>
-        ) : (
           <div className="relative group/carousel z-10">
             {/* Scroll Left Button */}
             <button
@@ -508,7 +490,6 @@ export const DealsSection = () => {
             </div>
             )}
           </div>
-        )}
       </div>
     </section>
   );

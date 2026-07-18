@@ -138,6 +138,17 @@ const ProductGrid = ({ category, wholesale = false }: ProductGridProps) => {
 
   const handleAddToCart = (product: ApiProduct, e: React.MouseEvent) => {
     e.stopPropagation()
+
+    if (!isLoggedIn) {
+      toast({
+        title: "Login Required",
+        description: "Please login to add items to your cart.",
+        variant: "destructive"
+      })
+      navigate(`/login?redirect=${encodeURIComponent(window.location.pathname + window.location.search)}`)
+      return
+    }
+
     // If product has variants and no variant is selected, default to the first one automatically for a smooth quick-add experience!
     let variant = selectedVariants[product.id]
     if (product.variants && product.variants.length > 0 && !variant) {
@@ -281,35 +292,7 @@ const ProductGrid = ({ category, wholesale = false }: ProductGridProps) => {
     )
   }
 
-  if (!isLoggedIn) {
-    return (
-      <div className="w-full bg-slate-50 py-16">
-        <div className="container mx-auto px-4 text-center max-w-2xl relative overflow-hidden bg-white border border-slate-200 p-8 rounded-3xl shadow-xl group hover-pulse-glow">
-          {/* Ambient lighting spots */}
-          <div className="absolute top-0 right-0 w-32 h-32 rounded-full bg-amber-500/10 blur-2xl pointer-events-none" />
-          <div className="absolute bottom-0 left-0 w-32 h-32 rounded-full bg-blue-500/10 blur-2xl pointer-events-none" />
 
-          <div className="space-y-6 py-8 relative z-10 flex flex-col items-center">
-            <div className="h-16 w-16 bg-amber-50 border border-amber-200 rounded-2xl flex items-center justify-center text-amber-600 shadow-md">
-              <ShieldCheck className="h-8 w-8 text-amber-500" />
-            </div>
-            <div className="space-y-2 max-w-md">
-              <h3 className="text-xl font-black text-slate-800 uppercase tracking-tight">🔒 Premium Materials Catalog Locked</h3>
-              <p className="text-xs text-slate-500 font-extrabold uppercase tracking-wider leading-relaxed">
-                Unlock our entire database of certified power tools, cement, sand, electricals, paints, plumbing, and safety wear by logging in.
-              </p>
-            </div>
-            <Button
-              onClick={() => navigate("/login")}
-              className="bg-amber-500 hover:bg-amber-600 text-slate-950 font-black px-6 py-3 rounded-2xl shadow-lg shadow-amber-500/20 text-xs uppercase tracking-widest border-none transition-all duration-200 hover:scale-102 cursor-pointer"
-            >
-              Log In or Register to Browse
-            </Button>
-          </div>
-        </div>
-      </div>
-    )
-  }
 
   return (
     <div className="w-full">

@@ -240,11 +240,17 @@ const Login = () => {
             description: `${currentLang.welcomeBack}, ${res.name || name.trim() || "User"}!`
           });
 
-          const cart = localStorage.getItem("cart");
-          if (cart && JSON.parse(cart).length > 0) {
-            navigate("/cart");
+          const searchParams = new URLSearchParams(window.location.search);
+          const redirectUrl = searchParams.get("redirect");
+          if (redirectUrl) {
+            navigate(redirectUrl);
           } else {
-            navigate("/");
+            const cart = localStorage.getItem("cart");
+            if (cart && JSON.parse(cart).length > 0) {
+              navigate("/cart");
+            } else {
+              navigate("/");
+            }
           }
         } else if (!res.registered && res.tempToken) {
           // Profile/address registration incomplete - proceed to address modal onboarding
