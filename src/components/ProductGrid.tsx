@@ -189,8 +189,28 @@ const ProductGrid = ({ category, wholesale = false }: ProductGridProps) => {
     navigate(`/product/${productId}`)
   }
 
+  const [pincode, setPincode] = useState(localStorage.getItem('userPincode') || "")
+
+  useEffect(() => {
+    const handlePincodeUpdate = () => {
+      setPincode(localStorage.getItem('userPincode') || "")
+    }
+    window.addEventListener('pincode-updated', handlePincodeUpdate)
+    return () => {
+      window.removeEventListener('pincode-updated', handlePincodeUpdate)
+    }
+  }, [])
+
   // Live Relative Delivery Projections helper
   const getDeliveryEstimateText = (id: string) => {
+    const savedPin = pincode || localStorage.getItem('userPincode') || "";
+    const savedCity = localStorage.getItem('userPincodeCity') || "";
+    const isSameDay = savedPin.startsWith("273") || savedCity.toLowerCase() === "gorakhpur";
+    
+    if (isSameDay) {
+      return "FREE Delivery Today (Same Day)";
+    }
+
     const seed = id.charCodeAt(id.length - 1) || 0;
     const now = new Date();
     const est = new Date();
@@ -604,7 +624,7 @@ const ProductGrid = ({ category, wholesale = false }: ProductGridProps) => {
 
                     {/* Delivery estimate */}
                     <div className="text-[8.5px] text-slate-500 font-bold leading-tight">
-                      FREE Delivery **Tomorrow**
+                      {getDeliveryEstimateText(product.id)}
                     </div>
 
                     {/* Variant bubble chips */}

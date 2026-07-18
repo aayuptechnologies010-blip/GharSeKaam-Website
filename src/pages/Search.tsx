@@ -262,8 +262,28 @@ export default function Search() {
     setWholesaleOnly(false);
   };
 
+  const [pincode, setPincode] = useState(localStorage.getItem('userPincode') || "");
+
+  useEffect(() => {
+    const handlePincodeUpdate = () => {
+      setPincode(localStorage.getItem('userPincode') || "");
+    };
+    window.addEventListener('pincode-updated', handlePincodeUpdate);
+    return () => {
+      window.removeEventListener('pincode-updated', handlePincodeUpdate);
+    };
+  }, []);
+
   // Live Shipping estimates helper
   const getDeliveryEstimateText = (id: string) => {
+    const savedPin = pincode || localStorage.getItem('userPincode') || "";
+    const savedCity = localStorage.getItem('userPincodeCity') || "";
+    const isSameDay = savedPin.startsWith("273") || savedCity.toLowerCase() === "gorakhpur";
+    
+    if (isSameDay) {
+      return "FREE Delivery Today (Same Day)";
+    }
+
     const seed = id.charCodeAt(id.length - 1) || 0;
     const now = new Date();
     const est = new Date();
