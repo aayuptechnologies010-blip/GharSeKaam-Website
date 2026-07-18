@@ -66,9 +66,7 @@ const ProductDetail = () => {
   const userGST = localStorage.getItem('userGST') || sessionStorage.getItem('wholesaleGST')
   const isWholesaler = userType === 'WHOLESALER' && !!userGST
   const isLoggedIn = !!localStorage.getItem('authToken')
-
-
-
+  useEffect(() => {
     if (!id) return
 
     const fetchProduct = async () => {
