@@ -20,13 +20,9 @@ export default function DrawerCart({ isOpen, onClose }: DrawerCartProps) {
     const item = cartItems.find(i => i.id === productId && (!variant || i.variant?.size === variant.size))
     const min = item?.minQty || 1
 
-    if (newQuantity < min && item && item.quantity <= min) {
-      toast({
-        title: "Minimum Quantity",
-        description: `You cannot order less than ${min} units of this item.`,
-        variant: "destructive"
-      })
-      return
+    if (newQuantity < min) {
+      removeFromCart(productId, variant);
+      return;
     }
 
     if (newQuantity < 1) {
@@ -136,8 +132,7 @@ export default function DrawerCart({ isOpen, onClose }: DrawerCartProps) {
                           <div className="flex items-center border rounded-lg overflow-hidden bg-slate-50">
                             <button
                               onClick={() => handleQuantityChange(item.id, item.quantity - 1, item.variant)}
-                              className={`h-6 w-6 hover:bg-slate-100 flex items-center justify-center border-none bg-transparent cursor-pointer ${item.minQty && item.quantity <= item.minQty ? 'opacity-50 cursor-not-allowed' : ''}`}
-                              disabled={Boolean(item.minQty && item.quantity <= item.minQty)}
+                              className="h-6 w-6 hover:bg-slate-100 flex items-center justify-center border-none bg-transparent cursor-pointer"
                             >
                               <Minus className="h-2.5 w-2.5" />
                             </button>

@@ -76,6 +76,11 @@ const ProductDetail = () => {
         // Fetch from real backend API
         const productDetail = await getProductDetail(id)
         setProduct(productDetail)
+        if (productDetail.minimumpurchase && productDetail.minimumpurchase > 1) {
+          setQuantity(productDetail.minimumpurchase)
+        } else {
+          setQuantity(1)
+        }
         setError(null)
 
         // Fetch related products
@@ -214,7 +219,19 @@ const ProductDetail = () => {
   }
 
   const handleQuantityChange = (delta: number) => {
-    setQuantity(Math.max(1, quantity + delta))
+    const min = product?.minimumpurchase || 1
+    const newQty = quantity + delta
+    
+    if (newQty < min) {
+      toast({
+        title: "Minimum Quantity",
+        description: `You must order at least ${min} units of this item.`,
+        variant: "destructive"
+      })
+      return
+    }
+    
+    setQuantity(newQty)
   }
 
   // Pincode validation & city match

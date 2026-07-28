@@ -171,7 +171,9 @@ export const DealsSection = () => {
     const existing = cartItems.find(item => item.id === productId);
     if (!existing) return;
     const newQty = existing.quantity + delta;
-    if (newQty <= 0) {
+    const min = existing.minQty || 1;
+    
+    if (newQty < min) {
       removeFromCart(productId);
       toast({
         title: "Removed from Cart",

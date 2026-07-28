@@ -176,7 +176,9 @@ const ProductGrid = ({ category, wholesale = false }: ProductGridProps) => {
     );
     if (!inCartItem) return;
     const newQty = inCartItem.quantity + delta;
-    if (newQty <= 0) {
+    const min = inCartItem.minQty || product.minimumpurchase || 1;
+    
+    if (newQty < min) {
       removeFromCart(product.id, variant ? { size: variant.size } : undefined);
       toast({
         title: "Removed from Cart",

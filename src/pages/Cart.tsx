@@ -79,12 +79,8 @@ const Cart = () => {
     const item = cartItems.find(i => i.id === productId && (!variant || i.variant?.size === variant.size))
     const min = item?.minQty || 1
 
-    if (newQuantity < min && item && item.quantity <= min) {
-      toast({
-        title: "Minimum Quantity",
-        description: `You cannot order less than ${min} units of this item.`,
-        variant: "destructive"
-      })
+    if (newQuantity < min) {
+      removeFromCart(productId, variant, isWholesale)
       return
     }
 
@@ -402,8 +398,7 @@ const Cart = () => {
                                 <Button
                                   size="icon"
                                   variant="ghost"
-                                  className={`h-8 w-8 hover:bg-slate-100 border-none rounded-none ${item.minQty && item.quantity <= item.minQty ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                  disabled={Boolean(item.minQty && item.quantity <= item.minQty)}
+                                  className="h-8 w-8 hover:bg-slate-100 border-none rounded-none"
                                   onClick={() => handleQuantityChange(item.id, item.quantity - 1, item.variant, item.isWholesale)}
                                 >
                                   <Minus className="h-3.5 w-3.5" />
