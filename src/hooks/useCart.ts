@@ -42,7 +42,7 @@ export const useCart = () => {
     localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cartItems))
   }, [cartItems])
 
-  const addToCart = useCallback((product: Omit<CartItem, 'quantity'>) => {
+  const addToCart = useCallback((product: Omit<CartItem, 'quantity'> & { quantity?: number }) => {
     setCartItems(prevItems => {
       // Create a unique identifier that includes variant information and wholesale status
       const itemKey = product.variant 
@@ -66,7 +66,7 @@ export const useCart = () => {
             ? `${item.id}-${item.variant.size}-${item.isWholesale ? 'wholesale' : 'retail'}` 
             : `${item.id}-${item.isWholesale ? 'wholesale' : 'retail'}`
           return existingKey === itemKey
-            ? { ...item, quantity: item.quantity + 1 }
+            ? { ...item, quantity: item.quantity + (product.quantity || 1) }
             : item
         })
       } else {
@@ -74,7 +74,7 @@ export const useCart = () => {
           title: "Added to Cart",
           description: `${product.name}${product.variant ? ` (${product.variant.size})` : ''} added to cart`,
         })
-        return [...prevItems, { ...product, quantity: Math.max(1, product.minQty || 1) }]
+        return [...prevItems, { ...product, quantity: product.quantity ? product.quantity : Math.max(1, product.minQty || 1) }]
       }
     })
   }, [toast])

@@ -200,21 +200,15 @@ const ProductDetail = () => {
       bundleQty: bundleQty.toString()
     } : variant
 
-    for (let i = 0; i < quantity; i++) {
-      addToCart({
-        id: bundleQty ? `${product.id}-bundle-${variant?.size}` : product.id,
-        name: itemName,
-        price,
-        image: product.images && product.images.length > 0 ? product.images[0] : 'https://images.unsplash.com/photo-1608613304899-ea8098577e38?auto=format&fit=crop&w=400&q=80',
-        variant: finalVariant,
-        isWholesale: hasWholesaleAccess,
-        minQty: product.minimumpurchase
-      })
-    }
-
-    toast({
-      title: "Added to Cart",
-      description: `${quantity} × ${itemName} added successfully! 🛒`,
+    addToCart({
+      id: bundleQty ? `${product.id}-bundle-${variant?.size}` : product.id,
+      name: itemName,
+      price,
+      quantity,
+      image: product.images && product.images.length > 0 ? product.images[0] : 'https://images.unsplash.com/photo-1608613304899-ea8098577e38?auto=format&fit=crop&w=400&q=80',
+      variant: finalVariant,
+      isWholesale: hasWholesaleAccess,
+      minQty: product.minimumpurchase
     })
   }
 
