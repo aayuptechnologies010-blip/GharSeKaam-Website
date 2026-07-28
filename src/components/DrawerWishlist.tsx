@@ -27,6 +27,7 @@ export default function DrawerWishlist({ isOpen, onClose }: DrawerWishlistProps)
       name: item.title,
       price: item.price,
       image: item.image,
+      minQty: item.minimumpurchase
     });
   };
 

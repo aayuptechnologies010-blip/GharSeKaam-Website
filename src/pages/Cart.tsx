@@ -76,6 +76,18 @@ const Cart = () => {
   }
 
   const handleQuantityChange = (productId: string, newQuantity: number, variant?: { size: string }, isWholesale?: boolean) => {
+    const item = cartItems.find(i => i.id === productId && (!variant || i.variant?.size === variant.size))
+    const min = item?.minQty || 1
+
+    if (newQuantity < min && item && item.quantity <= min) {
+      toast({
+        title: "Minimum Quantity",
+        description: `You cannot order less than ${min} units of this item.`,
+        variant: "destructive"
+      })
+      return
+    }
+
     if (newQuantity < 1) {
       removeFromCart(productId, variant, isWholesale)
     } else {
@@ -298,6 +310,15 @@ const Cart = () => {
           <div className="flex-1 h-0.5 bg-slate-200 mx-4"></div>
           <div 
             onClick={() => {
+              const invalidItem = cartItems.find(item => item.minQty && item.quantity < item.minQty)
+              if (invalidItem) {
+                toast({
+                  title: "Minimum Quantity Required",
+                  description: `${invalidItem.name} requires a minimum purchase of ${invalidItem.minQty} units.`,
+                  variant: "destructive"
+                })
+                return
+              }
               const authToken = localStorage.getItem('authToken')
               if (!authToken) {
                 toast({
@@ -305,8 +326,7 @@ const Cart = () => {
                   description: "Please login to proceed to checkout",
                   variant: "destructive"
                 })
-                navigate('/login')
-                return
+                navigate('/login?redirect=/cart')
               }
               if (checkoutStep === "delivery" || checkoutStep === "cart") {
                 setCheckoutStep("delivery");
@@ -377,24 +397,30 @@ const Cart = () => {
                             </div>
 
                             {/* Quantity Controls */}
-                            <div className="flex items-center gap-2 bg-slate-50 border rounded-xl overflow-hidden">
-                              <Button
-                                size="icon"
-                                variant="ghost"
-                                className="h-8 w-8 hover:bg-slate-100 border-none rounded-none"
-                                onClick={() => handleQuantityChange(item.id, item.quantity - 1, item.variant, item.isWholesale)}
-                              >
-                                <Minus className="h-3.5 w-3.5" />
-                              </Button>
-                              <span className="w-10 text-center text-xs font-black text-slate-800">{item.quantity}</span>
-                              <Button
-                                size="icon"
-                                variant="ghost"
-                                className="h-8 w-8 hover:bg-slate-100 border-none rounded-none"
-                                onClick={() => handleQuantityChange(item.id, item.quantity + 1, item.variant, item.isWholesale)}
-                              >
-                                <Plus className="h-3.5 w-3.5" />
-                              </Button>
+                            <div className="flex flex-col items-center gap-1">
+                              <div className="flex items-center gap-2 bg-slate-50 border rounded-xl overflow-hidden">
+                                <Button
+                                  size="icon"
+                                  variant="ghost"
+                                  className={`h-8 w-8 hover:bg-slate-100 border-none rounded-none ${item.minQty && item.quantity <= item.minQty ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                  disabled={Boolean(item.minQty && item.quantity <= item.minQty)}
+                                  onClick={() => handleQuantityChange(item.id, item.quantity - 1, item.variant, item.isWholesale)}
+                                >
+                                  <Minus className="h-3.5 w-3.5" />
+                                </Button>
+                                <span className="w-10 text-center text-xs font-black text-slate-800">{item.quantity}</span>
+                                <Button
+                                  size="icon"
+                                  variant="ghost"
+                                  className="h-8 w-8 hover:bg-slate-100 border-none rounded-none"
+                                  onClick={() => handleQuantityChange(item.id, item.quantity + 1, item.variant, item.isWholesale)}
+                                >
+                                  <Plus className="h-3.5 w-3.5" />
+                                </Button>
+                              </div>
+                              {item.minQty && item.minQty > 1 && item.quantity < item.minQty && (
+                                <span className="text-[10px] text-red-500 font-bold text-center leading-tight mt-1">Min qty: {item.minQty}</span>
+                              )}
                             </div>
 
                             {/* Item Total */}
@@ -423,6 +449,15 @@ const Cart = () => {
                   <Button 
                     size="lg"
                     onClick={() => {
+                      const invalidItem = cartItems.find(item => item.minQty && item.quantity < item.minQty)
+                      if (invalidItem) {
+                        toast({
+                          title: "Minimum Quantity Required",
+                          description: `${invalidItem.name} requires a minimum purchase of ${invalidItem.minQty} units.`,
+                          variant: "destructive"
+                        })
+                        return
+                      }
                       const authToken = localStorage.getItem('authToken')
                       if (!authToken) {
                         toast({
@@ -430,8 +465,7 @@ const Cart = () => {
                           description: "Please login to proceed to delivery details",
                           variant: "destructive"
                         })
-                        navigate('/login')
-                        return
+                        navigate('/login?redirect=/cart')
                       }
                       setCheckoutStep("delivery")
                     }}

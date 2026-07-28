@@ -47,6 +47,7 @@ export interface ApiProduct {
   title: string
   retailprice?: string
   wholesaleprice?: string
+  minimumpurchase?: number
   images: string[]
   variants?: ProductVariant[]
   category?: {
@@ -73,6 +74,7 @@ export interface ApiProductDetail {
   images: string[]
   wholesaleprice?: string
   retailprice?: string
+  minimumpurchase?: number
   unit: string
   description: string
   warranty: string

@@ -153,21 +153,12 @@ export const DealsSection = () => {
   const handleAddToCart = (product: any, e: React.MouseEvent) => {
     e.stopPropagation();
 
-    if (!isLoggedIn) {
-      toast({
-        title: "Login Required",
-        description: "Please login to add items to your cart.",
-        variant: "destructive"
-      });
-      navigate(`/login?redirect=${encodeURIComponent(window.location.pathname + window.location.search)}`);
-      return;
-    }
-
     addToCart({
       id: product.id,
       name: product.title,
       price: product.dealPrice,
       image: product.image,
+      minQty: product.minimumpurchase
     });
     toast({
       title: "Added to Cart",

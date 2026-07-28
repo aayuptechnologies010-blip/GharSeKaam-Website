@@ -23,7 +23,8 @@ const AddressModal = ({ isOpen, onClose, googleAuthData }: AddressModalProps) =>
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
 
-  const [name, setName] = useState(googleAuthData.name || '');
+  const defaultName = googleAuthData.name?.startsWith('User ') ? '' : (googleAuthData.name || '');
+  const [name, setName] = useState(defaultName);
   const [city, setCity] = useState('Gorakhpur');
   const [pincode, setPincode] = useState('');
   const [flatnumber, setFlatnumber] = useState('');
@@ -304,7 +305,7 @@ const AddressModal = ({ isOpen, onClose, googleAuthData }: AddressModalProps) =>
         <DialogHeader>
           <DialogTitle>Complete Your Registration</DialogTitle>
           <DialogDescription>
-            {googleAuthData.name && `Welcome ${googleAuthData.name}! `}
+            {googleAuthData.name && !googleAuthData.name.startsWith('User ') && `Welcome ${googleAuthData.name}! `}
             Please provide your address details to complete signup.
           </DialogDescription>
         </DialogHeader>
@@ -315,7 +316,7 @@ const AddressModal = ({ isOpen, onClose, googleAuthData }: AddressModalProps) =>
                id="modal-name"
                value={name}
                onChange={(e) => setName(e.target.value)}
-               placeholder="First and last name"
+               placeholder="Enter your name"
                required
              />
            </div>
@@ -353,7 +354,7 @@ const AddressModal = ({ isOpen, onClose, googleAuthData }: AddressModalProps) =>
                 id="modal-city"
                 value={city}
                 onChange={(e) => setCity(e.target.value)}
-                placeholder="e.g., Gorakhpur"
+                placeholder="Enter City"
               />
             )}
           </div>
@@ -363,7 +364,7 @@ const AddressModal = ({ isOpen, onClose, googleAuthData }: AddressModalProps) =>
               id="modal-pincode"
               value={pincode}
               onChange={(e) => setPincode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-              placeholder="e.g., 273015"
+              placeholder="Enter Pincode"
               inputMode="numeric"
               pattern="[0-9]*"
               maxLength={6}
@@ -376,7 +377,7 @@ const AddressModal = ({ isOpen, onClose, googleAuthData }: AddressModalProps) =>
               id="modal-flatnumber"
               value={flatnumber}
               onChange={(e) => setFlatnumber(e.target.value)}
-              placeholder="e.g., Flat 4B / House No. 12"
+              placeholder="Enter Flat / House No. / Office"
             />
           </div>
           <div>
@@ -385,7 +386,7 @@ const AddressModal = ({ isOpen, onClose, googleAuthData }: AddressModalProps) =>
               id="modal-building"
               value={building}
               onChange={(e) => setBuilding(e.target.value)}
-              placeholder="e.g., Vrindavan Heights"
+              placeholder="Enter Building / Apartment / Society Name"
             />
           </div>
           <div>
@@ -394,7 +395,7 @@ const AddressModal = ({ isOpen, onClose, googleAuthData }: AddressModalProps) =>
               id="modal-street"
               value={street}
               onChange={(e) => setStreet(e.target.value)}
-              placeholder="e.g., Park Road / Sector 4"
+              placeholder="Enter Street / Colony / Road Name"
             />
           </div>
           <div>
@@ -403,7 +404,7 @@ const AddressModal = ({ isOpen, onClose, googleAuthData }: AddressModalProps) =>
               id="modal-area"
               value={area}
               onChange={(e) => setArea(e.target.value)}
-              placeholder="e.g., Golghar / Medical College Area"
+              placeholder="Enter Locality / Area / Sector"
             />
           </div>
           <div>
@@ -412,7 +413,7 @@ const AddressModal = ({ isOpen, onClose, googleAuthData }: AddressModalProps) =>
               id="modal-landmark"
               value={landmark}
               onChange={(e) => setLandmark(e.target.value)}
-              placeholder="e.g., Near Hanuman Temple"
+              placeholder="Enter Landmark / Famous Nearby Place"
             />
           </div>
          
@@ -427,7 +428,7 @@ const AddressModal = ({ isOpen, onClose, googleAuthData }: AddressModalProps) =>
               id="modal-phone"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
-              placeholder="e.g., 9876543210"
+              placeholder="Enter Phone Number"
             />
           </div>
           <div>

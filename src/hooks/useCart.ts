@@ -8,6 +8,7 @@ export interface CartItem {
   quantity: number
   image: string
   isWholesale?: boolean
+  minQty?: number
   variant?: {
     size: string
     price: number
@@ -73,7 +74,7 @@ export const useCart = () => {
           title: "Added to Cart",
           description: `${product.name}${product.variant ? ` (${product.variant.size})` : ''} added to cart`,
         })
-        return [...prevItems, { ...product, quantity: 1 }]
+        return [...prevItems, { ...product, quantity: Math.max(1, product.minQty || 1) }]
       }
     })
   }, [toast])

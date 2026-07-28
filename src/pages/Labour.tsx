@@ -157,6 +157,28 @@ function AnimatedSection({ children, className = "" }: { children: React.ReactNo
 
 /* ─── Main Labour Page ─── */
 const Labour = () => {
+  return (
+    <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-4 py-12">
+      <div className="bg-amber-100 p-6 rounded-full mb-6">
+        <HardHat className="w-16 h-16 text-amber-600" />
+      </div>
+      <h1 className="text-3xl md:text-5xl font-black text-slate-900 mb-4 tracking-tight">Labour Services</h1>
+      <div className="inline-block px-4 py-1 rounded-full bg-slate-900 text-amber-400 font-bold text-sm tracking-widest uppercase mb-6">
+        Coming Soon
+      </div>
+      <p className="text-lg text-slate-500 max-w-lg mb-8 leading-relaxed">
+        We are actively working on bringing verified, professional, and reliable construction labour right to your doorstep. Stay tuned for updates!
+      </p>
+      <Button 
+        onClick={() => window.history.back()}
+        variant="outline"
+        className="border-2 border-slate-200 hover:border-slate-300 font-bold rounded-xl h-12 px-8"
+      >
+        Go Back
+      </Button>
+    </div>
+  );
+
   const { toast } = useToast();
   const [categories, setCategories] = useState(labourCategories);
   const [selected, setSelected] = useState<any | null>(null);

@@ -197,15 +197,7 @@ export default function Search() {
   const handleAddToCart = (product: ApiProduct, e: React.MouseEvent) => {
     e.stopPropagation();
 
-    if (!isLoggedIn) {
-      toast({
-        title: "Login Required",
-        description: "Please login to add items to your cart.",
-        variant: "destructive"
-      });
-      navigate(`/login?redirect=${encodeURIComponent(window.location.pathname + window.location.search)}`);
-      return;
-    }
+
 
     // Default to first variant if none selected
     const variant = product.variants && product.variants.length > 0 ? product.variants[0] : undefined;
@@ -218,7 +210,8 @@ export default function Search() {
       price: price,
       image: image,
       variant: variant,
-      isWholesale: false
+      isWholesale: hasWholesaleAccess,
+      minQty: product.minimumpurchase
     });
 
     toast({

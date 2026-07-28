@@ -139,16 +139,6 @@ const ProductGrid = ({ category, wholesale = false }: ProductGridProps) => {
   const handleAddToCart = (product: ApiProduct, e: React.MouseEvent) => {
     e.stopPropagation()
 
-    if (!isLoggedIn) {
-      toast({
-        title: "Login Required",
-        description: "Please login to add items to your cart.",
-        variant: "destructive"
-      })
-      navigate(`/login?redirect=${encodeURIComponent(window.location.pathname + window.location.search)}`)
-      return
-    }
-
     // If product has variants and no variant is selected, default to the first one automatically for a smooth quick-add experience!
     let variant = selectedVariants[product.id]
     if (product.variants && product.variants.length > 0 && !variant) {
@@ -167,7 +157,8 @@ const ProductGrid = ({ category, wholesale = false }: ProductGridProps) => {
       price: price,
       image: getProductImage(product),
       variant: variant,
-      isWholesale: hasWholesaleAccess
+      isWholesale: hasWholesaleAccess,
+      minQty: product.minimumpurchase
     })
 
     toast({

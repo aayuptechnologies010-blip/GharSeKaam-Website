@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { useCartContext } from "@/context/CartContext";
 import { motion, AnimatePresence } from "framer-motion";
+import { useToast } from "@/components/ui/use-toast";
 
 interface DrawerCartProps {
   isOpen: boolean;
@@ -12,9 +13,22 @@ interface DrawerCartProps {
 
 export default function DrawerCart({ isOpen, onClose }: DrawerCartProps) {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const { cartItems, updateQuantity, removeFromCart, getTotalPrice } = useCartContext();
 
   const handleQuantityChange = (productId: string, newQuantity: number, variant?: { size: string }) => {
+    const item = cartItems.find(i => i.id === productId && (!variant || i.variant?.size === variant.size))
+    const min = item?.minQty || 1
+
+    if (newQuantity < min && item && item.quantity <= min) {
+      toast({
+        title: "Minimum Quantity",
+        description: `You cannot order less than ${min} units of this item.`,
+        variant: "destructive"
+      })
+      return
+    }
+
     if (newQuantity < 1) {
       removeFromCart(productId, variant);
     } else {
@@ -122,7 +136,8 @@ export default function DrawerCart({ isOpen, onClose }: DrawerCartProps) {
                           <div className="flex items-center border rounded-lg overflow-hidden bg-slate-50">
                             <button
                               onClick={() => handleQuantityChange(item.id, item.quantity - 1, item.variant)}
-                              className="h-6 w-6 hover:bg-slate-100 flex items-center justify-center border-none bg-transparent cursor-pointer"
+                              className={`h-6 w-6 hover:bg-slate-100 flex items-center justify-center border-none bg-transparent cursor-pointer ${item.minQty && item.quantity <= item.minQty ? 'opacity-50 cursor-not-allowed' : ''}`}
+                              disabled={Boolean(item.minQty && item.quantity <= item.minQty)}
                             >
                               <Minus className="h-2.5 w-2.5" />
                             </button>
